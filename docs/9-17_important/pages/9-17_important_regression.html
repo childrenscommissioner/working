@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WCM57W6');</script>
+<!-- End Google Tag Manager -->
+
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+<link rel="stylesheet" href="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/dist/scss/main.css">
+
+<link rel="icon" href="https://www.childrenscommissioner.gov.uk/wp-content/uploads/2017/06/favicon-150x150.png" sizes="32x32" />
+<link rel="icon" href="https://www.childrenscommissioner.gov.uk/wp-content/uploads/2017/06/favicon.png" sizes="192x192" />
+<link rel="apple-touch-icon-precomposed" href="https://www.childrenscommissioner.gov.uk/wp-content/uploads/2017/06/favicon.png" />
+<meta name="msapplication-TileImage" content="https://www.childrenscommissioner.gov.uk/wp-content/uploads/2017/06/favicon.png" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <title>What do children think is important for their future?: Regression analysis</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="styles.css" type="text/css" />
+  <script src="9-17_important_regression_files/header-attrs-2.3/header-attrs.js"></script>
+  <script src="9-17_important_regression_files/core-js-2.5.3/shim.min.js"></script>
+  <script src="9-17_important_regression_files/react-17.0.0/react.min.js"></script>
+  <script src="9-17_important_regression_files/react-17.0.0/react-dom.min.js"></script>
+  <script src="9-17_important_regression_files/reactwidget-1.0.0/react-tools.js"></script>
+  <script src="9-17_important_regression_files/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+  <script src="9-17_important_regression_files/reactable-binding-0.2.3/reactable.js"></script>
+  <link href="9-17_important_regression_files/tippyjs-3.2.0/themes/google.css" rel="stylesheet" />
+  <link href="9-17_important_regression_files/tippyjs-3.2.0/themes/light-border.css" rel="stylesheet" />
+  <link href="9-17_important_regression_files/tippyjs-3.2.0/themes/light.css" rel="stylesheet" />
+  <link href="9-17_important_regression_files/tippyjs-3.2.0/themes/translucent.css" rel="stylesheet" />
+  <script src="9-17_important_regression_files/tippyjs-3.2.0/tippy.all.min.js"></script>
+  <script src="9-17_important_regression_files/tippy-binding-0.1.0/tippy.js"></script>
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCM57W6"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <body class="page-template-default page page-id-83 page-child parent-pageid-4">
+    
+    <div class="topbar bg-white hidden-sm hidden-xs">
+        <div class="container text-right">
+            <span class="m-r-sm" style="color: #494850 !important; font-size: 15px; font-weight: 400;">Follow us</span>
+      <div class="icons hvr-grow">
+        <a href="https://twitter.com/ChildrensComm" target="_blank">
+          <img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/icons/twitter.svg" alt="Twitter" />
+        </a>
+      </div>
+      <div class="icons hvr-grow">
+        <a href="https://www.facebook.com/childrenscommissionersoffice" target="_blank">
+          <img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/icons/facebook.svg" alt="Facebook" />
+        </a>
+      </div>
+      <div class="icons hvr-grow">
+        <a href="https://www.youtube.com/channel/UCriFe51AU_RomWvSzZxCgfA" target="_blank">
+          <img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/icons/youtube.svg" alt="YouTube" />
+        </a>
+      </div>
+      <div class="icons hvr-grow">
+        <a href="https://www.linkedin.com/company/the-office-of-the-children%27s-commissioner" target="_blank">
+          <img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/icons/linkedin.svg" alt="LinkedIn" />
+        </a>
+      </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-inverse bg-grey" role="navigation" id="mainnav">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="https://www.childrenscommissioner.gov.uk" class="navbar-brand"><img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/LOGOCC.png" alt="Children&#039;s Commissioner for England"></a>
+            </div>
+
+            <div id="navbar" class="navbar-collapse collapse">
+
+<ul id="menu-main-menu" class="nav navbar-nav">
+<li itemscope="itemscope" itemtype="https://www.schema.org/SiteNavigationElement" id="menu-item-107" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-107"><a title="Publications" href="https://www.childrenscommissioner.gov.uk/"><< Back to main site</a></li>
+</ul>
+                </div>
+
+     </div>
+        </div>
+    </nav>
+
+<div class="container-fluid">
+
+    <div class="row bg-white p-t-lg p-b-lg">
+        <div class="container">
+            <div class="row">
+          
+               
+              
+        <div class="col-lg-12 col-md-push-1 col-lg-push-0 col-md-10">
+                  <h1 class="m-r-md" style="line-height: 38px;">What do children think is important for their future?: Regression analysis</h1>
+              </div>
+              
+              
+              		            </div>
+        </div>
+    </div>
+
+       
+    
+    <div class="row m-t-lg">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-7 col-lg-push-1 col-md-7 col-md-push-1" style="width: 830px;">
+
+                                        <div class="span12">
+                                        <nav>
+                                        <ol>
+                                        <li class="breadcrumb">
+                                        <a href="../../index.html">Home</a>
+                                        </li>
+                                        <li class="breadcrumb">
+                                        <a href="9-17_important_index.html">What do children think is important for their future?</a>
+                                        </li>
+                                        <li class="breadcrumb">
+                                        Regression analysis
+                                        </li>
+                                        </ol>
+                                        </nav>
+                                        <script src="extra_js.js"></script>
+                                        <h4>
+                                        What types of characteristics are most predictive?
+                                        </h4>
+                                        <p><img src="9-17_important_regression_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+                                        <h4>
+                                        What specific characteristics are most predictive?
+                                        </h4>
+                                        <div class="picker-group">
+                                        <p><label>Select outcome</label> <select id="reg_picker"> <option value="a_good_job_or_career">A good job or career</option> <option value="a_healthy_environment_and_planet">A healthy environment and planet</option> <option value="a_nice_home_to_live_in">A nice home to live in</option> <option value="being_part_of_a_good_local_community">Being part of a good local community</option> <option value="enough_money_to_buy_the_things_i_need">Enough money to buy the things I need</option> <option value="everyone_being_treated_fairly">Everyone being treated fairly</option> <option value="getting_on_well_with_my_current_family">Getting on well with my current family</option> <option value="good_friends">Good friends</option> <option value="good_mental_health">Good mental health</option> <option value="good_physical_health">Good physical health</option> <option value="having_a_good_education">Having a good education</option> <option value="living_in_a_nice_area_with_things_to_do">Living in a nice area with things to do</option> <option value="starting_my_own_family">Starting my own family</option></select> <button class="picker_button" onclick="picker_f('reg_picker','reg')">Go</button></p>
+                                        </div>
+                                        <div id="a_good_job_or_career" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-1.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-0197ba8eedfbdd5d4250" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-0197ba8eedfbdd5d4250">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[0.93,0.95,0.99,1.02,0.85,1.03,1.06,0.97,1.05,1.35,1.67,2.03,2.19,2.55,1.94,2.12,1.9,2.71,1.19,1.39,1.15,1.31,1.3,1.01,0.65,0.55,1.02,0.94,1.06,1.03,0.85,0.98,1.07,1.12,1.22,1.07,0.74,1.01,0.9,1.18,0.78,0.81,1.03,0.88,1.07,0.91,0.63,1.19,1.98]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"8b60ac8c2ecf6b034f4a2aa631aff19a","key":"8b60ac8c2ecf6b034f4a2aa631aff19a"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="a_healthy_environment_and_planet" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-2.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-290f94f1067fcb6b94a3" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-290f94f1067fcb6b94a3">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[0.91,0.87,0.93,0.94,1.55,1.06,1.07,1.1,1.11,0.91,0.99,0.86,0.85,0.84,0.84,0.94,1.32,0.87,1.03,0.92,0.94,0.87,0.76,1.35,1.93,1.62,1.17,1.11,1.37,1.28,0.66,0.87,0.71,0.74,0.73,1.1,0.95,0.78,1.37,0.94,0.89,0.81,1.19,1.05,0.89,0.86,1.03,0.87,0.98]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"8ddcc39f09febb0336151bee634ebe7b","key":"8ddcc39f09febb0336151bee634ebe7b"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="a_nice_home_to_live_in" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-3.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-9701193e2958e2372574" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-9701193e2958e2372574">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[0.96,0.89,0.98,1.14,0.88,0.97,0.99,0.99,0.97,0.9,0.76,0.62,0.76,0.66,0.65,0.57,0.57,0.72,0.74,1.01,0.86,0.79,0.63,1.15,0.78,0.98,1.06,1.06,1.06,1.02,1.06,0.97,1.01,1.09,1.04,0.79,0.95,0.73,1.14,1.16,1.21,1.25,0.81,1.07,0.75,1.17,1.12,1.12,1.33]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"3e3235164171def014e4296fddce083f","key":"3e3235164171def014e4296fddce083f"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="being_part_of_a_good_local_community" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-4.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-cdb34216025ab80b083a" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-cdb34216025ab80b083a">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[1.1,0.97,1.26,1.18,0.8,1.11,1.11,1.09,0.98,1.01,0.87,1.05,0.79,0.86,0.81,0.56,0.6,0.44,1.54,1.36,0.9,0.86,0.82,1.03,0.92,0.83,0.63,0.86,0.69,0.9,2.09,1.19,0.95,0.78,1.03,0.87,1.6,0.79,1.14,1.37,1.24,0.51,0.97,0.99,1.6,0.93,1.21,1.72,0.18]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"54715cc764dd56c87ce4332a802139b8","key":"54715cc764dd56c87ce4332a802139b8"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="enough_money_to_buy_the_things_i_need" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-5.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-a04c3f857e557c9e99fb" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-a04c3f857e557c9e99fb">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[1.1,1.16,1.04,0.98,0.8,1.06,1.12,1.23,1.12,1,0.9,0.87,0.88,0.98,0.96,0.96,0.89,0.82,0.71,0.99,0.93,0.9,0.91,1.17,0.92,1.16,1.1,1.02,0.97,0.96,0.97,0.98,1,1,1.03,1.02,0.84,0.97,1.04,1.03,1.38,1.08,1.11,1.12,0.91,1.33,1.18,1.03,0.98]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"111b416dc086b31fc45d7685657a9292","key":"111b416dc086b31fc45d7685657a9292"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="everyone_being_treated_fairly" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-6.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-7f477e55925b34cbf5e4" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-7f477e55925b34cbf5e4">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[1.02,1.14,1.07,1.1,1.71,0.88,0.82,0.89,0.77,0.94,1.04,0.96,1,0.93,1.14,1.47,1.01,1.12,1.4,0.86,1.24,1.05,1.27,1.59,2.45,1.62,1.14,1.03,1.01,1.06,0.86,1.2,1.08,1.02,1.18,0.74,1.33,0.9,0.97,0.99,1.1,0.86,1.37,0.92,0.99,0.91,1.3,1.02,0.89]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"4ada47fffcd8020ba0eb26076de093da","key":"4ada47fffcd8020ba0eb26076de093da"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="getting_on_well_with_my_current_family" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-7.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-3e3f6a7339a5c3fdd0b7" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-3e3f6a7339a5c3fdd0b7">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[1.05,1.06,1.07,1.09,0.99,1.05,0.92,0.99,1.02,0.89,0.89,0.95,0.99,1.01,1.03,0.83,1.15,1.05,1.13,0.96,0.95,1.01,2.05,0.97,0.85,0.4,0.89,0.99,1.07,1.01,0.85,1.01,1.03,0.98,0.88,0.95,1.47,0.96,0.96,0.94,1,0.99,0.76,0.82,1,0.71,1.12,0.93,0.92]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"d9026b751af26c4536171d97cfde3750","key":"d9026b751af26c4536171d97cfde3750"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="good_friends" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-8.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-00ece7b0eed63cd5cd21" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-00ece7b0eed63cd5cd21">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[1.05,0.98,0.93,0.94,0.78,0.9,1.06,0.98,0.84,0.85,0.94,0.98,1.04,1.07,1.27,1.32,1.13,1.23,0.85,0.76,0.82,0.94,0.62,0.8,0.79,1.28,1.02,1.04,1.06,1.06,1.23,1.04,0.99,0.98,0.85,0.72,0.88,1.19,0.95,0.92,0.95,0.83,0.96,1.12,1.05,0.98,0.68,0.98,1.61]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"960931f1e4fce64202918a23590f94d8","key":"960931f1e4fce64202918a23590f94d8"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="good_mental_health" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-9.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-2358c14891b00fbbba8b" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-2358c14891b00fbbba8b">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[0.95,0.93,0.79,0.87,1.55,1.1,1.17,1,1.14,1.09,1.4,1.72,1.73,1.79,1.94,2.32,2.5,1.26,0.93,0.79,0.76,0.96,0.96,1.2,1.15,1.24,1.02,1,0.92,0.98,0.86,0.94,0.93,0.9,0.89,0.91,0.83,0.8,0.97,0.96,0.93,1.15,1.86,0.95,1.13,0.91,0.65,0.99,0.6]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"8f928e5e6befd8bb7a3b696207b2faff","key":"8f928e5e6befd8bb7a3b696207b2faff"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="good_physical_health" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-10.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-6e48d10b412db0eda839" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-6e48d10b412db0eda839">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[0.91,0.95,0.73,0.85,0.98,1.1,1.14,1.03,0.85,0.95,1.09,1.34,1.2,1.52,1.54,1.98,1.71,0.89,1.01,1,0.83,0.91,1,0.74,0.59,0.96,1.15,1.1,1.02,1.09,0.79,0.83,0.92,0.87,1.06,0.88,0.78,0.9,1,0.95,1.12,0.98,0.85,1.43,1.01,0.88,0.52,0.71,0.75]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"56e60040c4c446f5ba1212997a01dddf","key":"56e60040c4c446f5ba1212997a01dddf"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="having_a_good_education" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-11.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-de360841949c285934fb" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-de360841949c285934fb">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[1.12,1.12,1.16,1.21,1.1,0.88,0.8,0.83,1.01,1.25,1.3,1.13,0.76,0.61,0.56,0.39,0.42,0.72,1.86,1.24,1.26,1.02,1.25,0.85,1.05,0.73,0.98,0.86,0.87,0.86,1.07,1.06,1.33,1.13,1.16,1.44,0.9,0.92,1.01,0.95,0.64,0.73,0.95,0.86,0.99,0.83,1.3,1.21,0.94]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"2469c3fb54c865176b290a8744f6292a","key":"2469c3fb54c865176b290a8744f6292a"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="living_in_a_nice_area_with_things_to_do" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-12.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-c4d126f0d45edeb30899" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-c4d126f0d45edeb30899">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[0.94,0.75,0.87,0.8,0.79,1.02,1.16,1.23,1.13,1.2,0.97,0.8,0.87,1.04,1.14,1.09,0.56,0.8,0.83,0.93,0.62,0.85,0.84,1.08,0.58,1.54,0.85,0.97,0.8,0.82,1.04,0.98,0.97,0.98,0.87,1.2,1.17,1.06,1.22,1.09,0.93,1.09,0.77,1.01,0.85,0.96,1.07,1.53,0.53]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"a8776295def605d6fe031fe5ed14a601","key":"a8776295def605d6fe031fe5ed14a601"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="starting_my_own_family" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_important_regression_files/figure-html/unnamed-chunk-7-13.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-5233c545fd40fddeb8c2" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-5233c545fd40fddeb8c2">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Age","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Child chars: Gender","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","9","White","White","White","White","White","Male","Male","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[1.05,1,1.06,0.92,0.97,1.21,1.03,1.16,1.14,1.14,1.05,1.14,1.1,1.17,1.22,1.12,1.43,1.12,0.76,1.15,1.34,1.13,1.23,0.89,0.37,0.61,0.99,0.96,0.91,0.83,1.18,0.87,0.92,0.95,1.05,1,1.08,1.13,0.77,1.05,0.83,1.05,0.93,0.98,0.8,1.31,0.69,0.85,1.41]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character"},{"accessor":"Ref category","name":"Ref category","type":"character"},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric"}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":49,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"f1a653a28928ec62cb22ffef7470f5b8","key":"f1a653a28928ec62cb22ffef7470f5b8"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <h4>
+                                        How well can we predict these outcomes overall?
+                                        </h4>
+                                        <p><img src="9-17_important_regression_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
+                          
+                    </div>
+              </div>
+            </div>
+
+        </div>
+   </div>     
+        
+<footer class="m-t-xl">
+      
+
+      <div class="bg-dark p-t-lg p-b-md">
+        <div class="container m-t-md">
+          <div class="col-md-3 col-md-push-4 col-xs-10 col-xs-push-1 col-sm-push-2 m-b-lg text-center-sm text-center-xs">
+
+          </div>
+
+          <div class="clearfix visible-sm visible-xs"></div>
+
+          <div class="col-md-4 col-md-pull-3 m-b-lg text-center-sm">
+
+          </div>
+
+          <div class="col-md-4 col-md-push-1 text-right text-center-sm text-center-xs">
+            <div>
+              <a href="https://www.childrenscommissioner.gov.uk">
+                <img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/LOGOCC.png" alt="Children&#039;s Commissioner for England" class="footerlogo inline-block img-responsive m-b-md">
+              </a>
+            </div>
+
+            <div class="clearfix"></div>
+            <div class="text-white text-16">&copy;2019 The Children's Commissioner's Office</div>
+          </div>
+
+          <div class="clear clearfix"></div>
+        </div>
+      </div>
+    </footer>
+
+</body>
+</html>

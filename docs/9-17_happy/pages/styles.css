@@ -90,7 +90,7 @@ margin-bottom: 2%;
 
 .breadcrumb ol {
     list-style-type: none;
-    padding-left: 0;
+    padding: 0;
 }
 
 
@@ -101,7 +101,7 @@ margin-bottom: 2%;
 .breadcrumb a::after {
     display: inline-block;
     color: #000;
-    content: '>';
+    content: '>>';
     font-size: 80%;
     font-weight: bold;
     padding: 0 3px;

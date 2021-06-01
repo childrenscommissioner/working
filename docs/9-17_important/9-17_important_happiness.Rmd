@@ -1,0 +1,143 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "`r paste0(params$section,': ',params$pg)`"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+   theme: null
+   template: "CCO_template_html.html"
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+```
+
+```{r, results='asis'}
+
+cat(paste0(
+  '<nav>
+<ol>
+<li class="breadcrumb"><a href="index.html">Home</a></li>
+<li class="breadcrumb"><a href="',params$var,'_index.html">',params$section,'</a></li>
+<li class="breadcrumb">',params$pg,'</li>
+</ol>
+</nav>'
+))
+
+```
+
+
+## `r params$pg`
+
+**% of respondents that are unhappy with something and that felt something is important for their future**
+
+```{r, fig.width=10}
+hap_col<-names(df)[grepl("id|happy.*_clean|important_|^wt$",names(df))]
+
+df_imp<-df[`q2_important_I dont want to say` %in% c(NA,"No")][,..hap_col]
+
+hap_cols<-hap_col[grepl("happy",hap_col)]
+
+imp_cols<-hap_col[grepl("imp",hap_col) & !grepl("dont|wt|Other",hap_col)]
+
+pal<-RColorBrewer::brewer.pal(7,"Reds")
+
+corr_list<-rbindlist(lapply(hap_cols,function(x){
+  
+  col<-c("id",x,imp_cols,"wt")
+  
+  tb<-melt(df_imp[,..col
+         ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) %in% c("dont know","I dont know"),NA,
+                                           ifelse(get(x) %in% c("Unhappy","Very unhappy","sad"),1,0))
+                              ][,value:=ifelse(value=="Yes",1,0)
+                                ][,.(c=sum(wt)),by=.(hap=get(x),variable,value)
+                                  ][,perc:=c/sum(c),by=.(variable,hap)
+                                    ][hap==1 & value==1]
+  
+  tb$hap_var<-splitF(q_lookup_hap$label[q_lookup_hap$var==x])
+  
+  tb$variable<-plyr::mapvalues(tb$variable,q_lookup$var,sapply(q_lookup$label,splitF))
+  
+  tb
+})
+)
+
+corr_list$hap_var<-factor(corr_list$hap_var,
+                          levels= sapply(q_lookup_hap$label,splitF))
+
+corr_list$variable<-factor(corr_list$variable,
+                          levels= sapply(q_lookup$label,splitF))
+
+ggplot(corr_list,
+       aes(x=variable,y=hap_var,fill=perc*100))+geom_tile(colour="grey50")+geom_text(aes(label=paste0(round(perc,2)*100,"%")))+
+  theme(axis.text.x = element_text(angle=90),
+        panel.grid=element_blank(),
+        panel.background = element_blank(),
+        axis.ticks=element_blank())+
+  scale_fill_gradient(low=pal[1],high=pal[length(pal)],name="% of children unhappy\nabout row")+
+  ylab("Children are unhappy with...")+xlab("Children think x is important...")
+
+```
+
+**Correlation between what children are unhappy with and what they feel is important**
+
+*Note: red = stronger positive correlation (i.e. children selecting row are more likely to also select column in the chart below), blue = stronger negative correlation*
+
+```{r, fig.width=10}
+
+hap_col<-names(df)[grepl("id|happy.*_clean|important_|^wt$",names(df))]
+
+df_imp<-df[`q2_important_I dont want to say` %in% c(NA,"No")][,..hap_col]
+
+hap_cols<-hap_col[grepl("happy",hap_col)]
+
+imp_cols<-hap_col[grepl("imp",hap_col) & !grepl("dont|Other|wt",hap_col)]
+
+corr_list<-rbindlist(lapply(hap_cols,function(x){
+  
+  col<-c("id",x,imp_cols,"wt")
+  
+  tb<-melt(df_imp[,..col
+         ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) %in% c("dont know","I dont know"),NA,
+                                           ifelse(get(x) %in% c("Unhappy","Very unhappy","sad"),1,0))
+                              ][!is.na(get(x)) & !is.na(value)][,value:=ifelse(value=="Yes",1,0)
+                                ][,.(c=sum(wt)),by=.(hap=get(x),variable,value)
+                                  ][,perc:=c/sum(c),by=.(hap,variable)
+                                    ]
+  
+  tb<-dcast(tb[value==1][,.(variable,perc,hap)],variable~hap,value.var="perc"
+            )[,rr:=`1`/`0`][,.(variable,rr)]
+  
+  
+  tb$hap_var<-splitF(q_lookup_hap$label[q_lookup_hap$var==x])
+  
+  tb$variable<-plyr::mapvalues(tb$variable,q_lookup$var,sapply(q_lookup$label,splitF))
+  
+  tb
+})
+)
+
+corr_list$hap_var<-factor(corr_list$hap_var,levels=sapply(q_lookup_hap$label,splitF))
+corr_list$variable<-factor(corr_list$variable,levels=sapply(q_lookup$label,splitF))
+
+pal_div<-RColorBrewer::brewer.pal(7,"RdBu")
+
+ggplot(corr_list,
+       aes(x=variable,y=hap_var,fill=rr))+geom_tile(colour="grey50")+
+  geom_text(aes(label=round(rr,2)))+
+  theme(axis.text.x = element_text(angle=90),
+        panel.grid=element_blank(),
+        panel.background = element_blank(),
+        axis.ticks=element_blank())+
+  scale_fill_gradient2(low=pal_div[length(pal_div)],high=pal_div[1],midpoint=1,name="Relative risk\n(Children unhappy with row\nare x times more\nlikely to think\ncolumn is important)")+
+  ylab("Children are unhappy with...")+xlab("Children think x is important...")
+
+
+```

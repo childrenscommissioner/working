@@ -1,0 +1,126 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "`r paste0(params$section,': ',params$pg)`"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+   theme: null
+   template: "CCO_template_html.html"
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+```
+
+```{r, results='asis'}
+
+cat(paste0(
+  '<nav>
+<ol>
+<li class="breadcrumb"><a href="index.html">Home</a></li>
+<li class="breadcrumb"><a href="',params$var,'_index.html">',params$section,'</a></li>
+<li class="breadcrumb">',params$pg,'</li>
+</ol>
+</nav>'
+))
+
+```
+
+
+### Link to importance for future
+
+<h3>How is this different based on what they think is important for the future?</h3>
+
+*% of respondents overall saying both that something is important for their future and that they think its unlikely they will have a better life than their parents*
+
+
+```{r, fig.width=10, include=F}
+
+hap_col<-names(df)[grepl("id|important_|parents_clean$|wt",names(df))]
+
+df_imp<-df[!q4_parents_clean %in% dk_vals][,..hap_col]
+
+hap_cols<-hap_col[grepl("important",hap_col) & !grepl("dont",hap_col)]
+
+imp_cols<-hap_col[grepl("parents_clean",hap_col) & !grepl("dont want|wt",hap_col)]
+
+corr_list<-rbindlist(lapply(hap_cols,function(x){
+  
+  col<-c("id",x,imp_cols,"wt")
+  
+  tb<-melt(df_imp[,..col
+         ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) =="Yes",1,0)
+                              ][,value:=ifelse(value %in% target_vals,1,0)
+                                ][,.(c=sum(wt)),by=.(hap=get(x),variable,value)
+                                  ][,perc:=c/sum(c),by=.(variable)
+                                    ][hap==1 & value==1]
+  
+  tb$hap_var<-splitF(q_lookup_imp$label[q_lookup_imp$var==x])
+  
+  tb$variable<-plyr::mapvalues(tb$variable,q_lookup$var,sapply(q_lookup$label,splitF))
+  
+  tb
+})
+)
+
+ggplot(corr_list,
+       aes(x=reorder(hap_var,perc),y=perc*100,group=variable,fill=variable))+geom_col(colour="grey50",position = position_dodge(0.9))+geom_text(aes(label=paste0(round(perc,2)*100,"%")),position = position_dodge(0.9),hjust=-0.1)+scale_y_continuous(limits=c(0,max(corr_list$perc*100,na.rm=T)*1.1))+
+  theme(axis.text.x = element_text(angle=90),
+        panel.grid=element_blank(),
+        panel.background = element_blank(),
+        axis.ticks=element_blank())+
+  scale_fill_brewer(type="qual",palette=3, name="", guide=F)+coord_flip()+
+  ylab("%\n")+xlab("")
+
+```
+
+*Correlation between what children think is important and whether they think it is unlikely they will have a better life than their parents*
+
+*Bars = % of children saying they think an item is important that think its unlikely they will have a better life than their parents*
+
+```{r, fig.width=10}
+
+hap_col<-names(df)[grepl("id|important_|parents_clean$|wt",names(df))]
+
+df_imp<-df[!q4_parents_clean %in% dk_vals][,..hap_col]
+
+hap_cols<-hap_col[grepl("important",hap_col) & !grepl("dont",hap_col)]
+
+imp_cols<-hap_col[grepl("parents_clean",hap_col) & !grepl("dont want|wt",hap_col)]
+
+corr_list<-rbindlist(lapply(hap_cols,function(x){
+  
+  col<-c("id",x,imp_cols,"wt")
+  
+  tb<-melt(df_imp[,..col
+         ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) =="Yes",1,0)
+                              ][,value:=ifelse(value %in% target_vals,1,0)
+                                ][,.(c=sum(wt)),by=.(hap=get(x),variable,value)
+                                  ][,perc:=c/sum(c),by=.(hap,variable)
+                                    ][hap==1 & value==1]
+  
+  tb$hap_var<-splitF(q_lookup_imp$label[q_lookup_imp$var==x])
+  
+  tb$variable<-plyr::mapvalues(tb$variable,q_lookup$var,sapply(q_lookup$label,splitF))
+  
+  tb
+})
+)
+
+ggplot(corr_list,
+       aes(x=reorder(hap_var,perc),y=perc*100,group=variable,fill=variable))+geom_col(colour="grey50",position = position_dodge(0.9))+geom_text(aes(label=paste0(round(perc,2)*100,"%")),position = position_dodge(0.9),hjust=-0.1)+scale_y_continuous(limits=c(0,max(corr_list$perc*100,na.rm=T)*1.1))+
+  theme(axis.text.x = element_text(angle=90),
+        panel.grid=element_blank(),
+        panel.background = element_blank(),
+        axis.ticks=element_blank())+
+  scale_fill_brewer(type="qual",palette=3, name="", guide=F)+coord_flip()+
+  ylab("%\n")+xlab("")
+
+```
