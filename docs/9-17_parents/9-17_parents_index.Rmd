@@ -14,7 +14,7 @@ output:
 knitr::opts_chunk$set(echo = F)
 ```
 
-<a href="index.html">Home</a></li>
+<a href="../../index.html">Home</a></li>
 
 <h3>Overall Rates</h3>
 
@@ -37,7 +37,7 @@ knitr::opts_chunk$set(echo = F)
 <h3 class="list_header">Vulnerable children</h3></a>
 </div>
 
-<h3>How is this different in different based on where children live?</h3>
+<h3>How is this different based on where children live?</h3>
 
 <div class="topic_navList">
 <a class="meta_navList_link" href="9-17_parents_map.html">
@@ -49,7 +49,7 @@ knitr::opts_chunk$set(echo = F)
 <h3 class="list_header">Differences by local area characteristics</h3></a>
 </div>
 
-<h3>How is this different in different based on where children go to school?</h3>
+<h3>How is this different based on where children go to school?</h3>
 
 <div class="topic_navList">
 <a class="meta_navList_link" href="9-17_parents_school.html">

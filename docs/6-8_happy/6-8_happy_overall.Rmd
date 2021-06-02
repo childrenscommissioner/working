@@ -82,17 +82,8 @@ age_grp<-"6-8"
 
 ```
 
-```{r, results='asis'}
+```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
 
-cat(paste0(
-  '<nav>
-<ol>
-<li class="breadcrumb"><a href="index.html">Home</a></li>
-<li class="breadcrumb"><a href="',params$var,'_index.html">',params$section,'</a></li>
-<li class="breadcrumb">',params$pg,'</li>
-</ol>
-</nav>'
-))
 
 ```
 
