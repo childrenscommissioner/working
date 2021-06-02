@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WCM57W6');</script>
+<!-- End Google Tag Manager -->
+
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+<link rel="stylesheet" href="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/dist/scss/main.css">
+
+<link rel="icon" href="https://www.childrenscommissioner.gov.uk/wp-content/uploads/2017/06/favicon-150x150.png" sizes="32x32" />
+<link rel="icon" href="https://www.childrenscommissioner.gov.uk/wp-content/uploads/2017/06/favicon.png" sizes="192x192" />
+<link rel="apple-touch-icon-precomposed" href="https://www.childrenscommissioner.gov.uk/wp-content/uploads/2017/06/favicon.png" />
+<meta name="msapplication-TileImage" content="https://www.childrenscommissioner.gov.uk/wp-content/uploads/2017/06/favicon.png" />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <title>Do children think its likely they will have a better life than their parents?: Regression analysis</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="styles.css" type="text/css" />
+  <script src="9-17_parents_regression_files/header-attrs-2.3/header-attrs.js"></script>
+  <script src="9-17_parents_regression_files/core-js-2.5.3/shim.min.js"></script>
+  <script src="9-17_parents_regression_files/react-17.0.0/react.min.js"></script>
+  <script src="9-17_parents_regression_files/react-17.0.0/react-dom.min.js"></script>
+  <script src="9-17_parents_regression_files/reactwidget-1.0.0/react-tools.js"></script>
+  <script src="9-17_parents_regression_files/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+  <script src="9-17_parents_regression_files/reactable-binding-0.2.3/reactable.js"></script>
+  <link href="9-17_parents_regression_files/tippyjs-3.2.0/themes/google.css" rel="stylesheet" />
+  <link href="9-17_parents_regression_files/tippyjs-3.2.0/themes/light-border.css" rel="stylesheet" />
+  <link href="9-17_parents_regression_files/tippyjs-3.2.0/themes/light.css" rel="stylesheet" />
+  <link href="9-17_parents_regression_files/tippyjs-3.2.0/themes/translucent.css" rel="stylesheet" />
+  <script src="9-17_parents_regression_files/tippyjs-3.2.0/tippy.all.min.js"></script>
+  <script src="9-17_parents_regression_files/tippy-binding-0.1.0/tippy.js"></script>
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCM57W6"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <body class="page-template-default page page-id-83 page-child parent-pageid-4">
+    
+    <div class="topbar bg-white hidden-sm hidden-xs">
+        <div class="container text-right">
+            <span class="m-r-sm" style="color: #494850 !important; font-size: 15px; font-weight: 400;">Follow us</span>
+      <div class="icons hvr-grow">
+        <a href="https://twitter.com/ChildrensComm" target="_blank">
+          <img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/icons/twitter.svg" alt="Twitter" />
+        </a>
+      </div>
+      <div class="icons hvr-grow">
+        <a href="https://www.facebook.com/childrenscommissionersoffice" target="_blank">
+          <img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/icons/facebook.svg" alt="Facebook" />
+        </a>
+      </div>
+      <div class="icons hvr-grow">
+        <a href="https://www.youtube.com/channel/UCriFe51AU_RomWvSzZxCgfA" target="_blank">
+          <img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/icons/youtube.svg" alt="YouTube" />
+        </a>
+      </div>
+      <div class="icons hvr-grow">
+        <a href="https://www.linkedin.com/company/the-office-of-the-children%27s-commissioner" target="_blank">
+          <img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/icons/linkedin.svg" alt="LinkedIn" />
+        </a>
+      </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-inverse bg-grey" role="navigation" id="mainnav">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="https://www.childrenscommissioner.gov.uk" class="navbar-brand"><img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/LOGOCC.png" alt="Children&#039;s Commissioner for England"></a>
+            </div>
+
+            <div id="navbar" class="navbar-collapse collapse">
+
+<ul id="menu-main-menu" class="nav navbar-nav">
+<li itemscope="itemscope" itemtype="https://www.schema.org/SiteNavigationElement" id="menu-item-107" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-107"><a title="Publications" href="https://www.childrenscommissioner.gov.uk/"><< Back to main site</a></li>
+</ul>
+                </div>
+
+     </div>
+        </div>
+    </nav>
+
+<div class="container-fluid">
+
+    <div class="row bg-white p-t-lg p-b-lg">
+        <div class="container">
+            <div class="row">
+          
+               
+              
+        <div class="col-lg-12 col-md-push-1 col-lg-push-0 col-md-10">
+                  <h1 class="m-r-md" style="line-height: 38px;">Do children think its likely they will have a better life than their parents?: Regression analysis</h1>
+              </div>
+              
+              
+              		            </div>
+        </div>
+    </div>
+
+       
+    
+    <div class="row m-t-lg">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-7 col-lg-push-1 col-md-7 col-md-push-1" style="width: 830px;">
+
+                                        <div class="span12">
+                                        <nav>
+                                        <ol>
+                                        <li class="breadcrumb">
+                                        <a href="../../index.html">Home</a>
+                                        </li>
+                                        <li class="breadcrumb">
+                                        <a href="9-17_parents_index.html">Do children think its likely they will have a better life than their parents?</a>
+                                        </li>
+                                        <li class="breadcrumb">
+                                        Regression analysis
+                                        </li>
+                                        </ol>
+                                        </nav>
+                                        <script src="extra_js.js"></script>
+                                        <h4>
+                                        What types of characteristics are most predictive?
+                                        </h4>
+                                        <p><img src="9-17_parents_regression_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+                                        <h4>
+                                        What specific characteristics are most predictive?
+                                        </h4>
+                                        <div class="picker-group">
+                                        <p><label>Select outcome</label> <select id="reg_picker"> <option value="children_think_its_likely_they_will_have_a_better_life_than_their_parents">Children think its likely they will have a better life than their parents</option> <option value="children_think_its_unlikely_they_will_have_a_better_life_than_their_parents">Children think its unlikely they will have a better life than their parents</option></select> <button class="picker_button" onclick="picker_f('reg_picker','reg')">Go</button></p>
+                                        </div>
+                                        <div id="children_think_its_likely_they_will_have_a_better_life_than_their_parents" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_parents_regression_files/figure-html/unnamed-chunk-7-1.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-39ddd92881458d5672b4" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-39ddd92881458d5672b4">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Important: A good job or career - ``Yes","Important: A healthy environment and planet - ``Yes","Important: A nice home to live in - ``Yes","Important: Being part of a good local community - ``Yes","Important: Enough money to buy the things I need - ``Yes","Important: Everyone being treated fairly - ``Yes","Important: Getting on well with my current family - ``Yes","Important: Good friends - ``Yes","Important: Good mental health - ``Yes","Important: Good physical health - ``Yes","Important: Having a good education - ``Yes","Important: Living in a nice area with things to do - ``Yes","Important: Starting my own family - ``Yes","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","White","White","White","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[0.93,0.98,1.11,0.94,1.08,0.87,0.94,0.88,0.87,1.13,1.18,1.24,1.11,1.09,1,0.83,1.12,0.46,0.39,0.55,1.01,1.14,1.31,1.5,1.64,0.72,1.12,1.1,1.03,1.03,1.15,1.23,1.51,1.07,1,1.2,1.54,1.11,0.99,1.02,0.95,0.72,0.8,1.16,0.91,1.23,1.01,1.12,1.13,0.93,1.17,0.91,0.9,0.96,0.84,0.99,1.33],"Significant at 5% level":["","","","","","","","","","","","Yes","","","","","","Yes","Yes","Yes","","","Yes","Yes","Yes","","","","","","","","Yes","","","Yes","Yes","","","","","Yes","Yes","Yes","","","","","Yes","","Yes","","","","Yes","",""]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character","minWidth":300},{"accessor":"Ref category","name":"Ref category","type":"character","minWidth":200},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric","minWidth":100},{"accessor":"Significant at 5% level","name":"Significant at 5% level","type":"character","minWidth":200}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":57,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"20f8506b859c5920f7728a30d3b15225","key":"20f8506b859c5920f7728a30d3b15225"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <div id="children_think_its_unlikely_they_will_have_a_better_life_than_their_parents" class="sect reg">
+                                        <p><strong>Overall predictive power</strong> <img src="9-17_parents_regression_files/figure-html/unnamed-chunk-7-2.png" width="1056" /> <strong>Odds ratios</strong></p>
+                                        <em>Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included</em>
+                                        <div style="margin:auto;text-align:center">
+                                        <div id="htmlwidget-cf7280ef0419d78113b8" class="reactable html-widget" style="width:auto;height:auto;">
+
+                                        </div>
+                                        <script type="application/json" data-for="htmlwidget-cf7280ef0419d78113b8">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Predictor":["Area chars: Crime rate quintile - 2","Area chars: Crime rate quintile - 3","Area chars: Crime rate quintile - 4","Area chars: Crime rate quintile - 5","Vulnerability: Receiving MH support","Area chars: Cum. COVID rate quintile - 2","Area chars: Cum. COVID rate quintile - 3","Area chars: Cum. COVID rate quintile - 4","Area chars: Cum. COVID rate quintile - 5","Child chars: Age - 10","Child chars: Age - 11","Child chars: Age - 12","Child chars: Age - 13","Child chars: Age - 14","Child chars: Age - 15","Child chars: Age - 16","Child chars: Age - 17","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Ethnic group","Child chars: Gender","Area chars: IDACI quintile - 2","Area chars: IDACI quintile - 3","Area chars: IDACI quintile - 4","Area chars: IDACI quintile - 5","Vulnerability: Kinship care","Area chars: Days of missed face to face learning quintile - 2","Area chars: Days of missed face to face learning quintile - 3","Area chars: Days of missed face to face learning quintile - 4","Area chars: Days of missed face to face learning quintile - 5","Unhappy with: My friendships","Unhappy with: My experiences online","Unhappy with: My personal safety","Unhappy with: My access to somewhere outside to have fun","Unhappy with: The choice of things to do in my local area","Unhappy with: Life at school or college","Unhappy with: My progress in education","Unhappy with: My mental health","Unhappy with: My physical health","Unhappy with: My family's health","Unhappy with: My family life","Unhappy with: My family's ability to buy things we need","Important: A good job or career - ``Yes","Important: A healthy environment and planet - ``Yes","Important: A nice home to live in - ``Yes","Important: Being part of a good local community - ``Yes","Important: Enough money to buy the things I need - ``Yes","Important: Everyone being treated fairly - ``Yes","Important: Getting on well with my current family - ``Yes","Important: Good friends - ``Yes","Important: Good mental health - ``Yes","Important: Good physical health - ``Yes","Important: Having a good education - ``Yes","Important: Living in a nice area with things to do - ``Yes","Important: Starting my own family - ``Yes","Vulnerability: Has a social worker","Vulnerability: Is young carer"],"Ref category":["1","1","1","1","Not","1","1","1","1","9","9","9","9","9","9","9","9","White","White","White","Male","1","1","1","1","Not","1","1","1","1","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not","Not"],"Odds ratio":[1.04,0.96,1.33,1.16,1.13,1.15,1.56,0.9,1.09,0.78,0.81,0.7,0.52,0.71,0.75,0.61,0.69,0.61,0.77,0.91,0.91,0.86,0.83,1,1.1,1.17,0.9,0.79,0.92,0.83,1.36,1.65,1.18,1.49,1.11,1.66,1.44,1.42,1.2,1.39,1.16,1.16,0.83,1.04,0.83,0.95,1.01,0.93,1,0.89,0.8,0.75,0.81,0.83,0.67,1.1,1.51],"Significant at 5% level":["","","","","","","Yes","","","","","Yes","Yes","","","Yes","","Yes","","","","","","","","","","","","","","Yes","","Yes","","Yes","Yes","Yes","","","","","","","","","","","","","Yes","Yes","Yes","","Yes","",""]},"columns":[{"accessor":"Predictor","name":"Predictor","type":"character","minWidth":300},{"accessor":"Ref category","name":"Ref category","type":"character","minWidth":200},{"accessor":"Odds ratio","name":"Odds ratio","type":"numeric","minWidth":100},{"accessor":"Significant at 5% level","name":"Significant at 5% level","type":"character","minWidth":200}],"resizable":true,"searchable":true,"defaultSortDesc":true,"defaultPageSize":57,"paginationType":"numbers","showPageInfo":true,"minRows":1,"bordered":true,"showSortable":true,"inline":true,"language":{"searchPlaceholder":"Search table...","searchLabel":""},"dataKey":"495438d0b91c15b5ac743bdc5a1fabc2","key":"495438d0b91c15b5ac743bdc5a1fabc2"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+                                        </div>
+                                        </div>
+                                        <h4>
+                                        How well can we predict these outcomes overall?
+                                        </h4>
+                                        <p><img src="9-17_parents_regression_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
+                          
+                    </div>
+              </div>
+            </div>
+
+        </div>
+   </div>     
+        
+<footer class="m-t-xl">
+      
+
+      <div class="bg-dark p-t-lg p-b-md">
+        <div class="container m-t-md">
+          <div class="col-md-3 col-md-push-4 col-xs-10 col-xs-push-1 col-sm-push-2 m-b-lg text-center-sm text-center-xs">
+
+          </div>
+
+          <div class="clearfix visible-sm visible-xs"></div>
+
+          <div class="col-md-4 col-md-pull-3 m-b-lg text-center-sm">
+
+          </div>
+
+          <div class="col-md-4 col-md-push-1 text-right text-center-sm text-center-xs">
+            <div>
+              <a href="https://www.childrenscommissioner.gov.uk">
+                <img src="https://www.childrenscommissioner.gov.uk/wp-content/themes/childrenscommissioner/assets/img/LOGOCC.png" alt="Children&#039;s Commissioner for England" class="footerlogo inline-block img-responsive m-b-md">
+              </a>
+            </div>
+
+            <div class="clearfix"></div>
+            <div class="text-white text-16">&copy;2019 The Children's Commissioner's Office</div>
+          </div>
+
+          <div class="clear clearfix"></div>
+        </div>
+      </div>
+    </footer>
+
+</body>
+</html>
