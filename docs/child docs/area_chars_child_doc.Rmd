@@ -1,0 +1,243 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "`r paste0(params$section,': ',params$pg)`"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+   theme: null
+   template: "CCO_template_html.html"
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+```
+
+```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
+
+
+```
+
+<script src="extra_js.js"></script>
+
+```{r, results='asis'}
+if(seg){
+
+  suffix<-"_seg"
+}else{
+  suffix<-""
+}
+
+cat(
+  paste0('
+   <div class="picker-group">
+<label>Select characteristic</label>
+<select id="area_picker',suffix,'">
+<option value="urban',suffix,'">Urban/rural</option>
+<option value="idaci',suffix,'">Income deprivation affecting children</option>
+<option value="covid',suffix,'">Cumulative LA COVID case rate</option>
+<option value="learn_loss',suffix,'">LA rates of missed face to face teaching up to Dec 2020</option>
+<option value="crime_all',suffix,'">Crime rates in an area</option>
+<option value="obese',suffix,'">LA Child obesity rates (Yr 6 pupils)</option>
+</select>
+<button class="picker_button" onclick="picker_f(',"'",'area_picker',suffix,"'",",'area",suffix,"'",')">Go</button>
+</div> 
+  ')
+)
+```
+
+
+*Please select area characteristic of interest and press Go. Note: all characteristics are based on respondents' LSOA of residence with the exception of estimated days of missed face-to-face teaching estimates and child obesity rates which are LA level*
+
+```{r, results='asis'}
+
+  cat(
+    paste0('<div id="urban',suffix,'" class="sect area',suffix,'">\n'
+             )
+  )
+
+
+```
+
+```{r}
+
+df_urb<-table_f("ru11ind")[,urb:=ifelse(grepl("[A-C]",ru11ind),"Urban","Rural")
+                           ][!is.na(value)]
+
+two_way_tb_f(df_urb,"urb","Rural vs Urban",col1)
+
+```
+
+</div>
+
+
+```{r, results='asis'}
+
+  cat(
+    paste0('<div id="idaci',suffix,'" class="sect area',suffix,'">\n'
+             )
+  )
+
+
+```
+
+```{r}
+
+if(!"idaci_decile" %in% names(df)){
+
+df<-merge(df,imd[`Indices of Deprivation`=="i. Income Deprivation Affecting Children Index (IDACI)",.(idaci_decile=Value,FeatureCode)],
+             by.x="lsoa11",by.y="FeatureCode",all.x=T)
+}
+
+df_idaci<-table_f("idaci_decile")[!is.na(idaci_decile) & !is.na(value)
+                                  ]
+
+two_way_tb_f(df_idaci,"idaci_decile","Highest vs lowest",col1,
+             mult_cols=T,test_vals=c(1,5),
+             columnGroups = list(colGroup(name="IDACI quintile (1 = most deprived)",as.character(c(1:5))))
+             )
+
+
+
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+  cat(
+    paste0('<div id="covid',suffix,'" class="sect area',suffix,'">\n'
+             )
+  )
+
+
+```
+
+```{r}
+
+if(! "covid_quintile" %in% names(df)){
+covid<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/covidCaseRate_1205.csv")
+
+covid<-covid[,perc_rank:=frank(caseRate)/.N
+             ][,covid_quintile:=ceiling(perc_rank/0.2)]
+
+df<-merge(df,covid,by.y="areaCode",by.x="UTLA19CD",all.x=T)
+
+}
+
+df_age<-table_f("covid_quintile",df_use=df)[!is.na(covid_quintile)]
+
+
+two_way_tb_f(df_age,"covid_quintile","Highest quintle vs lowest",col1,mult_cols=T,test_vals=c(1,5),
+             columnGroups = list(colGroup(name="Cumulative COVID case rate quintile (5= highest rate)",as.character(c(1:5))))
+             )
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+  cat(
+    paste0('<div id="learn_loss',suffix,'" class="sect area',suffix,'">\n'
+             )
+  )
+
+
+```
+
+```{r}
+
+if(!"loss10" %in% names(df)){
+la_loss<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/la_learningLoss.csv")
+
+la_loss<-la_loss[Phase=="All state-funded schools",.(UTLA19CD=`Local Authority Code`,loss_rate=`Days of classroom learning missed per pupil (9th September to 10th December)`)
+                 ][,loss10:=ceiling((frank(loss_rate)/.N)/0.2)]
+
+df<-merge(df,la_loss,by="UTLA19CD",all.x=T)
+}
+
+df_age<-table_f("loss10")[!is.na(loss10)]
+
+two_way_tb_f(df_age,"loss10","Highest quintle vs lowest",col1,mult_cols=T,test_vals=c(1,5),
+             columnGroups = list(colGroup(name="Learning lost per pupil quintile (5= highest rate)",as.character(c(1:5))))
+             )
+             
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+  cat(
+    paste0('<div id="obese',suffix,'" class="sect area',suffix,'">\n'
+             )
+  )
+
+
+```
+
+```{r}
+
+if(!"obese_rate" %in% names(df)){
+obese<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/obesity.csv")
+
+obese<-obese[,.(UTLA19CD=`Area Code`,obese_rate)
+                 ][,obese_rate:=ceiling((frank(obese_rate)/.N)/0.2)]
+
+df<-merge(df,obese,by="UTLA19CD",all.x=T)
+}
+
+df_age<-table_f("obese_rate",df[!is.na(obese_rate)])
+
+two_way_tb_f(df_age,"obese_rate","Highest quintle vs lowest",col1,mult_cols=T,test_vals=c(1,5),
+             columnGroups = list(colGroup(name="LA child obesity rate quintile (Yr 6 children, 5= highest rate)",as.character(c(1:5))))
+             )
+             
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+  cat(
+    paste0('<div id="crime_all',suffix,'" class="sect area',suffix,'">\n'
+             )
+  )
+
+
+```
+
+```{r}
+
+if(! "all_crime" %in% names(df)){
+crime<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/lsoa_crime_quantile.csv")
+
+names(crime)[2]<-"all_crime"
+
+df<-merge(df,crime,
+             by="lsoa11",all.x=T)
+
+}
+
+df_idaci<-table_f("all_crime")[!is.na(all_crime) & !is.na(value)
+                                  ]
+
+two_way_tb_f(df_idaci,"all_crime","Highest quintile vs lowest",col1,
+             mult_cols=T,test_vals=c(1,5),
+             columnGroups = list(colGroup(name="Crime rate quintile (5 = highest rate)",as.character(c(1:5))))
+             )
+
+```
+
+</div>
+

@@ -1,0 +1,323 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "`r paste0(params$section,': ',params$pg)`"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+   theme: null
+   template: "CCO_template_html.html"
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+```
+
+```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
+
+
+```
+
+<script src="extra_js.js"></script>
+
+```{r}
+hap_col<-names(df)[grepl(paste0("^id$|UTLA19CD|ward|^wt$|",search_str),names(df))]
+
+hap_col<-hap_col[!grepl("dont|Other",hap_col)]
+
+df_la<-melt(df[,..hap_col],id.vars = c("id","UTLA19CD","ward","wt"))[,variable:=plyr::mapvalues(variable,
+                                                                                    q_lookup$var,
+                                                                                    q_lookup$label)
+                                                                ][,UTLA19CD:=plyr::mapvalues(
+                                                                  UTLA19CD,c("E08000020","E06000048"),
+                                                                  c("E08000037","E06000057")
+                                                                )]
+
+
+
+df_la_1<-df_la[,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,1,0))
+           ][!is.na(value)][,.(c=sum(wt),c_unweighted=.N),by=.(UTLA19CD,variable,value)]
+
+grid<-expand.grid(UTLA19CD=unique(df_la$UTLA19CD),
+                  variable=unique(df_la$variable),
+                  value=unique(df_la$value))
+
+
+df_la<-merge(df_la_1,
+                grid,all.y=T)[,c:=ifelse(is.na(c),0,c)
+                              ][,`:=`(perc=c/sum(c),c_unweighted=sum(c_unweighted,na.rm=T)),by=.(variable,UTLA19CD)][value==1]
+
+#df_la_p<-merge(df_la_p,df_la,all.y=T,by=c("variable","UTLA19CD"))
+
+
+
+```
+
+
+<h4>By local authority</h4>
+
+*Overall rates in an LA*
+
+```{r, fig.width=10}
+leaf_poly<-readRDS("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\interactive_eg\\laBase_19.rds")
+
+tb_count<-dcast(na.omit(df_la)[,.(UTLA19CD,variable,c_unweighted)],UTLA19CD~variable,value.var="c_unweighted")
+
+names(tb_count)[2:length(names(tb_count))]<-paste0(names(tb_count)[2:length(names(tb_count))],"_count")
+
+names(tb_count)[!grepl("UTLA",names(tb_count))]<-gsub(" |[']","_",names(tb_count)[!grepl("UTLA",names(tb_count))])
+
+tb_map<-dcast(na.omit(df_la)[,.(UTLA19CD,variable,perc)
+                    ][,perc:=round(perc,3)*100],UTLA19CD~variable,value.var="perc")
+
+names(tb_map)[!grepl("UTLA",names(tb_map))]<-gsub(" |[']","_",names(tb_map)[!grepl("UTLA",names(tb_map))])
+
+opt_var<-names(tb_map)[!grepl("UTLA",names(tb_map))]
+
+require(leaflet)
+
+pal2<-colorNumeric("Reds",c(0,max(df_la$perc,na.rm=T)*100))
+
+leaf_poly@data<-merge(leaf_poly@data,tb_map,by.x="ctyua19cd",by.y="UTLA19CD",all.x=T)
+
+leaf_poly@data<-merge(leaf_poly@data,tb_count,by.x="ctyua19cd",by.y="UTLA19CD",all.x=T)
+
+labels<-lapply(opt_var,function(x){
+  
+  lb<-gsub("_s_","'s_",x)
+  lb<-gsub("_"," ",lb)
+  
+  substr(lb,1,1)<-tolower(substr(lb,1,1))
+  
+  paste0("LA: ",leaf_poly@data$ctyua19nm,paste0("</br>Measure: ",col1),lb,"</br>% of LA cohort: ",round(leaf_poly@data[,x]),"%</br>Unweighted base: ",leaf_poly@data[,paste0(x,"_count")])
+  
+  
+})
+
+for(i in seq_len(length(labels))){
+  
+  labels[[i]]<-lapply(labels[[i]],htmltools::HTML)
+  
+}
+
+names(labels)<-opt_var
+
+map<-leaflet(data=leaf_poly, options = leafletOptions(background="#FFF"),
+        elementId = "la_map_1") %>%
+  addProviderTiles(providers$CartoDB)
+
+for(i in opt_var){
+
+  fill_f<-as.formula(paste0("~pal2(",i,")"))
+  
+  g<-gsub("_s_","'s_",i)
+  g<-gsub("_"," ",g)
+  
+map<-map %>%
+  addPolygons(color="#444444", weight=1, smoothFactor = 0.5,
+              opacity=1.0, fillOpacity = 0.7, fillColor = fill_f,
+              popupOptions = highlightOptions(bringToFront = T, weight=4),
+              label =labels[[i]],group=splitF(g,html=T)) 
+
+}
+
+gList<-gsub("_s_","'s_",opt_var)
+gList<-gsub("_"," ",gList)
+
+gList<-sapply(gList,function(x) splitF(x,html=T))
+
+map %>%
+  addLayersControl(
+    baseGroups = as.character(gList),options = layersControlOptions(collapsed=F))  %>%
+  addLegend("topleft", pal = pal2, values = seq(0,max(df_la$perc,na.rm=T)*100),bins=5,
+            labFormat = function(type, cuts, p) { 
+              n = length(cuts) 
+              cuts[n] = round(max(df_la$perc,na.rm=T)*100) 
+              for (i in 2:(n-1)){cuts[i] = " "} 
+              cuts[1] = "0" 
+              paste0(cuts[-n], cuts[-1])},
+            title = splitF(col1,html=T),
+            na.label = "Missing/excluded",
+            opacity = 0.7,className = "la_map_legend_1"
+  )
+
+```
+
+```{r}
+download_tb<-merge(df_la,unique(leaf_poly@data[,c("ctyua19nm","ctyua19cd")]),
+                   by.x="UTLA19CD",by.y="ctyua19cd",all.x=T)
+
+download_tb<-download_tb[!is.na(UTLA19CD)
+            ][,value:=NULL
+              ][,perc:=round(perc,3)*100][,.(UTLA19CD,UTLA19NM=ctyua19nm,variable,`%`=perc,
+                               `Unweighted base`=c_unweighted)]
+
+names(download_tb)[names(download_tb)=="variable"]<-col1
+
+download_tb_str<-apply(download_tb,1,function(x){
+  paste0(gsub("[,]"," ",x),collapse=",")
+})
+
+download_header<-paste0(names(download_tb),collapse=",")
+
+download_tb_str<-paste0(download_tb_str,collapse="\n")
+
+download_tb_str<-paste0(download_header,"\n",download_tb_str)
+
+download_out<-openssl::base64_encode(download_tb_str)
+
+fNm<-paste0("big_ask_survey_",gsub(" ","_",params$section),"_la_rates.csv")
+
+```
+
+<a download=`r fNm` href="`r sprintf('data:text/csv;base64,%s', download_out)`">Download underlying data</a>
+
+</br>
+
+
+<h4>By Parliamentary Constituency</h4>
+
+*Note: Map below presents unweighted percentages. Constituencies with less than 50 children responding to the survey have been greyed out in the map below.*
+
+```{r}
+
+hap_col<-names(df)[grepl(paste0("^id$|pcon|^wt$|",search_str),names(df))]
+
+hap_col<-hap_col[!grepl("dont|Other",hap_col)]
+
+df_la<-melt(df[,..hap_col],id.vars = c("id","pcon","wt"))[,variable:=plyr::mapvalues(variable,
+                                                                                    q_lookup$var,
+                                                                                    q_lookup$label)
+                                                                ]
+
+df_la_1<-df_la[,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,1,0))
+           ][,.(c=.N),by=.(pcon,variable,value)]
+
+grid<-expand.grid(pcon=unique(df_la_1$pcon),
+                  variable=unique(df_la_1$variable),
+                  value=unique(df_la_1$value))
+
+
+df_la<-merge(df_la_1,
+                grid,all.y=T)[,c:=ifelse(is.na(c),0,c)][!is.na(value)][,perc:=c/sum(c),by=.(variable,pcon)
+                                                        ][,base:=sum(c),by=.(variable,pcon)][value==1
+                                                                                             ][base>=50 & grepl("E",pcon)]
+
+leaf_poly<-readRDS("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\pcon_base.rds")
+
+leaf_poly<-leaf_poly[grepl("E",leaf_poly$pcon19cd),]
+
+tb_map<-dcast(na.omit(df_la)[,.(pcon,variable,perc)
+                    ][,perc:=round(perc,3)*100],pcon~variable,value.var="perc")
+
+names(tb_map)[!grepl("pcon",names(tb_map))]<-gsub(" |[']","_",names(tb_map)[!grepl("pcon",names(tb_map))])
+
+opt_var<-names(tb_map)[!grepl("pcon",names(tb_map))]
+
+require(leaflet)
+
+pal2<-colorNumeric("Reds",c(0,max(df_la$perc,na.rm=T)*100))
+
+leaf_poly@data<-merge(leaf_poly@data,tb_map,by.x="pcon19cd",by.y="pcon",all.x=T)
+
+
+labels<-lapply(opt_var,function(x){
+  
+  lb<-gsub("_s_","'s_",x)
+  lb<-gsub("_"," ",lb)
+  
+  substr(lb,1,1)<-tolower(substr(lb,1,1))
+  
+  paste0("Constituency: ",leaf_poly@data$pcon19nm,paste0("</br>Measure: ",col1),lb,"</br>% of constituency cohort: ",round(leaf_poly@data[,x]),"%")
+  
+  
+})
+
+for(i in seq_len(length(labels))){
+  
+  labels[[i]]<-lapply(labels[[i]],htmltools::HTML)
+  
+}
+
+names(labels)<-opt_var
+
+map<-leaflet(data=leaf_poly, options = leafletOptions(background="#FFF"),
+        elementId = "pcon_map_1") %>%
+  addProviderTiles(providers$CartoDB)
+
+for(i in opt_var){
+
+  fill_f<-as.formula(paste0("~pal2(",i,")"))
+  
+  g<-gsub("_s_","'s_",i)
+  g<-gsub("_"," ",g)
+  
+map<-map %>%
+  addPolygons(color="#444444", weight=1, smoothFactor = 0.5,
+              opacity=1.0, fillOpacity = 0.7, fillColor = fill_f,
+              popupOptions = highlightOptions(bringToFront = T, weight=4),
+              label =labels[[i]],group=splitF(g,html=T)) 
+
+}
+
+gList<-gsub("_s_","'s_",opt_var)
+gList<-gsub("_"," ",gList)
+
+gList<-sapply(gList,function(x) splitF(x,html=T))
+
+map %>%
+  addLayersControl(
+    baseGroups = as.character(gList),options = layersControlOptions(collapsed=F))  %>%
+  addLegend("topleft", pal = pal2, values = seq(0,max(df_la$perc,na.rm=T)*100),bins=5,
+            labFormat = function(type, cuts, p) { 
+              n = length(cuts) 
+              cuts[n] = round(max(df_la$perc,na.rm=T)*100) 
+              for (i in 2:(n-1)){cuts[i] = " "} 
+              cuts[1] = "0" 
+              paste0(cuts[-n], cuts[-1])},
+            title = splitF(col1,html=T),
+            na.label = "Missing/excluded",
+            opacity = 0.7,className = "la_map_legend_1"
+  )
+
+
+```
+
+```{r}
+download_tb<-merge(df_la,unique(leaf_poly@data[,c("pcon19nm","pcon19cd")]),
+                   by.x="pcon",by.y="pcon19cd",all.x=T)
+
+download_tb<-download_tb[!is.na(pcon)
+            ][,value:=NULL
+              ][,perc:=round(perc,3)*100][,.(PCON19CD=pcon,PCON19NM=pcon19nm,variable,`%`=perc,
+                               `Unweighted base`=base)]
+
+
+names(download_tb)[names(download_tb)=="variable"]<-col1
+
+download_tb_str<-apply(download_tb,1,function(x){
+ paste0(gsub("[,]"," ",x),collapse=",")
+})
+
+download_header<-paste0(names(download_tb),collapse=",")
+
+download_tb_str<-paste0(download_tb_str,collapse="\n")
+
+download_tb_str<-paste0(download_header,"\n",download_tb_str)
+
+download_out<-openssl::base64_encode(download_tb_str)
+
+fNm<-paste0("big_ask_survey_",gsub(" ","_",params$section),"_pcon_rates.csv")
+
+```
+
+<a download=`r fNm` href="`r sprintf('data:text/csv;base64,%s', download_out)`">Download underlying data</a>
+

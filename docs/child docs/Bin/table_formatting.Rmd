@@ -1,0 +1,193 @@
+---
+title: "tb_format"
+author: "Tom Clarke"
+date: "24/04/2021"
+output: 
+ html_document: 
+   self_contained: no
+   theme: null
+   mathjax: null
+   highlight: null
+   template: "CCO_template_html.html"
+   css: styles.css
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+
+require(readxl)
+require(data.table)
+require(dplyr)
+require(ggplot2)
+require(reactable)
+require(htmltools)
+
+stem<-"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/cleaned data/"
+
+table_f<-function(x){
+  
+  x<-unlist(strsplit(x,"[|]"))
+  
+  reg<-paste0("^",x,"$")
+  
+  reg_string<-paste0("^id$|happy.*clean|",paste0(reg,collapse="|"))
+  hap_col<-names(df)[grepl(reg_string,names(df))]
+
+  
+df_la<-melt(df[,..hap_col],id.vars = c("id",x))[,variable:=plyr::mapvalues(variable,
+                                                                                    q_lookup$var,
+                                                                                    q_lookup$label)]
+
+df_la[,value:=ifelse(value %in% c("I don't know","Not applicable","dont know","I dont want to say"),NA,
+                        ifelse(value %in% c("Unhappy","Very unhappy","sad"),1,0))
+           ]
+}
+
+effectsize_f<-function(tb,grp1,grp2,perc_var){
+  
+  
+  if(length(unique(tb[,get(grp2)]))>2){
+    stop("Only works for 2 way comparisons")
+  }
+  
+  col_vars<-as.character(unique(tb[order(get(grp2)),get(grp2)]))
+  
+  odds<-dcast(tb[,odds:=get(perc_var)/(1-get(perc_var))][,.(g1=get(grp1),g2=get(grp2),odds)],
+      g1~g2,value.var="odds")[,OR:=get(col_vars[length(col_vars)])/get(col_vars[1])
+                                     ][,d:=abs(effectsize::oddsratio_to_d(OR))
+                                       ][,diff:=ifelse(d<0.2,"No difference",
+                                                       ifelse(d<0.5,"Small",
+                                                              ifelse(d<0.8,"Medium","Large")))
+                                         ][,diff:=factor(diff,c("No difference","Small","Medium","Large"))]
+  
+  rr<-dcast(tb[,.(g1=get(grp1),g2=get(grp2),perc=get(perc_var))],
+      g1~g2,value.var="perc")[,rr:=get(col_vars[length(col_vars)])/get(col_vars[1])]
+  
+  merge(rr[,.(g1,rr)],odds[,.(g1,diff)],all.x=T,by="g1")
+
+}
+
+perc_col<-function(){
+  colDef(
+    format=colFormat(percent=T,digits=1),
+    align="center",
+    cell = function(val,ind,col){
+      txt<-div(paste0(round(val,3)*100,"%"),
+               style=list(marginLeft="0", marginRight="10px",display="inline-flex"))
+      
+      
+      bar<-div(style = list(background =  "#A1D99B",width="20px", border="1px solid grey20", height = paste0(round(val,3)*100,"%"),
+                            marginLeft="auto", marginRight="0",
+                            display="inline-flex"))
+      
+      div(txt,bar,style=list(height="30px"))
+  
+      
+    },
+    maxWidth = 100)
+}
+
+html_table_f<-function(tb,column_def,...){
+reactable(
+  tb,
+  columns = column_def,
+  pagination = F,
+  fullWidth = F,
+  outlined=T,
+  resizable = T,
+  searchable = T,
+  defaultSorted = "diff",
+  defaultSortOrder = "asc",
+  showSortable = T,
+  ...
+)
+}
+
+splitF<-function(title,html=F){
+    split<-unlist(strsplit(title," "))
+    
+    
+    
+    if(html){
+      
+      d<-seq(4,length(split),by=4)
+      
+      split[d]<-paste0(split[d],"</br>")
+      
+      title<-paste0(split,collapse=" ")
+      
+      title<-gsub("[<][/]br[>] ","</br>",title)
+      title
+      
+    }else{
+      
+      if(length(split)>4){
+      d<-seq(4,length(split),by=4)
+      
+      split[d]<-paste0(split[d],"\n")
+      
+      title<-paste0(split,collapse=" ")
+      
+      title<-gsub("\n ","\n",title)
+      title<-gsub("\n$","",title)
+      title
+      }else{
+        title
+      }
+      
+    }
+  }
+  
+```
+
+```{r}
+
+df13<-readRDS(paste0(stem,"13-17_clean.rds"))[,survey:="13-17"]
+df_easy<-readRDS(paste0(stem,"9-17_easyread_clean.rds"))[,survey:="9-17_easy"]
+df9<-readRDS(paste0(stem,"9-12_clean.rds"))[,survey:="9-12"]
+
+df<-rbindlist(list(df13,df9,df_easy),use.names = T,fill = T)
+
+imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
+
+df<-df[,id:=paste0(id,survey)]
+
+q_lookup<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_happy_q_lookup.csv")
+q_lookup$var<-gsub("Option ","q1_happy_",q_lookup$var)
+
+```
+
+```{r}
+
+df<-merge(df,imd[`Indices of Deprivation`=="i. Income Deprivation Affecting Children Index (IDACI)",.(idaci_decile=Value,FeatureCode)],
+             by.x="lsoa11",by.y="FeatureCode",all.x=T)
+
+
+df_idaci<-table_f("idaci_decile")[!is.na(idaci_decile) & !is.na(value)
+                                  ][,.(c=.N),by=.(variable,idaci_decile,value)
+                                    ][,perc:=c/sum(c),by=.(variable,idaci_decile)][value==1]
+
+idac_or<-effectsize_f(df_idaci[idaci_decile %in% c(1,10)][,value:=NULL],"variable","idaci_decile","perc")
+
+tb<-merge(dcast(df_idaci[,.(variable,idaci_decile,perc)],variable~idaci_decile,value.var = "perc"),
+          idac_or[,.(variable=g1,rr,diff)],by="variable")
+
+
+
+dec_cols<-lapply(names(tb)[2:11],function(x) perc_col())
+
+names(dec_cols)<-names(tb)[2:11]
+
+cols<-c(list(variable=colDef(name=" % of children unhappy with...",minWidth = 150)),
+        dec_cols,
+        list(rr=colDef(name="Relative risk (Lowest decile vs highest)",format = colFormat(digits=2)),
+             diff=colDef(name="How big is this difference? (Lowest decile vs highest)",maxWidth = 120)
+))
+
+html_table_f(tb,
+             cols,
+  columnGroups = list(colGroup(name="IDACI decile",as.character(c(1:10))))
+             )
+
+
+
+```

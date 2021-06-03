@@ -1,0 +1,355 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "`r paste0(params$section,': ',params$pg)`"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+   theme: null
+   template: "CCO_template_html.html"
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+```
+
+```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
+
+
+```
+
+<script src="extra_js.js"></script>
+
+```{r, include=F}
+
+df_any_mh<-table_f("any_mh")
+
+two_way_tb_f(df_any_mh,"any_mh","Receiving support from a healthcare worker vs Not",col1)
+
+```
+
+
+
+```{r,results='asis'}
+if(seg){
+
+  suffix<-"_seg"
+}else{
+  suffix<-""
+}
+
+
+if(is.null(age_grp)){
+cat(paste0('
+    
+<div class="picker-group">
+<label>Select characteristic</label>
+<select id="disad_picker',suffix,'">
+<option value="sen',suffix,'">SEN</option>
+<option value="kinship',suffix,'">Kinship care</option>
+<option value="sw',suffix,'">Children in care/with a social worker</option>
+<option value="mh',suffix,'">Children receiving mental health support</option>
+<option value="yc',suffix,'">Young carers</option>
+</select>
+<button class="picker_button" onclick="picker_f(',"'","disad_picker",suffix,"',","'","disad",suffix,"'",')">Go</button>
+</div>
+    
+    
+    '))
+}else{
+  cat(paste0('
+    
+<div class="picker-group">
+<label>Select characteristic</label>
+<select id="disad_picker',suffix,'">
+<option value="sen',suffix,'">SEN</option>
+<option value="kinship',suffix,'">Kinship care</option>
+<option value="sw',suffix,'">Children in care/with a social worker</option>
+<option value="mh',suffix,'">Children receiving mental health support</option>
+<option value="yc',suffix,'">Young carers</option>
+</select>
+<button class="picker_button" onclick="picker_f(',"'","disad_picker",suffix,"',","'","disad",suffix,"'",')">Go</button>
+</div>
+    
+    
+    '))
+}
+
+```
+
+*Please select characteristic of interest and press Go*
+
+
+```{r, results='asis'}
+
+  cat(
+    paste0('<div id="sen',suffix,'" class="sect disad',suffix,'">\n'
+             )
+  )
+
+
+```
+
+**Children with Special Educational Needs (SEN)**
+
+```{r, results='asis'}
+
+if(!seg){
+
+if(is.null(age_grp)){
+df$dem_sen<-with(df,
+             ifelse(dfe_phase %in% "Special",
+                    "SEN",
+                    ifelse(`dem_support_A teaching assistant or SENCO at school` %in% "Yes","SEN",
+                           ifelse(grepl("easy",survey),"SEN","Not SEN")))
+             
+)
+}else if(age_grp=="6-8"){
+  df$dem_sen<-with(df,
+             ifelse(dfe_phase %in% "Special",
+                    "SEN",
+                    ifelse(`dem_support_A teaching assistant at school` %in% "Yes","SEN",
+                           ifelse(grepl("easy",survey),"SEN","Not SEN")))
+)
+  
+}
+}
+
+if(is.null(age_grp)){
+  
+ create_age_picker_f("_sen","dem_sen","Any SEN vs Not")
+  
+}else{
+  df_sen<-table_f("dem_sen")
+  
+  two_way_tb_f(df_sen,"dem_sen","Any SEN vs Not",col1)
+}
+
+cat("\n*Children with SEN defined as those receiving support from a teaching assistant/SENCO or those enrolled in a special school*\n")
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+  cat(
+    paste0('<div id="kinship',suffix,'" class="sect disad',suffix,'">\n'
+             )
+  )
+
+
+```
+
+**Children living with relatives other than their parents (in kinship care)**
+
+```{r, results='asis'}
+
+if(!seg){
+df<-df[,kinship:=ifelse(is.na(kinship),NA,
+                        ifelse(kinship=="Yes","Kinship care","Any other family type"))]
+}
+
+if(is.null(age_grp)){
+
+ create_age_picker_f("_kinship","kinship","Living with relatives vs Not")
+  
+}else{
+  df_sen<-table_f("kinship")
+
+two_way_tb_f(df_sen,"kinship","Living with relatives vs Not",col1)
+
+}
+
+cat("\n*Children in kinship care defined as those living with relatives other than their parents*\n")
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+  cat(
+    paste0('<div id="sw',suffix,'" class="sect disad',suffix,'">\n'
+             )
+  )
+
+
+```
+
+**Children in care or with a social worker**
+
+```{r, results='asis'}
+if(!seg){
+
+df$sw<-with(df,ifelse(`dem_support_A social worker`=="Yes" | care=="Yes",
+                      "In care/has a social worker","Not in care/has a social worker")
+)
+
+df<-df[,sw:=factor(sw,levels=c("Not in care/has a social worker","In care/has a social worker"))]
+}
+
+if(is.null(age_grp)){
+
+ create_age_picker_f("_sw","sw","In care/has a social worker vs Not")
+  
+}else{
+
+df_sw<-table_f("sw")
+
+two_way_tb_f(df_sw,"sw","In care/has a social worker vs Not",col1)
+}
+
+cat("\n*Children with a social worker defined as those reporting receiving support from a social worker. Those in care defined by those reporting living with foster parents, in a children's home (secure and non-secure) or those in independent or semi-independent  accommodation supported by the local council*\n")
+
+```
+
+**Children with a social worker only**
+
+```{r, results='asis'}
+if(!seg){
+
+df$sw_only<-with(df,ifelse(`dem_support_A social worker`=="Yes" ,
+                      "Has a social worker","Does not have a social worker")
+)
+
+df<-df[,sw_only:=factor(sw_only,levels=c("Does not have a social worker","Has a social worker"))]
+}
+
+if(is.null(age_grp)){
+
+ create_age_picker_f("_swOnly","sw_only","Has a social worker vs Not")
+  
+}else{
+
+df_sw<-table_f("sw_only")
+
+two_way_tb_f(df_sw,"sw_only","Has a social worker vs Not",col1)
+}
+```
+
+
+**Children in care only**
+
+```{r, results='asis'}
+if(!seg){
+df<-df[,care:=ifelse(is.na(care),NA,
+                     ifelse(care=="Yes","In care","Not in care"))][,care:=factor(care,levels=c("Not in care","In care"))]
+}
+
+if(is.null(age_grp)){
+
+ create_age_picker_f("_care","care","In care vs Not")
+  
+}else{
+df_care<-table_f("care")
+
+two_way_tb_f(df_care,"care","In care vs Not",col1)
+}
+```
+
+</div>
+
+
+
+```{r, results='asis'}
+cat(
+    paste0('<div id="mh',suffix,'" class="sect disad',suffix,'">\n'
+             )
+  )
+```
+
+**Children receiving mental health support**
+
+```{r, results='asis'}
+
+if(is.null(age_grp)){
+
+ if(!seg){ 
+  
+df<-df[,any_mh:=ifelse(is.na(any_mh),NA,ifelse(any_mh=="Yes","Receiving mental health support","Not receiving mental health support"))][,any_mh:=factor(any_mh,levels=c("Not receiving mental health support","Receiving mental health support"))]
+}
+
+cat("**Children currently receiving mental health support**\n")
+
+create_age_picker_f("_mh","any_mh","Receiving mental health support vs Not")
+
+}else if(age_grp=="6-8"){
+  
+  df_any_mh<-table_f("any_mh")[,any_mh:=ifelse(any_mh=="Yes","Receiving support from a healthcare worker","Not receiving support from a healthcare worker")][,any_mh:=factor(any_mh,levels=c("Not receiving support from a healthcare worker","Receiving support from a healthcare worker"))]
+
+two_way_tb_f(df_any_mh,"any_mh","Receiving support from a healthcare worker vs Not",col1)
+
+}
+
+cat("\n*Children receiving mental health support are defined as those reporting receiving support from a counsellor therapist or other health care worker and those reporting living in a mental health hospital*\n")
+
+```
+
+```{r, results='asis'}
+if(is.null(age_grp)){
+cat("\n**Children in mental health hospitals**\n")
+}
+
+```
+
+
+```{r, results='asis'}
+if(is.null(age_grp)){
+
+  if(!seg){
+  
+  df<-df[,mh_hospital:=ifelse(is.na(mh_hospital),NA,ifelse(mh_hospital=="Yes","In MH hospital","Not in MH hospital"))][,mh_hospital:=factor(mh_hospital,levels=c("Not in MH hospital","In MH hospital"))]
+  }
+
+create_age_picker_f("_mhhosp","mh_hospital","In MH hospital vs Not")
+
+}
+
+cat("\n*Children in mental health hospitals defined as those reporting living in a mental health hospital*\n")
+
+```
+
+</div>
+
+```{r, results='asis'}
+cat(
+    paste0('<div id="yc',suffix,'" class="sect disad',suffix,'">\n'
+             )
+  )
+```
+
+**Young carers**
+
+```{r, results='asis'}
+if(!seg){
+
+df<-df[,yc:=ifelse(`dem_support_I dont want to say`=="Yes",NA,
+                   ifelse(`dem_support_A young carers project`=="Yes","Young carer","Not young carer"))]
+
+}
+
+if(is.null(age_grp)){
+  
+  create_age_picker_f("_yc","yc","Young carer vs Not")
+}else{
+
+  df_yc<-table_f("yc")[!is.na(yc)]
+
+  
+two_way_tb_f(df_yc,"yc","Young carer vs Not",col1)
+}
+
+cat("\n*Young carers defined as children reporting receiving support from a young carers' project*\n")
+
+```
+
+</div>
+
+

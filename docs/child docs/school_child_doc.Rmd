@@ -1,0 +1,249 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "`r paste0(params$section,': ',params$pg)`"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+   theme: null
+   template: "CCO_template_html.html"
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+```
+
+```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
+
+
+```
+
+<script src="extra_js.js"></script>
+
+```{r, results='asis'}
+if(is.null(age_grp)){
+cat(paste0(
+'<div class="picker-group">
+<label>Select characteristic</label>
+<select id="sc_picker">
+<option value="phase">School phase</option>
+<option value="sctype">Type of school</option>
+<option value="ofsted">School Ofsted rating</option>
+<option value="att8">Average school attainment 8 scores</option>
+<option value="exclusion">School exclusion rates</option>
+<option value="absence">School absence rates</option>
+</select>
+<button class="picker_button" onclick="picker_f(',"'sc_picker','school')",'"','>Go</button>
+</div>'
+))
+}else{
+  cat(paste0(
+'<div class="picker-group">
+<label>Select characteristic</label>
+<select id="sc_picker">
+<option value="sctype">Type of school</option>
+<option value="ofsted">School Ofsted rating</option>
+<option value="exclusion">School exclusion rates</option>
+<option value="absence">School absence rates</option>
+</select>
+<button class="picker_button" onclick="picker_f(',"'sc_picker','school')",'"','>Go</button>
+</div>'
+))
+}
+
+```
+
+*Please select characteristic of interest and press Go*
+
+```{r, results='asis'}
+if(is.null(age_grp)){
+  cat('<div id="phase" class="sect school">')
+}
+```
+
+
+```{r, results='asis'}
+if(is.null(age_grp)){
+df_dfe_phase<-table_f("dfe_phase")[!is.na(dfe_phase)]
+
+print(
+  two_way_tb_f(df_dfe_phase,"dfe_phase","Secondary vs Primary",col1,
+             mult_cols = T,test_vals = c("Primary","Secondary")
+)
+)
+
+cat("\n*Source: DfE Get Information About Schools*\n")
+}
+```
+
+```{r, results='asis'}
+if(is.null(age_grp)){
+cat("</div>")
+}
+```
+
+<div id="sctype" class="sect school">
+
+```{r, results='asis'}
+df_scGroup<-table_f("scGroup")[!scGroup %in% c("Other types","Universities")][,scGroup:=ifelse(scGroup %in% c("Foundation special schoo","Community special school"),"Local authority maintained schools",
+                                           ifelse(scGroup=="Special schools","Other special schools",scGroup))][!is.na(scGroup)]
+
+two_way_tb_f(df_scGroup,"scGroup","Maintained vs Academies",col1,mult_cols = T,
+             c("Local authority maintained schools","Academies"))
+
+cat("\n*Source: DfE Get Information About Schools*\n")
+```
+
+</div>
+
+<div id="ofsted" class="sect school">
+
+```{r, results='asis'}
+df_ofsted<-table_f("ofsted")[!ofsted %in% c(NA,"")][,ofsted:=ifelse(ofsted %in% c("Serious Weaknesses","Special Measures","Inadequate"),"Inadequate",ofsted)][,ofsted:=factor(ofsted,levels=c("Outstanding","Good","Requires improvement","Inadequate"))]
+
+two_way_tb_f(df_ofsted,"ofsted","Inadequate vs Outstanding",col1,mult_cols=T,
+             test_vals=c("Inadequate","Outstanding"))
+
+cat("\n*Source: DfE Get Information About Schools*\n")
+```
+
+</div>
+
+```{r, results='asis'}
+if(is.null(age_grp)){
+  cat('<div id="att8" class="sect school">')
+}
+```
+
+
+```{r, results='asis'}
+if(is.null(age_grp)){
+  
+  if(! "att8_quintile" %in% names(df)){
+
+att<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/attainment_2605.csv"
+              )[!is.na(URN)
+                ][,att8:=as.numeric(ATT8SCR)
+                  ][!is.na(att8)
+                    ][,.(urn=URN,att8)
+                      ][,perc_rank:=frank(att8)/.N
+             ][,att8_quintile:=ceiling(perc_rank/0.2)]
+
+
+df_exc<-merge(df,att[,.(urn,att8_quintile)],all.x=T,by="urn")
+}else{
+  df_exc<-df
+}
+  
+  
+df_age<-table_f("att8_quintile",df_use=df_exc)[!is.na(att8_quintile)]
+
+
+print(
+  two_way_tb_f(df_age,"att8_quintile","Highest quintle vs lowest",col1,mult_cols=T,test_vals=c(1,5),
+             columnGroups = list(colGroup(name="School average attainment 8 score quintile (5= highest rate)",as.character(c(1:5))))
+             
+  ))
+
+cat("\n*Source: DfE Key Stage 4 Performance Tables 2019*\n")
+}
+```
+
+```{r, results='asis'}
+if(is.null(age_grp)){
+cat("</div>")
+}
+```
+
+<div id="exclusion" class="sect school">
+
+**Permanent exclusions**
+
+```{r, results='asis'}
+
+if(! "perm10" %in% names(df)){
+
+exc_sc<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/sc_exclusions.csv"
+              )[,perm10:=as.numeric(perm_excl_rate)
+               ][!is.na(perm10)][,perm10:=ifelse(perm10>quantile(as.numeric(perm_excl_rate),0.9,na.rm=T),"Top 10%","Other 90% of schools")][,perm10:=factor(perm10,c("Other 90% of schools","Top 10%"))]
+
+exc_sc<-exc_sc[,fixed10:=ifelse(one_plus_fixed_rate>quantile(as.numeric(one_plus_fixed_rate),0.9,na.rm=T),"Top 10%","Other 90% of schools")][,fixed10:=factor(fixed10,c("Other 90% of schools","Top 10%"))]
+
+df_exc<-merge(df,exc_sc[,.(urn,perm10,fixed10)],all.x=T,by="urn")
+}else{
+  df_exc<-df
+}
+df_exc<-df_exc[!is.na(fixed10)]
+
+df_exc<-df_exc
+
+df_exc_perm<-table_f("perm10",df_exc)
+
+two_way_tb_f(df_exc_perm,"perm10","Top 10% permanent exclusion rate vs rest",col1)
+
+cat("\n*Source: DfE Exclusion statistics 2019*\n")
+
+```
+
+
+**Fixed term exclusions**
+
+```{r, results='asis'}
+df_exc_perm<-table_f("fixed10",df_exc)
+
+two_way_tb_f(df_exc_perm,"fixed10","Top 10% fixed term exclusion rate vs rest",col1)
+
+cat("\n*Source: DfE Exclusion statistics 2019*\n")
+
+```
+
+</div>
+
+<div id="absence" class="sect school">
+
+**Persistent absence**
+
+```{r, results='asis'}
+
+if(! "unauth10" %in% names(df)){
+ab_sc<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/sc_absence.csv"
+              )[,ab10:=as.numeric(enrolments_pa_10_exact_percent)
+               ][!is.na(ab10)][,ab10:=ifelse(ab10>quantile(as.numeric(enrolments_pa_10_exact_percent),0.8,na.rm=T),"20% schools with highest rates","Other 80% of schools")][,ab10:=factor(ab10,c("Other 80% of schools","20% schools with highest rates"))]
+
+ab_sc<-ab_sc[,unauth10:=ifelse(sess_unauthorised_percent>quantile(as.numeric(sess_unauthorised_percent),0.8,na.rm=T),"20% schools with highest rates","Other 80% of schools")][,unauth10:=factor(unauth10,c("Other 80% of schools","20% schools with highest rates"))]
+
+df_ab<-merge(df,ab_sc[,.(urn,ab10,unauth10)],all.x=T,by="urn")
+}else{
+  df_ab<-df
+}
+
+df_ab<-df_ab[!is.na(unauth10)]
+
+df_ab<-df_ab
+
+df_ab_perm<-table_f("ab10",df_ab)
+
+two_way_tb_f(df_ab_perm,"ab10","Top 20% persistent absence rate vs rest",col1)
+
+cat("\n*Source: DfE Absence statistics 2019*\n")
+
+```
+
+**Unauthorised absence**
+
+```{r, results='asis'}
+
+df_ab_perm<-table_f("unauth10",df_ab)
+
+two_way_tb_f(df_ab_perm,"unauth10","Top 20% unauthorised absence rate vs rest",col1)
+
+cat("\n*Source: DfE Absence statistics 2019*\n")
+```
+
+</div>

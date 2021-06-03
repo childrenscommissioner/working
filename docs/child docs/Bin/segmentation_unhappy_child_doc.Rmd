@@ -1,0 +1,142 @@
+
+
+```{r}
+
+seg_cols<-c(names(df)[grepl(search_str,names(df))],"id","wt")
+
+
+
+df_seg<-df[,..seg_cols]
+
+for(i in seg_cols[!grepl("id|wt",seg_cols)]){
+  
+  df_seg<-df_seg[,(i):=ifelse(get(i) %in% dk_vals,NA,
+                        ifelse(get(i) %in% target_vals,"1","0"))]
+  
+}
+
+seg_cols<-seg_cols[!grepl("dont|Other|not worried|happy_M",seg_cols)]
+
+df_seg<-na.omit(df_seg[,..seg_cols])
+
+```
+
+```{r}
+require(FactoMineR)
+
+mca_cols<-seg_cols[!seg_cols %in% c("id","wt")]
+
+mca<-MCA(df_seg[,..mca_cols],ncp=length(mca_cols),row.w=df_seg$wt,graph=F)
+
+mca_eig<-as.data.table(mca$eig)
+
+keep<-nrow(mca_eig[`percentage of variance`>100/length(mca_cols)])
+
+scores<-as.data.table(mca$ind$coord[,1:keep])
+```
+
+```{r}
+require(cluster)
+
+set.seed(1234567)
+
+clust<-lapply(c(1:10),function(x){
+  
+  clara(scores,k=x,samples=100,sampsize=1000)
+  
+})
+
+sil<-sapply(clust[2:length(clust)],function(x){
+  
+  x$silinfo$avg.width
+})
+
+sil_res<-data.table(clust=2:length(clust),sil=sil)
+
+sil_use<-sil_res$clust[which.max(sil_res$sil)]
+
+df_seg$clust<-clust[[sil_use]]$clustering
+
+clust_wide<-df_seg[,.(id,clust)][,val:="Yes"]
+
+clust_wide<-dcast(clust_wide,id~clust,value.var = "val",fill="No")
+
+names(clust_wide)[!names(clust_wide) %in% "id"]<-paste0("cluster_",names(clust_wide)[!names(clust_wide) %in% "id"])
+
+df<-merge(df,clust_wide,by="id",all.x=T)
+
+df<-df[!is.na(cluster_1)]
+
+```
+
+### Approach to creating groups
+
+### Resulting groups with similar combinations
+
+```{r}
+
+prof_cols<-c(mca_cols,"clust","wt","id")
+
+df_prof<-melt(df_seg,id.vars=c("id","clust","wt"))
+
+
+df_prof_v<-df_prof[,.(c=sum(wt)),by=.(clust,variable,value)
+        ][,value:=ifelse(value=="Yes",1,
+                         ifelse(value=="No",0,value))
+          ][,perc:=c/sum(c),by=.(clust,variable)][value==1]
+
+all<-expand.grid(clust=unique(df_seg$clust),variable=unique(df_prof$variable))
+
+df_prof_v<-merge(df_prof_v,all,all.y=T,by=c("clust","variable")
+                 )[,perc:=ifelse(is.na(perc),0,perc)]
+
+df_prof_av<-df_prof[,.(c=sum(wt)),by=.(variable,value)
+        ][,value:=ifelse(value=="Yes",1,
+                         ifelse(value=="No",0,value))
+          ][,av_perc:=c/sum(c),by=.(variable)][value==1][,.(variable,av_perc)]
+
+clust_size<-df_seg[,.(c=sum(wt)),by=clust
+                   ][,perc_clust:=round(c/sum(c),2)*100]
+
+df_prof<-merge(df_prof_v,df_prof_av,by=c("variable")
+               )[,diff:=(perc/av_perc)-1
+                 ][,diff2:=(perc-av_perc)*100
+                   ][,lb:=paste0(ifelse(diff2>0,"+",""),round(diff2),"pp")]
+
+df_prof<-merge(df_prof,clust_size,by="clust",all.x=T
+               )
+
+df_prof$vargroup<-gsub("_.*$","",df_prof$variable)
+
+df_prof$variable<-plyr::mapvalues(df_prof$variable,q_lookup$var,
+                                 q_lookup$label)
+
+df_prof$clust<-plyr::mapvalues(df_prof$clust,gsub("cluster_","",q_lookup$var),q_lookup$label)
+
+df_prof<-df_prof[,clust_lb:=paste0(clust,"\n",perc_clust,"%")]
+
+plots<-purrr::imap(split(df_prof,df_prof$vargroup),function(x,y){
+  
+  y<-ifelse(y=="q1","What children are unhappy about now","What children worry about\nfor the future")
+  
+ggplot(x,aes(x=variable,y=diff2))+geom_col(fill="light blue",colour="grey20")+
+  facet_wrap(~clust_lb)+coord_flip()+scale_y_continuous(limits=c(-max(x$diff2)*1.1,max(x$diff2)*1.1))+
+  #geom_text(aes(label=lb))+
+  xlab(y)+ylab("\nPercentage point difference to\naverage rate")+
+  theme_bw()
+
+})
+```
+
+```{r}
+
+if(grepl("happy",search_str)){
+saveRDS(list(plots=plots,clust_wide=clust_wide),"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/happy_clust.rds")
+}else if(grepl("important",search_str)){
+saveRDS(list(plots=plots,clust_wide=clust_wide),"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/important_clust.rds")
+  
+}else if(grepl("worry",search_str)){
+  saveRDS(list(plots=plots,clust_wide=clust_wide),"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/worry_clust.rds")
+}
+```
+

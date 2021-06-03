@@ -1,0 +1,36 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "`r paste0(params$section,': ',params$pg)`"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+   theme: null
+   template: "CCO_template_html.html"
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+```
+
+```{r, results='asis'}
+
+if(!seg){
+cat(paste0(
+'<nav>
+<ol>
+<li class="breadcrumb"><a href="../../index.html">Home</a></li>
+<li class="breadcrumb"><a href="',params$var,'_index.html">',params$section,'</a></li>
+<li class="breadcrumb">',params$pg,'</li>
+</ol>
+</nav>'
+))
+}
+```
+

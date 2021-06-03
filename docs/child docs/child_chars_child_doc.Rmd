@@ -1,0 +1,458 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "`r paste0(params$section,': ',params$pg)`"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+   theme: null
+   template: "CCO_template_html.html"
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+```
+
+```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
+
+
+```
+
+<script src="extra_js.js"></script>
+
+```{r, results='asis'}
+
+if(seg){
+
+  suffix<-"_seg"
+}else{
+  suffix<-""
+}
+
+cat(
+  paste0('
+   <div class="picker-group">
+<label>Select characteristic</label>
+<select id="child_picker',suffix,'">
+<option value="age',suffix,'">Age (grouped)</option>
+<option value="ageSingle',suffix,'">Age (Single year)</option>
+<option value="gender',suffix,'">Gender</option>
+<option value="age_gender',suffix,'">Age + gender</option>
+<option value="ethnicity',suffix,'">Ethnicity</option>
+<option value="ethnicity_age',suffix,'">Ethnicity + Age</option>
+<option value="ethnicity_gender',suffix,'">Ethnicity + Gender</option>
+</select>
+<button class="picker_button" onclick="picker_f(',"'",'child_picker',suffix,"'",",'child",suffix,"'",')">Go</button>
+</div> 
+  ')
+)
+
+```
+
+
+*Please select characteristic of interest and press Go*
+
+```{r, results='asis'}
+
+if(seg){
+  cat(
+    paste0('<div id="age',suffix,'" class="sect child',suffix,'">\n'
+             )
+  )
+}else{
+  cat('<div id="age" class="sect child">\n')
+}
+
+```
+
+```{r}
+
+if(is.null(age_grp)){
+
+df_age<-table_f("dem_age_clean")[!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
+                                                ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17"))
+                                 ][,dem_age_clean:=factor(dem_age_clean,c("9-11","12-15","16-17"))]
+
+two_way_tb_f(df_age,"dem_age_clean","16-17 vs 9-11",col1,
+             mult_cols=T,test_vals=c("16-17","9-11"))
+}else{
+  df_age<-table_f("dem_age_clean")[!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=as.factor(dem_age_clean)]
+
+  age_split<-unlist(strsplit(age_grp,"[-]"))
+  
+  age_str<-paste0(age_split[length(age_split)]," vs ",age_split[1])
+  
+two_way_tb_f(df_age,"dem_age_clean",age_str,col1,
+             mult_cols=T,test_vals=age_split)
+}
+
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+if(seg){
+  cat(
+    paste0('<div id="ageSingle',suffix,'" class="sect child',suffix,'">\n'
+             )
+  )
+}else{
+  cat('<div id="ageSingle" class="sect child">\n')
+}
+
+```
+
+```{r}
+
+if(is.null(age_grp)){
+
+df_age<-table_f("dem_age_clean")[!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=factor(dem_age_clean,as.character(seq(9,17)))]
+
+two_way_tb_f(df_age,"dem_age_clean","16 vs 9",col1,
+             mult_cols=T,test_vals=c("16","9"))
+}else{
+  df_age<-table_f("dem_age_clean")[!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=as.factor(dem_age_clean)]
+
+  age_split<-unlist(strsplit(age_grp,"[-]"))
+  
+  age_str<-paste0(age_split[length(age_split)]," vs ",age_split[1])
+  
+two_way_tb_f(df_age,"dem_age_clean",age_str,col1,
+             mult_cols=T,test_vals=age_split)
+}
+
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+if(seg){
+  cat(
+    paste0('<div id="gender',suffix,'" class="sect child',suffix,'">\n'
+             )
+  )
+}else{
+  cat('<div id="gender" class="sect child">\n')
+}
+
+```
+
+```{r}
+
+
+df_gender<-table_f("dem_gender_clean")[!dem_gender_clean=="I dont want to say"]
+
+df_gender$dem_gender_clean<-factor(df_gender$dem_gender_clean,c("Female","Girl","Boy","Male","Other"))
+
+two_way_tb_f(df_gender,"dem_gender_clean","Male vs Female",col1,
+             mult_cols = T, test_vals=c("Male","Female"))
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+if(seg){
+  cat(
+    paste0('<div id="age_gender',suffix,'" class="sect child',suffix,'">\n'
+             )
+  )
+}else{
+  cat('<div id="age_gender" class="sect child">\n')
+}
+
+```
+
+```{r}
+
+hap_col<-names(df)[grepl(paste0("^id$|dem_gender_clean|",search_str,"|dem_age_clean|^wt$"),names(df))]
+
+df_gender<-melt(df[,..hap_col],id.vars = c("id","dem_gender_clean","dem_age_clean","wt"))[,variable:=plyr::mapvalues(variable,
+                                                                                    q_lookup$var,
+                                                                                    q_lookup$label)]
+
+if(is.null(age_grp)){
+  
+  df_gender<-df_gender[,age:=ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
+                                                ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17"))][,age:=factor(age,levels=c("9-11","12-15","16-17"))]
+}else{
+  df_gender<-df_gender[,age:=dem_age_clean]
+}
+
+df_gender_out<-df_gender[,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,1,0))
+           ][,.(c=sum(wt)),by=.(dem_gender_clean,variable,value,age)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_gender_clean,age)
+  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)][,v2:=paste0(variable,"_",age)]
+
+effect_test_genAge<-merge(
+  effectsize_f(df_gender_out[dem_gender_clean %in% c("Male","Female")],"v2","dem_gender_clean","perc"),
+  sig_f(copy(df_gender)[,variable:=paste0(variable,"_",age)][,.(variable,dem_gender_clean,value)][dem_gender_clean %in% c("Male","Female")],
+        "dem_gender_clean","value"),by="g1"
+)
+
+tb<-merge(dcast(df_gender_out[!dem_gender_clean %in% c("I dont want to say")][,.(v2,variable,dem_gender_clean,age,perc)],v2+variable+age~dem_gender_clean,value.var = "perc"),
+          effect_test_genAge[,.(v2=g1,rr,diff,p.value)],by="v2")[,v2:=NULL
+                                                         ][order(variable,age)]
+
+tb<-tb[order(variable,age)]
+
+ download_tb<-tb
+  
+  names(download_tb)<-plyr::mapvalues(names(tb),c("variable","rr","diff","p.value"),
+                                      c(col1,paste0("Relative risk with age group (Male vs Female)"),
+                                        "How big is this difference?","Statistical significance"))
+ 
+
+pList<-p_col_select(tb,c("variable","rr","diff","age","p.value"))
+
+div(html_table_f(tb,column_def = c(
+  list(
+    variable=colDef(name=col1,minWidth=200),
+    age=colDef(name="Age group")),
+    pList,
+    list(rr=colDef(name="Relative risk with age group (Male vs Female)",format = colFormat(digits=2),align = "center"),
+   diff=colDef("How big is this difference?",minWidth = 150),
+   p.value=colDef("Statistical significance"))
+  ),
+  groupBy="variable",sort_col=NULL),
+  downloadthis::download_this(as.data.frame(download_tb),
+                              output_name="big_ask_table_download",output_extension=".xlsx")
+)
+
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+if(seg){
+  cat(
+    paste0('<div id="ethnicity',suffix,'" class="sect child',suffix,'">\n'
+             )
+  )
+}else{
+  cat('<div id="ethnicity" class="sect child">\n')
+}
+
+```
+
+```{r}
+
+df_eth<-table_f("dem_eth_grp")[!dem_eth_grp %in% c("I dont want to say",NA)
+                               ]
+
+df_eth_full<-df_eth[,.(c=sum(wt)),by=.(variable,value,dem_eth_grp)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_eth_grp)
+  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)]
+
+df_bme<-df_eth[!is.na(value)][,bme:=ifelse(dem_eth_grp=="White",1,0)][,.(c=sum(wt)),by=.(variable,bme,value)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,bme)
+                                                                             ][value==1][,value:=NULL][,val_col:=paste0(c,"|",base,"|",perc)]
+
+effect_test_bme<-merge(effectsize_f(df_bme,"variable","bme","perc"),
+                       sig_f(df_eth[!is.na(value) & !is.na(dem_eth_grp)][,bme:=ifelse(dem_eth_grp=="White",1,0)],"bme","value"),
+                       by="g1"
+)
+
+tb<-Reduce(function(x,y) merge(x,y,by="variable"),
+           list(dcast(df_eth_full[,.(variable,dem_eth_grp,perc)],variable~dem_eth_grp,value.var = "perc"),
+                df_bme[bme==0][,.(variable,BME=perc)],
+          effect_test_bme[,.(variable=g1,rr,diff,p.value)]
+          )
+)
+
+
+pList<-p_col_select(tb,c("variable","rr","diff","p.value"))
+
+download_tb<-tb
+  
+  names(download_tb)<-plyr::mapvalues(names(tb),c("variable","rr","diff","p.value"),
+                                      c(col1,paste0("Relative risk (White vs BME)"),
+                                        "How big is this difference?","Statistical significance"))
+ 
+
+div(html_table_f(tb,column_def = c(
+  list(
+    variable=colDef(name=col1,minWidth=200)),
+    pList,
+    list(rr=colDef(name="Relative risk (White vs BME)",format = colFormat(digits=2),align = "center"),
+   diff=colDef("How big is this difference?",minWidth = 150),
+   p.value=colDef(name="Statistical significance",minWidth = 150))
+  )
+),downloadthis::download_this(as.data.frame(download_tb),
+                              output_name="big_ask_table_download",output_extension=".xlsx")
+)
+
+
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+if(seg){
+  cat(
+    paste0('<div id="ethnicity_age',suffix,'" class="sect child',suffix,'">\n'
+             )
+  )
+}else{
+  cat('<div id="ethnicity_age" class="sect child">\n')
+}
+
+```
+
+```{r}
+hap_col<-names(df)[grepl(paste0("^id$|dem_eth_grp|",search_str,"|dem_age_clean|^wt$"),names(df))]
+
+df_eth<-melt(df[!is.na(dem_eth_grp) & !dem_eth_grp=="I dont want to say",..hap_col],id.vars = c("id","dem_eth_grp","dem_age_clean","wt"))[,variable:=plyr::mapvalues(variable,
+                                                                                    q_lookup$var,
+                                                                                    q_lookup$label)]
+
+if(is.null(age_grp)){
+  
+  df_eth<-df_eth[,age:=ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
+                                                ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17"))][,age:=factor(age,levels=c("9-11","12-15","16-17"))]
+}else{
+  df_eth<-df_eth[,age:=dem_age_clean]
+}
+
+df_eth<-df_eth[!is.na(value)][,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,1,0))
+           ]
+
+df_eth_all<-df_eth[,.(c=sum(wt)),by=.(dem_eth_grp,variable,value,age)
+             ][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_eth_grp,age)
+  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)][,v2:=paste0(variable,"_",age)]
+
+df_bme<-df_eth[!is.na(value)][,bme:=ifelse(dem_eth_grp=="White",1,0)][,.(c=sum(wt)),by=.(variable,age,bme,value)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,age,bme)
+  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)][,v2:=paste0(variable,"_",age)]
+
+effect_test_ethAge<-merge(
+  effectsize_f(df_bme,"v2","bme","perc"),
+  sig_f(df_eth[!is.na(value)][,bme:=ifelse(dem_eth_grp=="White",1,0)
+                              ][,variable:=paste0(variable,"_",age)][,.(bme,variable,value)],"bme","value"),
+  by="g1"
+)
+
+tb<-merge(dcast(df_eth_all[,.(v2,variable,dem_eth_grp,age,perc)],v2+variable+age~dem_eth_grp,value.var = "perc"),
+          effect_test_ethAge[,.(v2=g1,rr,diff,p.value)],by="v2")[order(variable,age)]
+
+tb<-merge(tb,
+      df_bme[bme==0][,.(v2,`BME`=perc)],
+      by="v2")[,v2:=NULL][,.(variable,Age=age,Asian,Black,Mixed,Other,BME,White,rr,diff,p.value)]
+
+tb<-tb[order(variable,Age)]
+
+pList<-p_col_select(tb,c("variable","rr","diff","Age","p.value"))
+
+download_tb<-tb
+  
+  names(download_tb)<-plyr::mapvalues(names(tb),c("variable","rr","diff","p.value"),
+                                      c(col1,paste0("Relative risk within age group (White vs BME)"),
+                                        "How big is this difference?","Statistical significance"))
+
+
+div(
+  html_table_f(tb,column_def = c(
+  list(
+    variable=colDef(name=col1,minWidth=200),
+    Age=colDef(name="Age")),
+    pList,
+    list(rr=colDef(name="Relative risk within age group (White vs BME)",format = colFormat(digits=2),align = "center"),
+   diff=colDef("How big is this difference?",minWidth = 150),
+   p.value=colDef("Statistical significance",minWidth = 150))
+  ),
+  groupBy="variable",sort_col =NULL),
+downloadthis::download_this(as.data.frame(download_tb),
+                              output_name="big_ask_table_download",output_extension=".xlsx")
+)
+
+
+
+```
+
+</div>
+
+```{r, results='asis'}
+
+if(seg){
+  cat(
+    paste0('<div id="ethnicity_gender',suffix,'" class="sect child',suffix,'">\n'
+             )
+  )
+}else{
+  cat('<div id="ethnicity_gender" class="sect child">\n')
+}
+
+```
+
+```{r, fig.width=10}
+hap_col<-names(df)[grepl(paste0("^id$|dem_eth_grp|",search_str,"|dem_gender_clean|^wt$"),names(df))]
+
+df_eth<-melt(df[!is.na(dem_eth_grp) & !dem_eth_grp=="I dont want to say",..hap_col],id.vars = c("id","dem_eth_grp","dem_gender_clean","wt"))[,variable:=plyr::mapvalues(variable,
+                                                                                    q_lookup$var,
+                                                                                    q_lookup$label)]
+
+df_eth_2<-df_eth[!is.na(value)][,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,1,0))
+           ][,.(c=sum(wt)),by=.(dem_eth_grp,variable,value,dem_gender_clean)][,v2:=paste0(variable,"_",dem_gender_clean)]
+
+df_bme<-df_eth_2[!is.na(value)][,bme:=ifelse(dem_eth_grp=="White",1,0)][,.(c=sum(c)),by=.(v2,bme,value)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(v2,bme)
+  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)]
+
+df_eth_all<-df_eth_2[!is.na(value)][,perc:=c/sum(c),by=.(dem_eth_grp,variable,dem_gender_clean)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_eth_grp,dem_gender_clean)
+  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)][,v2:=paste0(variable,"_",dem_gender_clean)]
+
+effect_test_ethdem_gender_clean<-merge(
+  effectsize_f(df_bme,"v2","bme","perc"),
+  sig_f(df_eth[!is.na(value)][,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,1,0))
+           ][,bme:=ifelse(dem_eth_grp=="White",1,0)][,variable:=paste0(variable,"_",dem_gender_clean)],"bme","value"),
+  by="g1"
+)
+
+tb<-merge(dcast(df_eth_all[,.(v2,variable,dem_eth_grp,dem_gender_clean,perc)],v2+variable+dem_gender_clean~dem_eth_grp,value.var = "perc"),
+          effect_test_ethdem_gender_clean[,.(v2=g1,rr,diff,p.value)],by="v2")[order(variable,dem_gender_clean)]
+
+tb<-merge(tb,
+      df_bme[bme==0][,.(v2,`BME`=perc)],
+      by="v2")[,v2:=NULL][,.(variable,dem_gender_clean=dem_gender_clean,Asian,Black,Mixed,Other,BME,White,rr,diff,p.value)]
+
+pList<-p_col_select(tb,c("variable","rr","diff","dem_gender_clean","p.value"))
+
+download_tb<-tb
+  
+  names(download_tb)<-plyr::mapvalues(names(tb),c("variable","rr","diff","p.value"),
+                                      c(col1,paste0("Relative risk within gender (White vs BME)"),
+                                        "How big is this difference?","Statistical significance"))
+
+
+div(html_table_f(tb[!dem_gender_clean=="I dont want to say"],column_def = c(
+  list(
+    variable=colDef(name=col1,minWidth=200),
+    dem_gender_clean=colDef(name="Gender")),
+    pList,
+    list(rr=colDef(name="Relative risk within gender (White vs BME)",format = colFormat(digits=2),align = "center"),
+   diff=colDef("How big is this difference?",minWidth = 150),
+   p.value=colDef("Statistical significance",minWidth = 150))
+  ),
+  groupBy="variable"),
+  downloadthis::download_this(as.data.frame(download_tb),
+                              output_name="big_ask_table_download",output_extension=".xlsx")
+)
+
+
+```
+
+</div>

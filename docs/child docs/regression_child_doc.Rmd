@@ -1,0 +1,368 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "`r paste0(params$section,': ',params$pg)`"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+   theme: null
+   template: "CCO_template_html.html"
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+```
+
+```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
+
+
+```
+
+<script src="extra_js.js"></script>
+
+```{r, include=F}
+
+df_any_mh<-table_f("any_mh")
+
+two_way_tb_f(df_any_mh,"any_mh","Receiving support from a healthcare worker vs Not",col1)
+
+```
+
+```{r, include=F}
+
+pal<-RColorBrewer::brewer.pal(7,"Reds")
+
+reg_lookup<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/regressions_predictor_lookup.csv")
+
+outcomes<-q_lookup$var[!grepl("Other|dont",q_lookup$var)]
+
+pred_child<-c("dem_age_clean","dem_gender_clean","dem_eth_grp")
+
+pred_area<-c("idaci_decile","all_crime","covid_quintile","loss10")
+
+pred_disad<-c("kinship","any_mh","sw","yc")
+
+pred_school<-c("ofsted","dfe_phase")
+
+sel<-c(outcomes,pred_child,pred_area,pred_disad,"wt")
+
+block_list<-list(`Child characteristics`=pred_child,
+                 `Area characteristics`=pred_area,
+                 `Vulnerabilities`=pred_disad#,
+                 #`School characteristics`=pred_school
+                 )
+
+hap<-any(grepl("q_lookup_hap",ls())) | any(grepl("happy",q_lookup$var))
+imp<-any(grepl("q_lookup_imp",ls()))
+
+if(hap){
+  
+  if(any(grepl("happy",q_lookup$var))){
+    hap_pred<-q_lookup$var
+  }else{
+  
+  hap_pred<-q_lookup_hap$var
+  }
+  
+  sel<-c(outcomes,pred_child,pred_area,pred_disad,hap_pred,"wt")
+
+block_list<-list(`Child characteristics`=pred_child,
+                 `Area characteristics`=pred_area,
+                 `Vulnerabilities`=pred_disad,
+                 `Happiness with current situation`=hap_pred#,
+                 #`School characteristics`=pred_school
+                 )
+  
+}
+
+if(imp){
+  
+  imp_pred<-q_lookup_imp$var[!grepl("dont|Other",q_lookup_imp$var)]
+  
+  sel<-c(outcomes,pred_child,pred_area,pred_disad,hap_pred,imp_pred,"wt")
+
+block_list<-list(`Child characteristics`=pred_child,
+                 `Area characteristics`=pred_area,
+                 `Vulnerabilities`=pred_disad,
+                 `Happiness with current situation`=hap_pred,
+                 `What they think is important`=imp_pred#,
+                 #`School characteristics`=pred_school
+                 )
+}
+
+
+
+reg_df<-df[`dem_support_I dont want to say`=="No"
+           ][,yc:=ifelse(`dem_support_A young carers project`=="Yes","Young carer","Not")
+             ]
+
+#reg_df<-reg_df[!ofsted %in% c(NA,"")][,ofsted:=ifelse(ofsted %in% c("Serious Weaknesses","Special Measures","Inadequate"),"Inadequate",ofsted)][,ofsted:=factor(ofsted,levels=c("Outstanding","Good","Requires improvement","Inadequate"))]
+
+
+reg_df<-reg_df[,..sel]
+
+for(i in outcomes){
+  
+  reg_df<-reg_df[,(i):=ifelse(get(i) %in% dk_vals,NA,
+                        ifelse(get(i) %in% target_vals,1,0))]
+  
+}
+
+for(i in setdiff(sel,outcomes)){
+  
+  reg_df<-reg_df[,(i):=ifelse(get(i) %in% dk_vals,NA,get(i))]
+  
+}
+
+if(hap & !any(grepl("happy",q_lookup$var))){
+  
+  dk_vals_hap<-c("I don't know","Not applicable","dont know","I dont want to say")
+
+target_vals_hap<-c("Unhappy","Very unhappy","sad")
+  
+  for(i in hap_pred){
+    
+    reg_df<-reg_df[,(i):=ifelse(get(i) %in% dk_vals_hap,NA,
+                                ifelse(get(i) %in% target_vals_hap,"Yes","No"))]
+    
+  }
+  
+}
+
+reg_df<-na.omit(reg_df)[sample(seq_len(.N),1e4)]
+
+reg_df$dem_gender_clean<-relevel(as.factor(reg_df$dem_gender_clean),ref="Male")
+reg_df$dem_eth_grp<-relevel(as.factor(reg_df$dem_eth_grp),ref="White")
+reg_df$dem_age_clean<-relevel(as.factor(reg_df$dem_age_clean),ref="9")
+
+reg_df$sw<-ifelse(reg_df$sw==2,"Yes","No")
+reg_df$any_mh<-ifelse(reg_df$any_mh==2,"Yes","No")
+
+reg_df$idaci_decile<-as.factor(reg_df$idaci_decile)
+reg_df$all_crime<-as.factor(reg_df$all_crime)
+reg_df$covid_quintile<-as.factor(reg_df$covid_quintile)
+reg_df$loss10<-as.factor(reg_df$loss10)
+
+#reg_df$dfe_phase<-relevel(as.factor(reg_df$dfe_phase),ref="Secondary")
+#reg_df$scGroup<-relevel(as.factor(reg_df$scGroup),ref="Local authority maintained #schools")
+```
+
+```{r}
+require(survey)
+
+mod_res<-pbapply::pblapply(outcomes,function(x){
+
+  ## Full model
+  
+  if(any(grepl("happy",q_lookup$var))){
+  
+  vars<-setdiff(names(reg_df)[!names(reg_df)=="q1_happy_M_clean" & !grepl("Other|dont|not worried",names(reg_df))],x)
+  }else{
+    vars<-setdiff(names(reg_df)[!names(reg_df)=="q1_happy_M_clean" & !grepl("Other|dont|not worried",names(reg_df))],outcomes)
+  }
+  
+  vars<-vars[!vars=="wt"]
+  
+  f<-as.formula(paste0("`",x,"`~`",paste0(vars,collapse="`+`"),"`"))
+  
+mod<-svyglm(f,design=svydesign(ids=~1,data=reg_df,weights=~wt),family=binomial)
+
+pred_all<-as.numeric(
+  predict(mod,newdata=model.frame(f,data=reg_df),type="response",se.fit=F)
+)
+
+lb<-reg_df[,get(x)]
+
+allAUC<-ModelMetrics::auc(lb,pred_all)
+
+d2<-modEvA::Dsquared(mod)
+
+coef<-as.data.table(broom::tidy(mod))[,outcome:=x]
+
+coef$pred<-NA
+
+for(i in vars){
+  coef$pred[grepl(i,coef$term)]<-i
+}
+
+coef<-merge(coef,reg_lookup,by.x="pred",by.y="var",all.x=T)
+
+coef$label<-apply(coef,1,function(x){
+  
+    
+    x[["label"]]<-paste0(x[["label"]]," - ",gsub(x[["pred"]],"",x[["term"]]))
+    gsub("[`]","",x[["label"]])
+  
+})
+
+coef<-coef[,or:=round(exp(estimate),2)
+     ][,sig:=ifelse(p.value<0.05,"Yes","")][!grepl("Intercept",term),.(Predictor=label,`Ref category`=ref,`Odds ratio`=or,`Significant at 5% level`=sig,outcome)]
+
+## Variable importance
+
+permList<-rbindlist(lapply(vars,function(y){
+  
+  perm_df<-copy(reg_df)[,(y):=sample(get(y),nrow(reg_df))]
+  
+  pred<-as.numeric(
+  predict(mod,newdata=model.frame(f,data=perm_df),type="response",se.fit=F)
+)
+  
+ data.table(
+   var=y,auc=ModelMetrics::auc(lb,pred)
+ )[,change:=allAUC-auc
+   ][,outcome:=x]
+
+})
+)
+
+## Blocks
+
+block_auc<-rbindlist(purrr::imap(block_list,function(y,z){
+  f<-as.formula(paste0("`",x,"`~`",paste0(y[!y==x],collapse="`+`"),"`"))
+  
+mod<-svyglm(f,design=svydesign(ids=~1,data=reg_df,weights=~wt),family=binomial)
+
+pred<-as.numeric(
+  predict(mod,newdata=model.frame(f,data=reg_df),type="response",se.fit=F)
+)
+
+blockAUC<-ModelMetrics::auc(lb,pred)
+
+data.table(outcome=x,block=z,auc=blockAUC)
+
+}
+            )
+)
+list(coef=coef,d2=d2,allAUC=data.table(outcome=x,auc=allAUC),imp=permList,block_auc=block_auc)
+  
+})
+
+```
+
+<h4>What types of characteristics are most predictive?</h4>
+
+```{r}
+
+var_imp<-rbindlist(lapply(mod_res,function(x) x$block_auc))
+
+var_imp$outcome<-plyr::mapvalues(var_imp$outcome,
+                                 q_lookup$var,q_lookup$label)
+
+ggplot(var_imp,
+       aes(x=block,y=outcome,fill=auc))+
+  geom_tile(colour="grey50")+
+  geom_text(aes(label=round(auc,2)))+
+  theme(axis.text.x = element_text(angle=90),
+        panel.grid=element_blank(),
+        panel.background = element_blank(),
+        axis.ticks=element_blank())+
+  scale_fill_gradient(low=pal[1],high=pal[length(pal)],name="Predictive power of block\n(Higher = more predictive)")+
+  ylab("")+xlab("")
+
+```
+
+<h4>What specific characteristics are most predictive?</h4>
+
+```{r,fig.width=11,results='asis',fig.height=11}
+
+var_imp<-rbindlist(lapply(mod_res,function(x) x$imp))
+
+var_imp$outcome<-plyr::mapvalues(var_imp$outcome,
+                                 q_lookup$var,q_lookup$label)
+
+
+pList<-split(var_imp,var_imp$outcome)
+
+coefList<-rbindlist(lapply(mod_res,function(x) x$coef))
+
+coefList$outcome<-plyr::mapvalues(coefList$outcome,
+                                 q_lookup$var,q_lookup$label)
+
+
+coefList<-split(coefList,coefList$outcome)
+
+pick_string<-sapply(names(pList),
+                    function(x){
+                      
+                      paste0('<option value="',gsub(" |[[:punct:]]","_",tolower(x)),'">',x,'</option>')
+                      
+                    })
+
+pick_string<-paste0(pick_string,collapse = "\n")
+
+cat(paste0(
+  '<div class="picker-group">
+<label>Select outcome</label>
+<select id="reg_picker">
+',pick_string,
+'</select>
+<button class="picker_button" onclick="picker_f(',"'",'reg_picker',"','",'reg',"')",'"','>Go</button>
+</div>\n\n'
+)
+  
+)
+
+for(i in seq_len(length(pList))){
+  
+  y<-names(pList)[i]
+  x<-pList[[i]]
+  
+  d<-merge(pList[[i]],reg_lookup,by="var",all.x=T)
+  
+  d$label<-sapply(d$label,function(y) splitF(y,n_words=5))
+ 
+  cat(paste0('<div id="',gsub(" |[[:punct:]]","_",tolower(y)),'" class="sect reg">\n'))
+  
+  cat("\n**Overall predictive power**\n")
+  
+ print( ggplot(d,
+       aes(x=reorder(label,change),y=change*100))+geom_segment(aes(xend=label,yend=0))+
+  geom_point(size=2)+coord_flip()+
+  theme_bw()+scale_y_continuous(limits=c(min(var_imp$change)*100,max(var_imp$change)*100))+
+  xlab("Predictor\n")+ylab("\n% change in correctly identifying a child with outcome\nafter randomising predictor")+ggtitle(y) )
+ 
+ cat("\n**Odds ratios**\n")
+ 
+ cat("\n*Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included*\n")
+ 
+ coef_tb<-coefList[[i]]
+ 
+ coef_tb<-coef_tb[,outcome:=NULL]
+ 
+ print(div(style="margin:auto;text-align:center",html_table_f(coef_tb,
+              list(Predictor=colDef(minWidth = 300),
+                   `Ref category`=colDef(minWidth=200),
+                   `Odds ratio`=colDef(minWidth = 100),
+                   `Significant at 5% level`=colDef(minWidth=200)),
+              sort_col=NULL)
+ )
+ )
+  
+  cat("</div>")
+ 
+}
+
+```
+
+<h4>How well can we predict these outcomes overall?</h4>
+
+```{r}
+
+var_imp<-rbindlist(lapply(mod_res,function(x) x$allAUC))
+
+var_imp$outcome<-plyr::mapvalues(var_imp$outcome,
+                                 q_lookup$var,q_lookup$label)
+
+
+ggplot(var_imp,
+       aes(x=reorder(outcome,auc),y=auc))+
+  geom_segment(aes(xend=outcome,yend=0.5))+geom_point(size=2)+coord_flip()+scale_y_continuous(limits=c(0.5,1))+theme_bw()+xlab("Outcome")+ylab("Overall prediction quality\n(1 = perfect prediction, 0.5 = no better than random)")+theme_bw()
+
+```

@@ -1,0 +1,284 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "`r paste0(params$section,': ',params$pg)`"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+   theme: null
+   template: "CCO_template_html.html"
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+```
+
+```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
+
+
+```
+
+<script src="extra_js.js"></script>
+
+```{r, fig.width=10}
+
+hap_col<-names(df)[grepl(paste0("^id$|",search_str,"|^wt$"),names(df))]
+
+
+q_vars<-hap_col[grepl("^q",hap_col) & !grepl("Other|dont|not worried",hap_col)]
+
+
+comb_chart_f1<-function(dat){
+dat<-dat[,..hap_col
+        ]
+
+
+dat<-dat[,(q_vars):=lapply(.SD,function(x){
+  ifelse(x %in% dk_vals,NA,
+                        ifelse(x %in% target_vals,1,0))
+           
+}),.SDcols=q_vars]
+
+vars_comb<-names(dat)[!grepl("id|wt",names(dat))]
+
+two_way<-as.data.table(expand.grid(var1=vars_comb,var2=vars_comb,stringsAsFactors = F))
+
+two_way_out<-rbindlist(lapply(seq_len(nrow(two_way)),function(x){
+  
+  v1<-two_way$var1[x]
+  v2<-two_way$var2[x]
+  
+  lb1<-q_lookup$label[q_lookup$var==v1]
+  lb2<-q_lookup$label[q_lookup$var==v2]
+  
+  d<-dat[,.(c=sum(wt)),by=.(var1=get(v1),var2=get(v2))
+  ][,`:=`(perc=round(c/sum(c),2)*100,base=sum(c))
+  ][var1==1 & var2==1
+    ][,comb:=paste0(v1,"-",v2)
+        ][,`:=`(v1=lb1,v2=lb2)][,.(comb,c,perc,base,v1,v2)]
+  
+  
+})
+)[,`:=`(v1=factor(sapply(v1,splitF),levels=sapply(q_lookup$label,splitF)),
+        v2=factor(sapply(v2,splitF),levels=sapply(q_lookup$label,splitF))
+        )]
+
+d2<-dcast(two_way_out[,.(v1,v2,perc)],v2~v1,value.var="perc")
+
+d2[upper.tri(d2,diag=T)]<-NA
+
+two_way_out<-melt(d2,id.vars="v2",variable.name = "v1",value.name="perc")
+
+pal<-RColorBrewer::brewer.pal(7,"Reds")
+
+
+
+ggplot(na.omit(two_way_out),
+       aes(x=v2,y=v1,v1,fill=perc))+geom_tile(colour="grey50")+
+  geom_text(aes(label=paste0(round(perc,1),"%")))+
+  theme(axis.text.x = element_text(angle=90),
+        panel.grid=element_blank(),
+        panel.background = element_blank(),
+        axis.ticks=element_blank())+
+  scale_fill_gradient(low=pal[1],high=pal[length(pal)],name="% of respondents")+
+  ylab("")+xlab("")
+
+}
+
+comb_chart_f2<-function(dat){
+  dat<-dat[,..hap_col
+        ]
+
+
+dat<-dat[,(q_vars):=lapply(.SD,function(x){
+  ifelse(x %in% dk_vals,NA,
+                        ifelse(x %in% target_vals,1,0))
+           
+}),.SDcols=q_vars]
+
+vars_comb<-names(dat)[!grepl("id|wt",names(dat))]
+
+vars_comb<-names(dat)[!grepl("id|wt",names(dat))]
+
+two_way<-as.data.table(expand.grid(var1=vars_comb,var2=vars_comb,stringsAsFactors = F))
+
+two_way_out<-rbindlist(lapply(seq_len(nrow(two_way)),function(x){
+  
+  v1<-two_way$var1[x]
+  v2<-two_way$var2[x]
+  
+  lb1<-q_lookup$label[q_lookup$var==v1]
+  lb2<-q_lookup$label[q_lookup$var==v2]
+  
+  dat[,.(c=sum(wt)),by=.(var1=get(v1),var2=get(v2))
+  ][,`:=`(perc=round(c/sum(c),2)*100,base=sum(c)),by=var1
+  ][var1==1 & var2==1
+    ][,comb:=paste0(v1,"-",v2)
+        ][,`:=`(v1=lb1,v2=lb2)][,.(comb,c,perc,base,v1,v2)
+                                ][,perc:=ifelse(v1==v2,NA,perc)]
+  
+  
+})
+)[,`:=`(v1=factor(sapply(v1,splitF),levels=sapply(q_lookup$label,splitF)),
+        v2=factor(sapply(v2,splitF),levels=sapply(q_lookup$label,splitF))
+        )]
+
+pal<-RColorBrewer::brewer.pal(7,"Reds")
+
+
+
+ggplot(two_way_out,
+       aes(x=reorder(v2,v1),y=v1,fill=perc))+geom_tile(colour="grey50")+
+  geom_text(aes(label=ifelse(!is.na(perc),paste0(round(perc,1),"%"),"")))+
+  theme(axis.text.x = element_text(angle=90),
+        panel.grid=element_blank(),
+        panel.background = element_blank(),
+        axis.ticks=element_blank())+
+  scale_fill_gradient(low=pal[1],high=pal[length(pal)],name="% of children\nselecting row\nthat also selected column",na.value = "#FFFFFF")+
+  ylab("")+xlab("")
+
+
+}
+
+comb_chart_f3<-function(dat){
+  
+  dat<-dat[,..hap_col
+        ]
+
+dat<-dat[,(q_vars):=lapply(.SD,function(x){
+  ifelse(x %in% dk_vals,NA,
+                        ifelse(x %in% target_vals,1,0))
+           
+}),.SDcols=q_vars]
+
+
+vars_comb<-names(dat)[!grepl("id|wt|ward|UTLA19CD|dont|Other|pcon|not worried",names(dat))]
+
+two_way<-as.data.table(expand.grid(var1=vars_comb,var2=vars_comb,stringsAsFactors = F))
+
+
+two_way_out<-rbindlist(lapply(seq_len(nrow(two_way)),function(x){
+  
+  v1<-two_way$var1[x]
+  v2<-two_way$var2[x]
+  
+  if(!v1==v2){
+  
+  lb1<-q_lookup$label[q_lookup$var==v1]
+  lb2<-q_lookup$label[q_lookup$var==v2]
+  
+  tb<-na.omit(dat[,.(c=sum(wt)),by=.(var1=get(v1),var2=get(v2))
+  ])[,`:=`(perc=c/sum(c),base=sum(c)),by=.(var1)
+  ][var2==1]
+  
+  
+   tb<-dcast(tb[,.(var2,perc,var1)],var2~var1,value.var="perc"
+            )[,rr:=`1`/`0`][,comb:=paste0(v1,"-",v2)
+        ][,`:=`(v1=lb1,v2=lb2)][,.(comb,rr,v1,v2)]
+  
+  }
+})
+
+)[,`:=`(v1=factor(sapply(v1,splitF),levels=sapply(q_lookup$label,splitF)),
+        v2=factor(sapply(v2,splitF),levels=sapply(q_lookup$label,splitF))
+        )]
+
+pal_div<-RColorBrewer::brewer.pal(7,"RdBu")
+
+
+ggplot(two_way_out,
+       aes(x=v2,y=v1,v1,fill=rr))+geom_tile(colour="grey50")+
+  geom_text(aes(label=round(rr,2)))+
+  theme(axis.text.x = element_text(angle=90),
+        panel.grid=element_blank(),
+        panel.background = element_blank(),
+        axis.ticks=element_blank())+
+  scale_fill_gradient2(low=pal_div[length(pal_div)],high=pal_div[1],midpoint=1,name="Relative risk\n(Children selecting row \nare x times more\nlikely to also say\ncolumn)")+
+  ylab("")+xlab("")
+
+}
+
+```
+
+```{r,results='asis', fig.width=10}
+
+
+if(is.null(age_grp)){
+
+  cat(
+paste0('<div class="picker-group">
+<label>Select age group</label>
+<select id="ageComb_picker">
+<option value="9-17">9-17</option>
+<option value="9-11">9-11</option>
+<option value="12-15">12-15</option>
+<option value="16-17">16-17</option>
+</select>
+<button class="picker_button" onclick="picker_f(',"'ageComb_picker','ageComb')",'">Go</button>
+</div>\n'
+)
+)
+
+
+for(i in c("9-17","9-11","12-15","16-17")){
+  
+  if(!i=="9-17"){
+    
+    ageSplit<-as.numeric(unlist(strsplit(i,"[-]")))
+    
+    comb_age<-df[as.numeric(dem_age_clean) >=ageSplit[1] & 
+                   as.numeric(dem_age_clean) <=ageSplit[2]]
+    
+  }else{
+    comb_age<-df
+  }
+ 
+  cat(paste0('<div id="',i,'" class="sect ageComb">\n'))
+   
+  cat("\n<h4>Which combinations most commonly co-occur?</h4>\n")
+  
+  print(comb_chart_f1(comb_age))
+  
+  cat("\n\n<h4>Which combinations are most correlated?</h4>\n")
+  
+
+  print(comb_chart_f2(comb_age))
+  
+  cat("\n")
+  
+  print(comb_chart_f3(comb_age))
+  
+  cat("</div>\n")
+  
+}
+  }else{
+  
+    comb_age<-df
+    
+  cat("\n<h4>Which combinations most commonly co-occur?</h4>\n")
+  
+  print(comb_chart_f1(comb_age))
+  
+  cat("\n\n<h4>Which combinations are most correlated?</h4>\n")
+  
+
+  print(comb_chart_f2(comb_age))
+  
+  cat("\n")
+  
+  print(comb_chart_f3(comb_age))
+  
+}
+  
+
+```
+
+
+
+
