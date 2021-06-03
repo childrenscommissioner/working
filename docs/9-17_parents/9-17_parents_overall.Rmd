@@ -93,8 +93,6 @@ q_lookup_worry<-q_lookup_worry[!grepl("dont want",var)]
 
 <script src="extra_js.js"></script>
 
-## `r params$pg`
-
 <h3>Key stats</h3>
 <div class="stat-boxes">
 
@@ -145,9 +143,7 @@ q_lookup_worry<-q_lookup_worry[!grepl("dont want",var)]
 
 INTRO TEXT
 
-### Overall rates
-
-<h3>% of children saying it is likely/unlikely that they will have a better life than their parents</h3>
+<h3>Do children think it is likely they will have a better life than their parents?</h3>
 
 ```{r}
 dat<-df[!q4_parents_clean %in% dk_vals

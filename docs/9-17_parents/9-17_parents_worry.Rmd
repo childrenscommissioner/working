@@ -25,13 +25,11 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F)
 ```
 
 
-### Link to future worries
+## `r params$pg`
 
-<h3>How is this different based on what they worry about in the future?</h3>
+**% of respondents overall saying they are both worried about something and that they think its unlikely they will have a better life than their parents**
 
-*% of respondents overall saying they are both worried about something and that they think its unlikely they will have a better life than their parents*
-
-```{r, fig.width=10, include=F}
+```{r, fig.width=10}
 
 hap_col<-names(df)[grepl("id|worry_|parents_clean$|wt",names(df))]
 
@@ -71,7 +69,7 @@ ggplot(corr_list,
 
 ```
 
-*Correlation between what children are worried about and whether they think it is unlikely they will have a better life than their parents*
+**Correlation between what children are worried about and whether they think it is unlikely they will have a better life than their parents**
 
 *Bars = % of children saying they are worried about each item that also think its unlikely they will have a better life than their parents*
 

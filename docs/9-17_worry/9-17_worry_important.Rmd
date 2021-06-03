@@ -25,11 +25,9 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F)
 ```
 
 
-### Link to future priorities
+## `r params$pg`
 
-<h3>How is this different based on what they think is important for the future?</h3>
-
-*% of respondents saying they think something is important and they are worried about*
+**% of respondents saying they think something is important and they are worried about it for the future**
 
 ```{r, fig.width=10}
 
@@ -77,7 +75,7 @@ ggplot(corr_list,
 
 ```
 
-*Correlations between what children think is important and what they are worried about*
+**Correlations between what children think is important and what they are worried about**
 
 *Note: red = stronger positive correlation (i.e. children selecting row are more likely to also select column in the chart below), blue = stronger negative correlation*
 

@@ -78,7 +78,7 @@ q_lookup_hap$var<-gsub("Option ","q1_happy_",q_lookup_hap$var)
 
 hap_col<-names(df)[grepl("^id$|important_|^wt$",names(df))]
 
-q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_happy_cluster_q_lookup.csv")
+q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_important_cluster_q_lookup.csv")
 
 
 ```
@@ -90,8 +90,6 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 ```
 
 <script src="extra_js.js"></script>
-
-### Summary
 
 <h3>Key stats</h3>
 <div class="stat-boxes">
@@ -144,13 +142,10 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 
 <h3>About this data</h3>
 
-INTRO TEXT
-
-## Overall rates
-
-<h3>% of children saying each item was important for their future</h3>
-
 *Children were asked to select up to 5 items from the items below that they felt were most important for them to have a good life when they grow up. The percentages in the chart below represent the proportion selecting each item.*
+
+
+<h3>What do children think is important for their future?</h3>
 
 
 

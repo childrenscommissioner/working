@@ -25,11 +25,9 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F)
 ```
 
 
-### Link to happiness now
+## `r params$pg`
 
-<h3>How is this different based on what they are unhappy about now?</h3>
-
-*% of respondents saying they are unhappy with something and that they are worried about*
+**% of respondents saying they are unhappy with something and that they are worried about**
 
 ```{r, fig.width=10}
 
@@ -81,7 +79,7 @@ ggplot(corr_list,
 
 ```
 
-*Correlations between what children are unhappy with and what they are worried about*
+**Correlations between what children are unhappy with and what they are worried about**
 
 *Note: red = stronger positive correlation (i.e. children selecting row are more likely to also select column in the chart below), blue = stronger negative correlation*
 

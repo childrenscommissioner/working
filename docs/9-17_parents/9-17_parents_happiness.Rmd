@@ -25,14 +25,12 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F)
 ```
 
 
-### Link to current happiness
+## `r params$pg`
 
-<h3>How is this different based on what they are unhappy about now?</h3>
-
-*% of respondents overall saying they are unhappy with something and that they think its unlikely they will have a better life than their parents*
+**% of respondents overall saying they are unhappy with an aspect of their life that think its unlikely they will have a better life than their parents**
 
 
-```{r, fig.width=10, include=F}
+```{r, fig.width=10}
 
 hap_col<-names(df)[grepl("id|happy.*_clean|parents_clean$|wt",names(df))]
 
@@ -72,7 +70,7 @@ ggplot(corr_list,
 
 ```
 
-*Correlation between what children are unhappy about and whether they think it is unlikely they will have a better life than their parents*
+**Correlation between what children are unhappy about and whether they think it is unlikely they will have a better life than their parents**
 
 *Bars = % of children saying they are unhappy with each item that think its unlikely they will have a better life than their parents*
 

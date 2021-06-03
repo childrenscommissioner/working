@@ -25,14 +25,12 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F)
 ```
 
 
-### Link to importance for future
+## `r params$pg`
 
-<h3>How is this different based on what they think is important for the future?</h3>
-
-*% of respondents overall saying both that something is important for their future and that they think its unlikely they will have a better life than their parents*
+**% of respondents overall saying both that something is important for their future and that they think its unlikely they will have a better life than their parents**
 
 
-```{r, fig.width=10, include=F}
+```{r, fig.width=10}
 
 hap_col<-names(df)[grepl("id|important_|parents_clean$|wt",names(df))]
 
@@ -72,7 +70,7 @@ ggplot(corr_list,
 
 ```
 
-*Correlation between what children think is important and whether they think it is unlikely they will have a better life than their parents*
+**Correlation between what children think is important and whether they think it is unlikely they will have a better life than their parents**
 
 *Bars = % of children saying they think an item is important that think its unlikely they will have a better life than their parents*
 

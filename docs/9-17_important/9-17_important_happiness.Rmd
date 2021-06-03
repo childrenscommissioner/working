@@ -27,7 +27,7 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F)
 
 ## `r params$pg`
 
-**% of respondents that are unhappy with something and that felt something is important for their future**
+**% of children that think each item is important for their future by the aspects of their lives that they are unhappy with**
 
 ```{r, fig.width=10}
 hap_col<-names(df)[grepl("id|happy.*_clean|important_|^wt$",names(df))]
@@ -72,7 +72,7 @@ ggplot(corr_list,
         panel.grid=element_blank(),
         panel.background = element_blank(),
         axis.ticks=element_blank())+
-  scale_fill_gradient(low=pal[1],high=pal[length(pal)],name="% of children unhappy\nabout row")+
+  scale_fill_gradient(low=pal[1],high=pal[length(pal)],name="% of children unhappy\nabout each aspect\nof  their life currently")+
   ylab("Children are unhappy with...")+xlab("Children think x is important...")
 
 ```

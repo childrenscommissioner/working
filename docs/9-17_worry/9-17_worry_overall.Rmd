@@ -79,7 +79,7 @@ q_lookup<-q_lookup[!grepl("dont want",var)]
 
 hap_col<-names(df)[grepl("^id$|worry_|^wt$",names(df))]
 
-q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_happy_cluster_q_lookup.csv")
+q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_worry_cluster_q_lookup.csv")
 
 
 ```
@@ -91,10 +91,6 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 ```
 
 <script src="extra_js.js"></script>
-
-## `r params$pg`
-
-### Summary
 
 <h3>Key stats
 <div class="stat-boxes">
@@ -143,15 +139,11 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 
 <div class="row"></div>
 
-
-
 <h3>About this data
 
 INTRO TEXT
 
-### Overall rates
-
-<h3>% of children reporting they are worried different things will not be true in 10 years</h3>
+<h3>What are children worried about for their future?</h3>
 
 ```{r}
 dat<-table_f("")[!grepl("dont|Other",variable)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),2)*100,by=.(variable)][value==1][,.(variable,perc)]

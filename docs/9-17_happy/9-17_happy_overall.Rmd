@@ -87,10 +87,6 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 
 <script src="extra_js.js"></script>
 
-## `r params$pg`
-
-### Summary
-
 <h3>Key stats</h3>
 <div class="stat-boxes">
 
@@ -139,8 +135,6 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 <h3>About this data</h3>
 
 INTRO TEXT
-
-### Overall rates
 
 <h3>How happy are children overall?</h3>
 
@@ -193,7 +187,7 @@ tb<-dat[][,.(c=sum(wt)),by=.(tot)
 
 names(tb)<-c("Number of aspects of their life children are unhappy with","% of respondents")
 
-reactable(tb,
+div(reactable(tb,
              columns=list(`Number of aspects of their life children are unhappy with`=colDef(),`% of respondents`=colDef()),
     pagination = F,
     fullWidth = T,
@@ -201,6 +195,8 @@ reactable(tb,
     resizable = T,
     searchable = F,
     showSortable = T,
-    language = reactableLang(searchPlaceholder = "Search table...",searchLabel = ""))
+    language = reactableLang(searchPlaceholder = "Search table...",searchLabel = "")),
+    downloadthis::download_this(tb,output_name ="big_ask_download",output_extension = ".xlsx")
+)
 
 ```
