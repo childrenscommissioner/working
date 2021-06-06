@@ -9,14 +9,14 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: styles.css
+   css: "../../styles.css"
    fig_width: 10
    theme: null
-   template: "CCO_template_html.html"
+   template: "../../CCO_template_html.html"
 ---
 
 ```{r, include=F}
-knitr::opts_chunk$set(echo = F, warning=F,message = F)
+knitr::opts_chunk$set(echo = F, warning=F,message = F) # Code is the same as 9-17_important_happiness document
 ```
 
 ```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
@@ -50,7 +50,7 @@ corr_list<-rbindlist(lapply(hap_cols,function(x){
                                   ][,perc:=c/sum(c),by=.(variable)
                                     ][hap==1 & value==1]
   
-  tb$hap_var<-splitF(q_lookup_imp$label[q_lookup_imp$var==x])
+  tb$hap_var<-splitF(q_lookup_worry$label[q_lookup_worry$var==x])
   
   tb$variable<-plyr::mapvalues(tb$variable,q_lookup$var,sapply(q_lookup$label,splitF))
   
@@ -58,14 +58,17 @@ corr_list<-rbindlist(lapply(hap_cols,function(x){
 })
 )
 
+corr_list$perc<-ifelse(corr_list$perc<0.01,round(corr_list$perc,3)*100,
+                       round(corr_list$perc,2)*100)
+
 ggplot(corr_list,
-       aes(x=reorder(hap_var,perc),y=perc*100,group=variable,fill=variable))+geom_col(colour="grey50",position = position_dodge(0.9))+geom_text(aes(label=paste0(round(perc,2)*100,"%")),position = position_dodge(0.9),hjust=-0.1)+scale_y_continuous(limits=c(0,max(corr_list$perc*100,na.rm=T)*1.1))+
+       aes(x=reorder(hap_var,perc),y=perc,group=variable,fill=variable))+geom_col(colour="grey50",position = position_dodge(0.9))+geom_text(aes(label=paste0(perc,"%")),position = position_dodge(0.9),hjust=-0.1)+scale_y_continuous(limits=c(0,max(corr_list$perc,na.rm=T)*1.1))+
   theme(axis.text.x = element_text(angle=90),
         panel.grid=element_blank(),
         panel.background = element_blank(),
         axis.ticks=element_blank())+
   scale_fill_brewer(type="qual",palette=3, name="", guide=F)+coord_flip()+
-  ylab("%\n")+xlab("")
+  ylab("% of 9-17 yr olds\n")+xlab("")
 
 ```
 

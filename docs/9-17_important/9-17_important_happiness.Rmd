@@ -9,18 +9,19 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: styles.css
+   css: "../../styles.css"
    fig_width: 10
    theme: null
-   template: "CCO_template_html.html"
+   template: "../../CCO_template_html.html"
 ---
 
 ```{r, include=F}
-knitr::opts_chunk$set(echo = F, warning=F,message = F)
+knitr::opts_chunk$set(echo = F, warning=F,message = F) # set chunk options
 ```
 
 ```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
 
+# read in navigation
 
 ```
 
@@ -30,17 +31,19 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F)
 **% of children that think each item is important for their future by the aspects of their lives that they are unhappy with**
 
 ```{r, fig.width=10}
-hap_col<-names(df)[grepl("id|happy.*_clean|important_|^wt$",names(df))]
+hap_col<-names(df)[grepl("id|happy.*_clean|important_|^wt$",names(df))] # get variables to use
 
-df_imp<-df[`q2_important_I dont want to say` %in% c(NA,"No")][,..hap_col]
+df_imp<-df[`q2_important_I dont want to say` %in% c(NA,"No")][,..hap_col] # subset df to columns required
 
-hap_cols<-hap_col[grepl("happy",hap_col)]
+hap_cols<-hap_col[grepl("happy",hap_col)] # object to store happiness column names
 
-imp_cols<-hap_col[grepl("imp",hap_col) & !grepl("dont|wt|Other",hap_col)]
+imp_cols<-hap_col[grepl("imp",hap_col) & !grepl("dont|wt|Other",hap_col)] # object to store future priorities column names
 
-pal<-RColorBrewer::brewer.pal(7,"Reds")
+pal<-RColorBrewer::brewer.pal(7,"Reds") # colour palette for charts
 
 corr_list<-rbindlist(lapply(hap_cols,function(x){
+  
+  # for each happiness column work out percentage who think each future priority is important
   
   col<-c("id",x,imp_cols,"wt")
   
@@ -52,20 +55,24 @@ corr_list<-rbindlist(lapply(hap_cols,function(x){
                                   ][,perc:=c/sum(c),by=.(variable,hap)
                                     ][hap==1 & value==1]
   
+  # split long strings into multiple lines
   tb$hap_var<-splitF(q_lookup_hap$label[q_lookup_hap$var==x])
   
+  # rename outcomes
   tb$variable<-plyr::mapvalues(tb$variable,q_lookup$var,sapply(q_lookup$label,splitF))
   
   tb
 })
 )
 
+#  ensure category orders are consistent
 corr_list$hap_var<-factor(corr_list$hap_var,
                           levels= sapply(q_lookup_hap$label,splitF))
 
 corr_list$variable<-factor(corr_list$variable,
                           levels= sapply(q_lookup$label,splitF))
 
+# Make plot
 ggplot(corr_list,
        aes(x=variable,y=hap_var,fill=perc*100))+geom_tile(colour="grey50")+geom_text(aes(label=paste0(round(perc,2)*100,"%")))+
   theme(axis.text.x = element_text(angle=90),
@@ -82,6 +89,8 @@ ggplot(corr_list,
 *Note: red = stronger positive correlation (i.e. children selecting row are more likely to also select column in the chart below), blue = stronger negative correlation*
 
 ```{r, fig.width=10}
+
+# Code is the same as chunk above but works out risk ratios rather than just %s
 
 hap_col<-names(df)[grepl("id|happy.*_clean|important_|^wt$",names(df))]
 

@@ -9,18 +9,19 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: styles.css
+   css: "../../styles.css"
    fig_width: 10
    theme: null
-   template: "CCO_template_html.html"
+   template: "../../CCO_template_html.html"
 ---
 
 ```{r, include=F}
-knitr::opts_chunk$set(echo = F, warning=F,message = F)
+knitr::opts_chunk$set(echo = F, warning=F,message = F) # set chunk options to avoid printing code
 ```
 
 ```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
 
+# add in navigation breadcrumbs
 
 ```
 
@@ -28,80 +29,110 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F)
 
 ```{r, fig.width=10}
 
-hap_col<-names(df)[grepl(paste0("^id$|",search_str,"|^wt$"),names(df))]
+## Code to create combination plots (i.e. proportion of children saying both row and column)
+
+hap_col<-names(df)[grepl(paste0("^id$|",search_str,"|^wt$"),names(df))] # Get columns needed
 
 
-q_vars<-hap_col[grepl("^q",hap_col) & !grepl("Other|dont|not worried",hap_col)]
+q_vars<-hap_col[grepl("^q",hap_col) & !grepl("Other|dont|not worried",hap_col)] # get outcome columns (excluding Other/dont know)
 
 
 comb_chart_f1<-function(dat){
+  
+  # function to create overall % selecting both options plot. dat = data frame to aggregate
+  
 dat<-dat[,..hap_col
-        ]
+        ] # select relevant columns
 
-
+# For each outcome - recode to be 1/0
 dat<-dat[,(q_vars):=lapply(.SD,function(x){
   ifelse(x %in% dk_vals,NA,
                         ifelse(x %in% target_vals,1,0))
            
 }),.SDcols=q_vars]
 
+# get grid of all possible combinations (to add in 0s)
 vars_comb<-names(dat)[!grepl("id|wt",names(dat))]
 
 two_way<-as.data.table(expand.grid(var1=vars_comb,var2=vars_comb,stringsAsFactors = F))
 
 two_way_out<-rbindlist(lapply(seq_len(nrow(two_way)),function(x){
   
-  v1<-two_way$var1[x]
-  v2<-two_way$var2[x]
+  # For each combination work out proportions saying both
   
-  lb1<-q_lookup$label[q_lookup$var==v1]
-  lb2<-q_lookup$label[q_lookup$var==v2]
+  v1<-two_way$var1[x] # get 1st variable name
+  v2<-two_way$var2[x] # get 2nd variable name
+  
+  lb1<-q_lookup$label[q_lookup$var==v1] # get label for 1st variable
+  lb2<-q_lookup$label[q_lookup$var==v2] # get label for 2nd variable
+  
+  # create % table of those saying both (note: base is all respondents)
   
   d<-dat[,.(c=sum(wt)),by=.(var1=get(v1),var2=get(v2))
-  ][,`:=`(perc=round(c/sum(c),2)*100,base=sum(c))
+  ][,`:=`(perc=c/sum(c)*100,base=sum(c))
   ][var1==1 & var2==1
     ][,comb:=paste0(v1,"-",v2)
         ][,`:=`(v1=lb1,v2=lb2)][,.(comb,c,perc,base,v1,v2)]
   
   
 })
-)[,`:=`(v1=factor(sapply(v1,splitF),levels=sapply(q_lookup$label,splitF)),
-        v2=factor(sapply(v2,splitF),levels=sapply(q_lookup$label,splitF))
-        )]
+)[,`:=`(v1=factor(sapply(v1,function(x) splitF(x,6,html = F)),levels=sapply(q_lookup$label,function(x) splitF(x,6,html=F))),
+        v2=factor(sapply(v2,function(x) splitF(x,6,html=F)),levels=sapply(q_lookup$label,function(x) splitF(x,6,html=F)))
+        )] # split long strings and turn into factor
 
+# Remove upper triangle from plot (it is symmetric in this case)
 d2<-dcast(two_way_out[,.(v1,v2,perc)],v2~v1,value.var="perc")
+
+var_names<-d2[,1]
+
+d2<-d2[,-1]
 
 d2[upper.tri(d2,diag=T)]<-NA
 
+d2<-cbind(d2,var_names)
+
+# Melt to long format for plotting by ggplot
 two_way_out<-melt(d2,id.vars="v2",variable.name = "v1",value.name="perc")
 
+
+# Create plot
 pal<-RColorBrewer::brewer.pal(7,"Reds")
 
+two_way_out$lb<-ifelse(is.na(two_way_out$perc),"",
+                       paste0(
+                         ifelse(two_way_out$perc<1,round(two_way_out$perc,2),round(two_way_out$perc,1)),
+                         "%")
+                       )
 
 
-ggplot(na.omit(two_way_out),
-       aes(x=v2,y=v1,v1,fill=perc))+geom_tile(colour="grey50")+
-  geom_text(aes(label=paste0(round(perc,1),"%")))+
+ggplot(two_way_out,
+       aes(x=v2,y=v1,v1,fill=perc))+geom_tile()+
+  geom_text(aes(label=lb))+
   theme(axis.text.x = element_text(angle=90),
         panel.grid=element_blank(),
         panel.background = element_blank(),
         axis.ticks=element_blank())+
-  scale_fill_gradient(low=pal[1],high=pal[length(pal)],name="% of respondents")+
+  scale_fill_gradient(low=pal[1],high=pal[length(pal)],name="% of respondents",na.value="white")+
   ylab("")+xlab("")
 
 }
 
 comb_chart_f2<-function(dat){
+  
+  # Function to create plot showing proportions of children who said row item that also said column item
+  
   dat<-dat[,..hap_col
-        ]
+        ] # select required columns
 
 
+  # recode outcomes to be 1/0
 dat<-dat[,(q_vars):=lapply(.SD,function(x){
   ifelse(x %in% dk_vals,NA,
                         ifelse(x %in% target_vals,1,0))
            
 }),.SDcols=q_vars]
 
+# get all 2 way combinations
 vars_comb<-names(dat)[!grepl("id|wt",names(dat))]
 
 vars_comb<-names(dat)[!grepl("id|wt",names(dat))]
@@ -110,12 +141,15 @@ two_way<-as.data.table(expand.grid(var1=vars_comb,var2=vars_comb,stringsAsFactor
 
 two_way_out<-rbindlist(lapply(seq_len(nrow(two_way)),function(x){
   
-  v1<-two_way$var1[x]
-  v2<-two_way$var2[x]
+  #for each combination work out proportions of those saying var 1 that also said var 2
   
-  lb1<-q_lookup$label[q_lookup$var==v1]
-  lb2<-q_lookup$label[q_lookup$var==v2]
+  v1<-two_way$var1[x] # get variable 1
+  v2<-two_way$var2[x] # get variable 2
   
+  lb1<-q_lookup$label[q_lookup$var==v1] # get label for variable 1
+  lb2<-q_lookup$label[q_lookup$var==v2] # get label for variable 2
+  
+  # create % table - note base is those saying yes to variable 1
   dat[,.(c=sum(wt)),by=.(var1=get(v1),var2=get(v2))
   ][,`:=`(perc=round(c/sum(c),2)*100,base=sum(c)),by=var1
   ][var1==1 & var2==1
@@ -125,17 +159,19 @@ two_way_out<-rbindlist(lapply(seq_len(nrow(two_way)),function(x){
   
   
 })
-)[,`:=`(v1=factor(sapply(v1,splitF),levels=sapply(q_lookup$label,splitF)),
-        v2=factor(sapply(v2,splitF),levels=sapply(q_lookup$label,splitF))
-        )]
+)[,`:=`(v1=factor(sapply(v1,function(x) splitF(x,6,html=F)),levels=sapply(q_lookup$label,function(x) splitF(x,6,html=F))),
+        v2=factor(sapply(v2,function(x) splitF(x,6,html=F)),levels=sapply(q_lookup$label,function(x) splitF(x,6,html=F)))
+        )] # recode outcomes and split long strings
+
+# Make plot
 
 pal<-RColorBrewer::brewer.pal(7,"Reds")
 
-
+two_way_out$lb<-ifelse(is.na(two_way_out$perc),"",paste0(round(two_way_out$perc,1),"%"))
 
 ggplot(two_way_out,
        aes(x=reorder(v2,v1),y=v1,fill=perc))+geom_tile(colour="grey50")+
-  geom_text(aes(label=ifelse(!is.na(perc),paste0(round(perc,1),"%"),"")))+
+  geom_text(aes(label=lb))+
   theme(axis.text.x = element_text(angle=90),
         panel.grid=element_blank(),
         panel.background = element_blank(),
@@ -147,6 +183,8 @@ ggplot(two_way_out,
 }
 
 comb_chart_f3<-function(dat){
+  
+  # As above but calculate risk ratios rather than percentages
   
   dat<-dat[,..hap_col
         ]
@@ -173,11 +211,13 @@ two_way_out<-rbindlist(lapply(seq_len(nrow(two_way)),function(x){
   lb1<-q_lookup$label[q_lookup$var==v1]
   lb2<-q_lookup$label[q_lookup$var==v2]
   
+  # work out % table
+  
   tb<-na.omit(dat[,.(c=sum(wt)),by=.(var1=get(v1),var2=get(v2))
   ])[,`:=`(perc=c/sum(c),base=sum(c)),by=.(var1)
   ][var2==1]
   
-  
+  # reshape to wide and calculate risk ratios
    tb<-dcast(tb[,.(var2,perc,var1)],var2~var1,value.var="perc"
             )[,rr:=`1`/`0`][,comb:=paste0(v1,"-",v2)
         ][,`:=`(v1=lb1,v2=lb2)][,.(comb,rr,v1,v2)]
@@ -185,9 +225,11 @@ two_way_out<-rbindlist(lapply(seq_len(nrow(two_way)),function(x){
   }
 })
 
-)[,`:=`(v1=factor(sapply(v1,splitF),levels=sapply(q_lookup$label,splitF)),
-        v2=factor(sapply(v2,splitF),levels=sapply(q_lookup$label,splitF))
+)[,`:=`(v1=factor(sapply(v1,function(x) splitF(x,6,html=F)),levels=sapply(q_lookup$label,function(x) splitF(x,6,html=F))),
+        v2=factor(sapply(v2,function(x) splitF(x,6,html=F)),levels=sapply(q_lookup$label,function(x) splitF(x,6,html=F)))
         )]
+
+# Make plot
 
 pal_div<-RColorBrewer::brewer.pal(7,"RdBu")
 
@@ -206,11 +248,12 @@ ggplot(two_way_out,
 
 ```
 
-```{r,results='asis', fig.width=10}
+```{r,results='asis', fig.width=11, fig.height=7}
 
 
 if(is.null(age_grp)){
-
+# Create age picker for 9-17 year olds
+  
   cat(
 paste0('<div class="picker-group">
 <label>Select age group</label>
@@ -228,7 +271,11 @@ paste0('<div class="picker-group">
 
 for(i in c("9-17","9-11","12-15","16-17")){
   
+  # for each age group and all 9-17 yr olds
+  
   if(!i=="9-17"){
+    
+    # if not all 9-17 yr olds filter df object to required age range
     
     ageSplit<-as.numeric(unlist(strsplit(i,"[-]")))
     
@@ -239,26 +286,28 @@ for(i in c("9-17","9-11","12-15","16-17")){
     comb_age<-df
   }
  
-  cat(paste0('<div id="',i,'" class="sect ageComb">\n'))
+
+  cat(paste0('<div id="',i,'" class="sect ageComb">\n')) # create html div to hold plot - this is whats shown/hidden
    
-  cat("\n<h4>Which combinations most commonly co-occur?</h4>\n")
+  cat("\n<h4>Which combinations most commonly co-occur?</h4>\n") # Add title 1
   
-  print(comb_chart_f1(comb_age))
+  print(comb_chart_f1(comb_age)) # output chart 1
   
-  cat("\n\n<h4>Which combinations are most correlated?</h4>\n")
+  cat("\n\n<h4>Which combinations are most correlated?</h4>\n") # Add title 2
   
 
-  print(comb_chart_f2(comb_age))
+  print(comb_chart_f2(comb_age)) # output chart 2
   
   cat("\n")
   
-  print(comb_chart_f3(comb_age))
+  print(comb_chart_f3(comb_age)) # output chart 3
   
   cat("</div>\n")
   
 }
   }else{
   
+    # for 6-8s no need for the loop or html picker 
     comb_age<-df
     
   cat("\n<h4>Which combinations most commonly co-occur?</h4>\n")

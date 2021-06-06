@@ -9,17 +9,19 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: styles.css
+   css: "../../styles.css"
    fig_width: 10
    theme: null
-   template: "CCO_template_html.html"
+   template: "../../CCO_template_html.html"
 ---
 
 ```{r, include=F}
-knitr::opts_chunk$set(echo = F, warning=F,message = F)
+knitr::opts_chunk$set(echo = F, warning=F,message = F) # add chunk options
 ```
 
 ```{r, results='asis'}
+
+## Add breadcrumbs navigation
 
 cat(paste0(
 '<nav>
@@ -41,9 +43,13 @@ cat(paste0(
 
 ```{r}
 
+# Chunk aims to import segmentation model - note model defined based on code in segmentation_template_doc
+
+
+ # mod = marker for which segmentation to import, y = title to use in chart below
 if(params$var=="9-17_happy"){
 
-mod<-"happy"
+ mod<-"happy"
 
 y<-"Children are unhappy with x\nin their current life"
 }else if(params$var=="9-17_important"){
@@ -60,17 +66,18 @@ y<-"Children are worried about x\nfor the future"
 }
 
 
+# replace q_lookup with cluster lookup object - in essence changes outcome labels to be cluster names instead of happiness/future priorities/worries questions
 q_lookup<-q_lookup_clust
 
-target_vals<-c("Yes")
+target_vals<-c("Yes") # amend target levels
 
-search_str_orig<-search_str
+search_str_orig<-search_str # save original search string
 
-search_str<-"cluster_"
+search_str<-"cluster_" # change search string to be cluster variables
 
-col1<-"Cluster"
+col1<-"Cluster" # amend col1 variable
 
-table_f<-function(x,df_use=df){
+table_f<-function(x,df_use=df){ # redefine table_f function to use segments as outcome
   
   x<-unlist(strsplit(x,"[|]"))
   
@@ -89,6 +96,7 @@ df_la[,value:=ifelse(value %in% target_vals,1,0)
            ]
 }
 
+# Read in segmentation model depending on mod object
 
 if(mod=="happy"){
   clust_mod<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/happy_clust.rds")
@@ -100,16 +108,19 @@ if(mod=="happy"){
   clust_mod<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/worry_clust.rds")
 }
 
-df<-merge(df,clust_mod$clust_wide,by="id",all.x=T)
+df<-merge(df,clust_mod$clust_wide,by="id",all.x=T) # append segments to df object
 
-plot_df<-ggplot_build(clust_mod$plots[[1]])
+## Slightly convoluted way of naming segments - sorry but it was late when I did this bit
 
-plot_df<-plot_df$plot$data
+plot_df<-ggplot_build(clust_mod$plots[[1]]) # turn plot into data frame
 
-plot_df$clust<-plyr::mapvalues(plot_df$clust,gsub("cluster_","",q_lookup$var),q_lookup$label)
+plot_df<-plot_df$plot$data # get original data for plot
+
+plot_df$clust<-plyr::mapvalues(plot_df$clust,gsub("cluster_","",q_lookup$var),q_lookup$label) # rename clusters
 
 plot_df$clust_lb<-paste0(plot_df$clust,"\n",plot_df$perc_clust,"%")
 
+# Remake plot
 
 clust_plot<-ggplot(plot_df,aes(x=variable,y=diff2))+geom_col(fill="light blue",colour="grey20")+
   facet_wrap(~clust_lb)+coord_flip()+scale_y_continuous(limits=c(-max(plot_df$diff2)*1.1,max(plot_df$diff2)*1.1))+
@@ -120,6 +131,10 @@ clust_plot<-ggplot(plot_df,aes(x=variable,y=diff2))+geom_col(fill="light blue",c
 
 ```{r, fig.width=10, fig.height=10}
 
+# print plot with renamed clusters 
+# div below defines picker to switch between child chars/vuln chars/area chars etc
+# Note rest of code reruns child docs with segmentation as outcome. refer to annotated child documents
+
 clust_plot
 
 ```
@@ -129,7 +144,7 @@ clust_plot
 <label>Explore characteristics of these groups</label>
 <select id="segUnhappy_picker">
 <option value="seg_childChars">Children's demographics</option>
-<option value="seg_maps">Differences by LA</option>
+<option value="seg_maps">Differences by local area</option>
 <option value="seg_areaChars">Differences by area characteristics</option>
 <option value="seg_disad">Differences by vulnerable groups</option>
 </select>
@@ -137,8 +152,6 @@ clust_plot
 </div>
 
 <div id="seg_childChars" class="sect segUnhappy">
-
-<h4>How is this different by children's characteristics?</h4>
 
 ```{r,child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\child_chars_child_doc.rmd'}
 
@@ -148,8 +161,6 @@ clust_plot
 
 <div id="seg_maps" class="sect segUnhappy">
 
-<h4>How is this different in different areas?</h4>
-
 ```{r,child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\map_child_doc.rmd'}
 
 ```
@@ -158,8 +169,6 @@ clust_plot
 
 <div id="seg_areaChars" class="sect segUnhappy">
 
-<h4>How is this different based on an area's characteristics?</h4>
-
 ```{r,child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\area_chars_child_doc.rmd'}
 
 ```
@@ -167,8 +176,6 @@ clust_plot
 </div>
 
 <div id="seg_disad" class="sect segUnhappy">
-
-<h4>How is this different for disadvantaged/vulnerable children?</h4>
 
 ```{r,child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\disad_child_doc.rmd'}
 

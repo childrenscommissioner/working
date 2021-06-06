@@ -9,13 +9,16 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: styles.css
+   css: "../../styles.css"
    fig_width: 10
    theme: null
-   template: "CCO_template_html.html"
+   template: "../../CCO_template_html.html"
 ---
 
 ```{r setup, include=FALSE}
+
+# Code is the same as 9-17_happy overall file though readsa in different lookups for outcomes and segment names
+
 knitr::opts_chunk$set(echo = F, warning=F,message = F)
 
 require(readxl)
@@ -30,15 +33,15 @@ age_grp<-NULL
 
 stem<-"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/cleaned data/"
 
-target_vals<-"Yes"
+target_vals<-"Yes" # value to be coded as 1
 
 dk_vals<-""
 
 col1<-"% of children that think x is important..."
 
-search_str<-"important_"
+search_str<-"important_" # string to match outcomes in column names
 
-table_f<-function(x,df_use=df){
+table_f<-function(x,df_use=df){ # table_f function redefined to account for differences between important and happiness question structure
   
   x<-unlist(strsplit(x,"[|]"))
   
@@ -68,16 +71,19 @@ df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/fina
 
 imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"][,Value:=ceiling(Value/2)]
 
-df<-df[`q2_important_I dont want to say` %in% c(NA,"No")]
+df<-df[`q2_important_I dont want to say` %in% c(NA,"No")] # exclude children saying I dont want to say from all analyses
 
+# Lookups for important for future outcomes
 q_lookup<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_important_q_lookup.csv")
 q_lookup<-q_lookup[!grepl("dont want",var)]
 
+# Look up for happiness questions (used in correlation plots)
 q_lookup_hap<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_happy_q_lookup.csv")
 q_lookup_hap$var<-gsub("Option ","q1_happy_",q_lookup_hap$var)
 
 hap_col<-names(df)[grepl("^id$|important_|^wt$",names(df))]
 
+# Lookup for cluster names
 q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_important_cluster_q_lookup.csv")
 
 
@@ -150,7 +156,7 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 
 
 ```{r}
-
+# Same plot function as 9-17_happiness overall
 
 dat<-table_f("")[,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),2)*100,by=.(variable)][value==1][,.(variable,perc)][,variable:=gsub("dont","don't",variable)]
 

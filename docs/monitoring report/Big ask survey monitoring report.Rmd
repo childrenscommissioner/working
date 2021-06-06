@@ -1,0 +1,428 @@
+---
+title: "Big Ask Survey: Monitoring Report"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    theme: flatly
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,warning = F,message = F)
+
+require(data.table)
+
+source("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\scripts\\4-5_cleaning.R",local=knitr::knit_global())
+source("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\scripts\\6-8_cleaning.R",local=knitr::knit_global())
+source("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\scripts\\9-12_cleaning.R",local=knitr::knit_global(),verbose=F)
+source("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\scripts\\13-17_cleaning.R",local=knitr::knit_global(),verbose=F)
+
+source("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\scripts\\9-17_easyread_cleaning.R",local=knitr::knit_global(),verbose=F)
+source("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\scripts\\6-8_easyread_cleaning.R",local=knitr::knit_global(),verbose=F)
+
+clean_f<-list.files("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\survey data\\cleaned data",full.names=T,pattern=".rds")
+
+df_all<-lapply(clean_f,readRDS)
+
+names(df_all)<-gsub("^.*[/]|_clean_|_clean|[.]rds","",clean_f)
+
+surv_all<-rbindlist(purrr::imap(df_all,function(x,y){
+  
+  x[,.(id,dem_age_clean,dem_gender_clean,dem_eth_grp,dfe_phase,scType,scGroup,la_use,UTLA19CD,timestamp,sc_postcode_clean,school_name,yp_la,key)
+    ][,survey:=gsub("oldServer|kinsta[0-9]+","",y)]
+  
+})
+)
+
+pops<-fread(file="W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\popFile.csv")
+
+pops<-pops[age>3 & age<18,.(code,age,sex,pop=population_2019)][,sex:=ifelse(sex==1,"Male","Female")]
+
+nat_pop<-pops[code=="E"]
+
+gias<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\edubasealldata20210413.csv")[CloseDate=="" & !`EstablishmentTypeGroup (name)` == "Welsh schools"]
+gias$Postcode<-gsub("[[:blank:]]","",tolower(gias$Postcode))
+
+
+gias$OpenDate<-lubridate::dmy(gias$OpenDate)
+
+gias_out<-suppressWarnings(gias[,.(urn=URN,school_name=EstablishmentName,scType=`TypeOfEstablishment (name)`,
+        phase=`PhaseOfEducation (name)`,scGroup=`EstablishmentTypeGroup (name)`,
+        school_postcode=Postcode,ofsted=`OfstedRating (name)`,OpenDate,pupils=NumberOfPupils)
+        ][,`:=`(m=max(OpenDate,na.rm=T),c=.N),by=.(school_name,school_postcode)
+          ][,keep:=ifelse(c==1,1,ifelse(OpenDate==m,1,0))
+            ][keep==1][,OpenDate:=NULL])
+
+gias_out$school_name<-gsub("[[:punct:]]","",tolower(gias_out$school_name))
+
+
+
+gias_out$dfe_phase<-with(gias_out,ifelse(grepl("primary|all[-]through",tolower(phase)),"Primary",
+                           ifelse(grepl("secondary",tolower(phase)),"Secondary",
+                                  ifelse(grepl("special",tolower(scType)),"Special",
+                                         ifelse(grepl("referral|alternative",tolower(scType)),"PRU/AP",
+                                                ifelse(phase=="16 plus","16 plus",
+                                                       ifelse(phase=="Nursery","Nursery","Other"))))))
+)
+
+surv_all<-surv_all
+```
+
+## Numbers of responses
+
+* So far we have had `r format(nrow(surv_all),big.mark=",")` responses to our child surveys. This is `r round(nrow(surv_all)/9408923,4)*100`% of children in England aged 4-17.
+
+## Number of responses per day for each survey
+
+
+```{r, fig.width=12}
+require(ggplot2)
+require(ggrepel)
+
+surv_all<-surv_all[,date:=lubridate::floor_date(lubridate::ymd_hms(timestamp),"day")
+                   ]
+
+tb<-rbind(surv_all[,.(count=.N),by=date][,survey:="Total responses per day"],
+        surv_all[,.(count=.N),by=.(survey,date)])[,date:=as.Date(date)]
+
+tb<-tb[,`:=`(minDate=min(date),maxDate=max(date)),by=.(survey)
+   ][,lb:=ifelse(date==minDate | date == maxDate,format(count,big.mark = ","),NA)]
+
+lims<-c(0,max(tb$count)*1.2)
+
+ggplot(
+  tb,
+  aes(x=date,y=count)
+)+geom_line()+geom_point()+theme_bw()+
+  geom_text_repel(aes(label=lb),vjust=-1)+scale_colour_brewer(type="qual",palette=4)+
+  facet_wrap(~survey)+
+  ylab("Number of responses per day\n")+xlab("Date")+scale_y_continuous(limits=lims)
+
+```
+
+## Who is responding?
+
+### Age
+
+#### Survey responses by age group
+
+```{r}
+tb<-surv_all[,age:=as.numeric(dem_age_clean)
+             ][,age:=ifelse(is.na(age),"I dont want to say",
+                                                                        ifelse(age<6,"4-5",
+                                                                               ifelse(age<9,"6-8",
+                                                                                      ifelse(age<13,"9-12",
+                                                                                             "13-17"))))
+                                                           ][,.(c=.N),by=.(age)
+                                                         ][,perc:=c/sum(c)][,age:=factor(age,levels=c(
+                                                           "4-5","6-8","9-12","13-17","I dont want to say"
+                                                         ))]
+
+lb<-tb[order(-age)][,cSum:=cumsum(c)
+                            ][,l:=shift(cSum,type="lag")
+                                              ][,l:=ifelse(is.na(l),0,l)
+                                                ][,mid:=l+((cSum-l)/2)
+                                                  ][,.(perc,c=mid,age)]
+
+
+ggplot(
+  tb,
+  aes(x=1,y=c,fill=age)
+)+geom_col(colour="grey20")+geom_text(data=lb,aes(label=paste0(round(perc,2)*100,"%")))+theme_bw()+coord_polar(theta="y")+scale_fill_brewer(type="qual",palette=3,name="Age group")+
+  theme(panel.grid = element_blank(),
+        panel.border = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank()
+  )
+
+```
+
+#### Comparison to national age profile
+
+```{r, fig.width=10}
+
+tb<-surv_all[,age:=as.numeric(dem_age_clean)][!is.na(age)][,.(c=.N),by=.(age)][,perc:=round(c/sum(c),2)*100]
+tb<-merge(tb,nat_pop[,.(pop=sum(pop)),by=.(age)][,pop_perc:=round(pop/sum(pop),2)*100],by="age",all.x=T)
+
+tb<-melt(tb[,.(age,perc,pop_perc)],id.vars="age")[,variable:=plyr::mapvalues(variable,c("perc","pop_perc"),
+                                                                     c("% of survey responses","% of population"))]
+
+ggplot(
+  tb,
+  aes(x=age,y=value,group=variable,fill=variable)
+)+geom_col(position=position_dodge(0.9),colour="grey20")+theme_bw()+geom_text(aes(label=paste0(value,"%")),position=position_dodge(0.9),vjust=1)+
+  xlab("Age")+scale_x_continuous(breaks = c(4:17),labels=c(4:17))+ylab("%")+
+  scale_fill_brewer(type="qual",palette=4,name="")
+
+```
+
+#### Survey responses over time by age
+
+
+```{r}
+require(ggrepel)
+
+tb<-surv_all[,age:=ifelse(as.numeric(dem_age_clean) %in% c(4:5),"4-5",
+  ifelse(as.numeric(dem_age_clean) %in% c(6:8),"6-8",
+  ifelse(as.numeric(dem_age_clean) %in% c(9:12),"9-12",
+  ifelse(as.numeric(dem_age_clean) %in% c(13:17),"13-17","I dont want to say/Missing"))))
+  ][,.(c=.N),by=.(date,age)][,date:=as.Date(date)
+                             ][,age:=factor(age,levels=c(
+                                                           "4-5","6-8","9-12","13-17","I dont want to say/Missing"
+                                                         ))]
+
+tb<-tb[,`:=`(minDate=min(date),maxDate=max(date)),by=.(age)
+   ][,lb:=ifelse(date==minDate | date == maxDate,format(c,big.mark = ","),NA)]
+
+lims<-c(0,max(tb$c,na.rm=T)*1.2)
+
+ggplot(
+  tb,
+  aes(x=date,y=c,group=age,colour=age)
+)+geom_line()+geom_point()+theme_bw()+scale_colour_brewer(type="qual",palette=3,name="Age group")+
+  xlab("Date")+ylab("Count")+
+  scale_y_continuous(limits=lims)+geom_text_repel(aes(label=lb),show.legend=F)
+
+```
+
+### Gender
+
+#### Survey responses by gender
+
+```{r}
+tb<-surv_all[,dem_gender_clean:=plyr::mapvalues(dem_gender_clean,c("Boy","Girl"),c("Male","Female"))
+           ][,.(c=.N),by=.(dem_gender_clean)][,perc:=c/sum(c)][,dem_gender_clean:=factor(dem_gender_clean,
+                                                                               levels=c("Male","Female","Other","I dont want to say"))][order(-dem_gender_clean)]
+
+lb<-tb[,cSum:=cumsum(c)
+                            ][,l:=shift(cSum,type="lag")
+                                              ][,l:=ifelse(is.na(l),0,l)
+                                                ][,mid:=l+((cSum-l)/2)
+                                                  ][,.(perc,c=mid,dem_gender_clean)]
+
+ggplot(
+  tb,
+  aes(x=1,y=c,fill=dem_gender_clean)
+)+geom_col(colour="grey20")+theme_bw()+coord_polar(theta="y")+scale_fill_brewer(type="qual",palette=3,name="Gender")+
+  geom_text(data=lb,aes(label=paste0(round(perc,2)*100,"%")))+
+  theme(panel.grid = element_blank(),
+        panel.border = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank()
+  )
+
+```
+
+#### Comparison to national profile
+
+*Note: chart below excludes respondents not selecting Male/Female*
+
+```{r}
+
+tb<-surv_all[,dem_gender_clean:=plyr::mapvalues(dem_gender_clean,c("Boy","Girl"),c("Male","Female"))
+           ][dem_gender_clean %in% c("Male","Female")][,.(c=.N),by=.(dem_gender_clean)][,perc:=round(c/sum(c),2)*100]
+
+tb<-merge(tb,nat_pop[,.(pop=sum(pop)),by=.(dem_gender_clean=sex)][,pop_perc:=round(pop/sum(pop),2)*100],by="dem_gender_clean",all.x=T)
+
+tb<-melt(tb[,.(dem_gender_clean,perc,pop_perc)],id.vars="dem_gender_clean")[,variable:=plyr::mapvalues(variable,c("perc","pop_perc"),
+                                                                     c("% of survey responses","% of population"))]
+
+ggplot(
+  tb,
+  aes(x=dem_gender_clean,y=value,group=variable,fill=variable)
+)+geom_col(position=position_dodge(0.9),colour="grey20")+theme_bw()+geom_text(aes(label=paste0(value,"%")),position=position_dodge(0.9),hjust=1)+
+  xlab("Gender")+ylab("%")+
+  scale_fill_brewer(type="qual",palette=4,name="")+coord_flip()
+
+
+```
+
+#### Survey responses over time by gender
+
+
+```{r}
+require(ggrepel)
+tb<-surv_all[,dem_gender_clean:=plyr::mapvalues(dem_gender_clean,c("Boy","Girl"),c("Male","Female"))
+           ][,.(c=.N),by=.(date,dem_gender_clean)][,date:=as.Date(date)
+                                                   ][,dem_gender_clean:=factor(dem_gender_clean,
+                                                                               levels=c("Male","Female","Other","I dont want to say"))]
+
+tb<-tb[,`:=`(minDate=min(date),maxDate=max(date)),by=.(dem_gender_clean)
+   ][,lb:=ifelse(date==minDate | date == maxDate,format(c,big.mark = ","),NA)]
+
+lims<-c(0,max(tb$c,na.rm=T)*1.2)
+
+ggplot(
+  tb,
+  aes(x=date,y=c,group=dem_gender_clean,colour=dem_gender_clean)
+)+geom_line()+geom_point()+theme_bw()+scale_colour_brewer(type="qual",palette=3,name="Gender")+geom_text_repel(aes(label=lb))+
+  xlab("Date")+ylab("Count")+scale_y_continuous(limits=lims)
+
+```
+
+### Ethnicity
+
+#### Survey responses by ethnicity
+
+```{r}
+tb<-surv_all[,dem_eth_grp:=ifelse(is.na(dem_eth_grp)| dem_eth_grp %in% c("I dont want to say"),"Missing/Prefer not to say",dem_eth_grp)][,.(c=.N),by=.(dem_eth_grp)
+                                                         ][,perc:=c/sum(c)]
+
+lb<-tb[order(-dem_eth_grp)][,cSum:=cumsum(c)
+                            ][,l:=shift(cSum,type="lag")
+                                              ][,l:=ifelse(is.na(l),0,l)
+                                                ][,mid:=l+((cSum-l)/2)
+                                                  ][,.(perc,c=mid,dem_eth_grp)]
+
+ggplot(
+  tb,
+  aes(x=1,y=c,fill=dem_eth_grp)
+)+geom_col(colour="grey20")+
+  geom_text(data=lb,aes(label=paste0(round(perc,2)*100,"%")))+theme_bw()+coord_polar(theta="y")+scale_fill_brewer(type="qual",palette=5,name="Ethnicity")+
+  theme(panel.grid = element_blank(),
+        panel.border = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank()
+  )
+
+```
+
+#### Comparison to national profile
+
+*Note: population percentages are for 5-17 yr olds and based on 2011 Census as this is the best source available. Chart below excludes responses where ethnicity is unknown*
+
+```{r}
+
+pop_eth<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\census_ethnicity.csv")[,perc:=round(perc,2)*100]
+
+names(pop_eth)[1]<-"dem_eth_grp"
+names(pop_eth)[2]<-"c"
+
+tb<-surv_all[,dem_eth_grp:=ifelse(is.na(dem_eth_grp)| dem_eth_grp %in% c("I dont want to say"),"Missing/Prefer not to say",dem_eth_grp)][!dem_eth_grp=="Missing/Prefer not to say"][,.(c=.N),by=.(dem_eth_grp)
+                                                         ][,perc:=c/sum(c)]
+
+tb<-rbind(pop_eth[,v:="% of population"],tb[,v:="% of survey responses"][,perc:=round(perc,2)*100])[,v:=factor(v,levels=c("% of survey responses","% of population"))]
+
+ggplot(tb,aes(x=dem_eth_grp,y=perc,group=v,fill=v))+
+  geom_col(colour="grey20",position=position_dodge(0.9))+scale_fill_brewer(type="qual",palette=4,name="")+
+  theme_bw()+geom_text(aes(label=paste0(perc,"%")),position=position_dodge(0.9))+coord_flip()+
+  xlab("Ethnicity\n")+ylab("%")
+
+```
+
+
+#### Survey responses over time by ethnicity
+
+
+```{r}
+tb<-surv_all[,dem_eth_grp:=ifelse(is.na(dem_eth_grp)| dem_eth_grp %in% c("I dont want to say"),"Missing/Prefer not to say",dem_eth_grp)][,.(c=.N),by=.(date,dem_eth_grp)][,date:=as.Date(date)]
+
+tb<-tb[,`:=`(minDate=min(date),maxDate=max(date)),by=.(dem_eth_grp)
+   ][,lb:=ifelse(date==minDate | date == maxDate,format(c,big.mark = ","),NA)]
+
+lims<-c(0,max(tb$c,na.rm=T)*1.2)
+
+ggplot(
+  tb,
+  aes(x=date,y=c,group=dem_eth_grp,colour=dem_eth_grp)
+)+geom_line()+geom_point()+theme_bw()+scale_colour_brewer(type="qual",palette=3,name="Ethnicity")+
+  xlab("Date")+ylab("Count")
+
+```
+
+## Where in the country are respondents?
+
+### Postcode information quality
+
+`r round(nrow(surv_all[is.na(la_use)])/nrow(surv_all),2)*100`% of respondents did not submit either a postcode, their local authority or the postcode of a school.
+
+### Map of responses so far by LA
+
+```{r}
+leaf_poly<-readRDS("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\laBase_19.rds")
+
+laPop<-pops[,.(pop=sum(pop)),by=code]
+
+tb<-surv_all[,.(c=.N),by=.(UTLA19CD,la_use)][,UTLA19CD:=plyr::mapvalues(
+                                                                  UTLA19CD,c("E08000020","E06000048"),
+                                                                  c("E08000037","E06000057")
+                                                                )]
+
+tb_out<-merge(laPop,tb,by.x="code",by.y="UTLA19CD",all.x=T)[,c:=ifelse(is.na(c),0,c)][,perc:=round(c/pop,4)*100
+                                                                                      ][!code %in% c("E09000001","E06000053")]
+
+
+
+require(leaflet)
+
+pal2<-colorNumeric("Reds",c(0,max(tb_out$perc,na.rm=T)))
+
+leaf_poly@data<-merge(leaf_poly@data,tb_out,by.x="ctyua19cd",by.y="code",all.x=T)
+
+  
+
+  labels<-as.list(paste0("LA: ",leaf_poly@data$ctyua19nm,"</br>Measure: % of 4-17 yr olds in LA responding: ",round(leaf_poly@data[,"perc"],3),"%,<br/>Count: ",format(leaf_poly@data[,"c"],big.mark=",")))
+  
+  
+  labels<-lapply(labels,htmltools::HTML)
+  
+  map<-leaflet(data=leaf_poly, options = leafletOptions(background="#FFF"),
+        elementId = "la_map_1") %>%
+  addProviderTiles(providers$CartoDB) %>%
+  addPolygons(color="#444444", weight=1, smoothFactor = 0.5,
+              opacity=1.0, fillOpacity = 0.7, fillColor = ~pal2(perc),
+              popupOptions = highlightOptions(bringToFront = T, weight=4),
+              label =labels) %>%
+  addLegend("topleft", pal = pal2, values = seq(0,max(tb_out$perc,na.rm=T)),bins=5,
+            title = "% of 4-17 yr olds responding",
+            na.label = "Missing/excluded",
+            opacity = 0.7,className = "la_map_legend_1"
+  )
+    map
+```
+
+## What schools are responding?
+
+* Note: school information is available for `r round(nrow(surv_all[!is.na(dfe_phase)])/nrow(surv_all),2)*100`% of respondents (prior to any corrections for spellings of schools etc)
+
+### Phase
+
+```{r}
+
+
+phase<-rbind(gias_out[!dfe_phase %in% c("Nursery","16 plus")][,.(pupils=sum(pupils,na.rm=T)),by=dfe_phase
+                      ][,perc:=round(pupils/sum(pupils),3)*100][,v:="% of pupils in England"],
+             surv_all[!dfe_phase %in% c("Nursery","16 plus") & !is.na(dfe_phase)][,.(pupils=.N),by=dfe_phase
+                      ][,perc:=round(pupils/sum(pupils),3)*100][,v:="% of survey respondents"]
+)[,v:=factor(v,levels=c("% of survey respondents","% of pupils in England"))]
+
+ggplot(phase[,dfe_phase:=gsub("Primary","Primary &\nAll-through",dfe_phase)],aes(x=dfe_phase,y=perc,group=v,fill=v))+
+  geom_col(colour="grey20",position=position_dodge(0.9))+scale_fill_brewer(type="qual",palette=4,name="")+
+  theme_bw()+geom_text(aes(label=paste0(perc,"%")),position=position_dodge(0.9))+coord_flip()+
+  xlab("Phase\n")+ylab("%")
+
+```
+
+### School type
+
+```{r}
+
+scGroup<-rbind(gias_out[!dfe_phase %in% c("Nursery","16 plus") & !scGroup %in% c("Colleges","Universities","Other types")
+                        ][,scGroup:=ifelse(scType %in% c("Foundation special schoo","Community special school"),"Local authority maintained schools",
+                                           ifelse(scGroup=="Special schools","Other special schools",scGroup))][,.(pupils=sum(pupils,na.rm=T)),by=scGroup
+                      ][,perc:=round(pupils/sum(pupils),3)*100][,v:="% of pupils in England"],
+             surv_all[!dfe_phase %in% c("Nursery","16 plus") & !scGroup %in% c("Colleges","Universities","Other types") & !is.na(dfe_phase)][,scGroup:=ifelse(scType %in% c("Foundation special schoo","Community special school"),"Local authority maintained schools",
+                                           ifelse(scGroup=="Special schools","Other special schools",scGroup))][,.(pupils=.N),by=scGroup
+                      ][,perc:=round(pupils/sum(pupils),3)*100][,v:="% of survey respondents"]
+)[,v:=factor(v,levels=c("% of survey respondents","% of pupils in England"))]
+
+ggplot(scGroup,aes(x=scGroup,y=perc,group=v,fill=v))+
+  geom_col(colour="grey20",position=position_dodge(0.9))+scale_fill_brewer(type="qual",palette=4,name="")+
+  theme_bw()+geom_text(aes(label=paste0(perc,"%")),position=position_dodge(0.9),
+                       hjust=ifelse(scGroup$perc<3,-0.2,1))+coord_flip()+
+  xlab("School type\n")+ylab("%")
+
+```

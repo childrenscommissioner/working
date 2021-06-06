@@ -9,15 +9,16 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: styles.css
+   css: "../../styles.css"
    fig_width: 10
    theme: null
-   template: "CCO_template_html.html"
+   template: "../../CCO_template_html.html"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = F, warning=F,message = F)
+knitr::opts_chunk$set(echo = F, warning=F,message = F) # define chunk options
 
+# import most packages needed
 require(readxl)
 require(data.table)
 require(dplyr)
@@ -26,62 +27,71 @@ require(reactable)
 require(htmltools)
 require(tippy)
 
-age_grp<-NULL
+age_grp<-NULL # set age_grp variable - marker for 9-17s/6-8
 
-stem<-"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/cleaned data/"
+stem<-"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/cleaned data/" # file path for cleaned data
 
-search_str<-"happy.*clean"
+search_str<-"happy.*clean" # string identifying outcome variables
 
-dk_vals<-c("I don't know","Not applicable","dont know","I dont want to say")
+dk_vals<-c("I don't know","Not applicable","dont know","I dont want to say") # values to treat as missing
 
-target_vals<-c("Unhappy","Very unhappy","sad")
+target_vals<-c("Unhappy","Very unhappy","sad") # variables to recode to being 1
 
 
-table_f<-function(x,df_use=df){
+table_f<-function(x,df_use=df){ # function to reshape data to long format and recode outcome variables
   
-  x<-unlist(strsplit(x,"[|]"))
+  x<-unlist(strsplit(x,"[|]")) # if more than one grouping variable specified, split by | delimiter
   
-  reg<-paste0("^",x,"$")
+  reg<-paste0("^",x,"$") # add beginning and end of word markers to ensure no accidental matching of variables
   
-  reg_string<-paste0("^id$|happy.*clean|^wt$|",paste0(reg,collapse="|"))
-  hap_col<-names(df_use)[grepl(reg_string,names(df_use))]
+  reg_string<-paste0("^id$|happy.*clean|^wt$|",paste0(reg,collapse="|")) # combine into single regex to get outcome and grouping variables
+  hap_col<-names(df_use)[grepl(reg_string,names(df_use))] # get column names matching regex
 
-  
+
+  # select relevant columns, reshape to long format... one row per indivual per outcome.... and rename outcome variables
+
 df_la<-melt(df_use[,..hap_col],id.vars = c("id",x,"wt"))[,variable:=plyr::mapvalues(variable,
                                                                                     q_lookup$var,
                                                                                     q_lookup$label)]
 
+# recode dks etc as NA and those in target vals as 1 else 0
 df_la[,value:=ifelse(value %in% dk_vals,NA,
                         ifelse(value %in% target_vals,1,0))
            ]
 }
 
+## import table helper functions from markdown functions script
+
 source("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/scripts/markdown_functions.R",local=knitr::knit_global())
   
-col1<-"% of children unhappy with..."
+col1<-"% of children unhappy with..." # define column label for outcomes in tables
 
 ```
 
 ```{r}
 
+# read in survey responses
 df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/9-17_weighted.rds")
 
+# read in IMD data... this is in a weird place
 imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"][,Value:=ceiling(Value/2)]
 
 df<-df[,id:=paste0(id,survey)
        ][,bme:=ifelse(dem_eth_grp=="White",1,0)
          ]
 
-q_lookup<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_happy_q_lookup.csv")
-q_lookup$var<-gsub("Option ","q1_happy_",q_lookup$var)
+# read in lookups from aux data folder
+q_lookup<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_happy_q_lookup.csv") # lookup for happiness questions
+q_lookup$var<-gsub("Option ","q1_happy_",q_lookup$var) # clean up lookup
 
-q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_happy_cluster_q_lookup.csv")
+q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_happy_cluster_q_lookup.csv") # lookup for cluster names
 
 ```
 
 
 ```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
 
+# read in breadcrumbs. HTML below creates key stat boxes
 
 ```
 
@@ -139,24 +149,26 @@ INTRO TEXT
 <h3>How happy are children overall?</h3>
 
 ```{r,fig.width=8,fig.height=8}
-hap_col<-names(df)[grepl("^id$|happy.*_clean|^wt$",names(df))]
+hap_col<-names(df)[grepl("^id$|happy.*_clean|^wt$",names(df))] # select columns to create overall rates chart
 
-df_happy<-melt(df[,..hap_col],id.vars = c("id","wt"))
+df_happy<-melt(df[,..hap_col],id.vars = c("id","wt")) # select relevant columns and convert to long format
+
+# recode dk vals to NA and target vals to 1 and calculate percentages for each outcome
 
 dat<-copy(df_happy)[,value:=ifelse(value %in% dk_vals,NA,
                         ifelse(value %in% target_vals,"Unhappy",
                                ifelse(value %in% c("Neither happy nor unhappy (neutral)","neural"),"Neutral","Happy")))
            ][!is.na(value)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),2)*100,by=.(variable)][,.(variable,perc,value)]
 
-dat<-merge(dat,q_lookup,by.x="variable",by.y="var")
+dat<-merge(dat,q_lookup,by.x="variable",by.y="var") # merge on outcome labels
 
 dat_unhap<-unique(dat[value=="Unhappy",.(variable,unhap_perc=perc)])
 
 dat<-merge(dat,dat_unhap,by="variable")
 
-pal_rgb<-c("#57C4AD","#EDA247","#DB4325")
+pal_rgb<-c("#57C4AD","#EDA247","#DB4325") # define colours for bar fills
 
-
+# Create plot
 ggplot(dat,
        aes(x=reorder(label,unhap_perc),y=perc,group=value,fill=value))+
   geom_col(colour="grey20",position = position_dodge(0.9))+coord_flip()+geom_text(aes(label=paste0(perc,"%")),hjust=ifelse(dat$perc<10,-0.1,1),position = position_dodge(0.9))+
@@ -170,14 +182,18 @@ ggplot(dat,
 
 ```{r}
 
-df_happy<-melt(df[,..hap_col],id.vars = c("id","wt"))
+# Chunk to make table of number of aspects of life children are unhappy with
 
+df_happy<-melt(df[,..hap_col],id.vars = c("id","wt")) # convert to long format
+
+# recode outcomes and get number of unhappy items for each person
 dat<-copy(df_happy)[,value:=ifelse(value %in% dk_vals,NA,
                         ifelse(value %in% target_vals,1,0))
            ][!is.na(value)
              ][,.(tot=sum(value,na.rm=T)),by=.(id,wt)]
 
-tb<-dat[][,.(c=sum(wt)),by=.(tot)
+# Work out cumulative percentages by count of unhappiness items
+tb<-dat[,.(c=sum(wt)),by=.(tot)
     ][,perc:=c/sum(c)][order(-tot)
                        ][,cum_perc:=cumsum(perc)
                          ][,cum_perc:=round(ifelse(tot==0,perc,cum_perc),3)*100
@@ -185,6 +201,7 @@ tb<-dat[][,.(c=sum(wt)),by=.(tot)
                              ][,.(tot,cum_perc)
                                ]
 
+# create table
 names(tb)<-c("Number of aspects of their life children are unhappy with","% of respondents")
 
 div(reactable(tb,

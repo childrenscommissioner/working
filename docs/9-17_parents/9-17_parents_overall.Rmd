@@ -9,10 +9,10 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: styles.css
+   css: "../../styles.css"
    fig_width: 10
    theme: null
-   template: "CCO_template_html.html"
+   template: "../../CCO_template_html.html"
 ---
 
 ```{r setup, include=FALSE}
@@ -71,7 +71,7 @@ imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd
 
 df<-df[,id:=paste0(id,survey)
        ][!q4_parents_clean %in% dk_vals
-         ][,q4_parents_clean_2:=ifelse(!q4_parents_clean %in% c("Fairly likely","Very likely","Likely"),"Yes","No")]
+         ][,q4_parents_clean_2:=ifelse(q4_parents_clean %in% c("Fairly likely","Very likely","Likely"),"Yes","No")]
 
 q_lookup<-data.table(var=c("q4_parents_clean","q4_parents_clean_2"),label=c("Children think its unlikely they will have a better life than their parents","Children think its likely they will have a better life than their parents"))
 

@@ -1,0 +1,255 @@
+## import + names
+
+stem<-"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/"
+
+csvList<-list.files(paste0(stem,"/survey data"),full.names = T)
+
+d<-readBin(csvList[grepl("13[-]17",csvList)],what="raw",n=file.info(csvList[grepl("13[-]17",csvList)])$size)
+
+ascii_tb<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/asci_tb.csv")
+
+d[!d %in% tolower(ascii_tb$Hex[1:128])]<-charToRaw("|")
+
+writeBin(d,csvList[grepl("13[-]17",csvList)])
+
+df<-as.data.table(fread(file=csvList[grepl("13[-]17",csvList)]))
+
+varLookup<-as.data.table(readxl::read_excel(paste0(stem,"aux data/13-17_varlookup.xlsx"),"varnames"))
+valLookup<-as.data.table(readxl::read_excel(paste0(stem,"aux data/13-17_varlookup.xlsx"),"values"))
+
+names(df)<-trimws(names(df))
+
+df_cols<-names(df)[!grepl("[(]label[)]",names(df))]
+
+
+cols<-data.table(col_num=seq_len(length(df_cols)),col=df_cols)
+
+cols<-cols[,`:=`(rw=seq_len(.N)),by=.(col)
+][rw==1]
+
+cols_use<-cols$col
+df<-df[,..cols_use]
+
+names(df)<-varLookup$var
+
+df<-df[,timestamp:=lubridate::ymd_hms(timestamp)
+][timestamp>lubridate::dmy_hms("19/04/2021 06:00:00")]
+
+df<-df[,lapply(.SD,function(x){
+  gsub("[']|[|]+","",x)})]
+
+## Restructure
+
+### Support
+df_supp<-df[,.(id,dem_support)]
+
+df_supp<-df_supp[,dem_support:=gsub("My relative[(]s[)] e[.]g[.][,] grandparents[,] aunt[,] uncle","Relatives",dem_support)]
+
+df_supp<-df_supp[,dem_support:=gsub("A counsellor[,] therapist or other health care worker","A counsellor therapist or other health care worker",dem_support)]
+
+
+supp_vals<-sort(unique(unlist(strsplit(df_supp$dem_support,", "))))
+
+supp_look<-data.table(orig=supp_vals,out_val=ifelse(!supp_vals %in% valLookup$dem_support,"Other",supp_vals))
+
+cols<-paste0("dem_support_",unique(supp_look$out_val))
+
+df_supp_wide<-Reduce(function(x,y) merge(x,y,by="id"),lapply(cols,function(x){
+  letter<-gsub("dem_support_","",x)
+  
+  out<-data.table(id=df_supp$id,v=ifelse(grepl(letter,df_supp$dem_support),"Yes","No"))
+  
+  names(out)[2]<-x
+  out
+})
+)
+
+### important
+
+df_imp<-df[,.(id,q2_important)]
+
+df_imp<-df_imp[,q2_important:=gsub("My relative[(]s[)] e[.]g[.][,] grandparents[,] aunt[,] uncle","Relatives",q2_important)]
+
+df_imp<-df_imp[,q2_important:=gsub("A counsellor[,] therapist or other health care worker","A counsellor therapist or other health care worker",q2_important)]
+
+
+supp_vals<-sort(unique(unlist(strsplit(df_imp$q2_important,", "))))
+
+supp_look<-data.table(orig=supp_vals,out_val=ifelse(!supp_vals %in% valLookup$q2_important,"Other",supp_vals))
+
+cols<-paste0("q2_important_",unique(supp_look$out_val))
+
+df_imp_wide<-Reduce(function(x,y) merge(x,y,by="id"),lapply(cols,function(x){
+  letter<-gsub("q2_important_","",x)
+  
+  out<-data.table(id=df_imp$id,v=ifelse(grepl(letter,df_imp$q2_important),"Yes","No"))
+  
+  names(out)[2]<-x
+  out
+})
+)
+
+## Worry
+
+df_worry<-df[,.(id,q3_worry)]
+
+df_worry<-df_worry[,q3_worry:=gsub("My relative[(]s[)] e[.]g[.][,] grandparents[,] aunt[,] uncle","Relatives",q3_worry)]
+
+df_worry<-df_worry[,q3_worry:=gsub("A counsellor[,] therapist or other health care worker","A counsellor therapist or other health care worker",q3_worry)]
+
+
+supp_vals<-sort(unique(unlist(strsplit(df_worry$q3_worry,", "))))
+
+supp_look<-data.table(orig=supp_vals,out_val=ifelse(!supp_vals %in% valLookup$q3_worry,"Other",supp_vals))
+
+cols<-paste0("q3_worry_",unique(supp_look$out_val))
+
+df_worry_wide<-Reduce(function(x,y) merge(x,y,by="id"),lapply(cols,function(x){
+  letter<-gsub("q3_worry_","",x)
+  
+  out<-data.table(id=df_worry$id,v=ifelse(grepl(letter,df_worry$q3_worry),"Yes","No"))
+  
+  names(out)[2]<-x
+  out
+})
+)
+
+df<-Reduce(function(x,y) merge(x,y,all.x=T,by="id"),list(df,df_supp_wide,df_imp_wide,df_worry_wide))
+
+## cleaning
+
+
+for(x in names(valLookup)[!names(valLookup) %in% c("dem_support","q2_important","q3_worry")]){
+  col<-valLookup[[x]]
+  vals<-col[!is.na(col)]
+  
+  if(length(vals)>0){
+    
+    vals<-gsub("[']","",vals)
+    
+    v_out<-paste0(x,"_clean")
+    
+    df<-df[,(v_out):=ifelse(get(x) %in% vals,get(x),"Other")]
+    
+  }
+  
+  
+}
+
+
+
+### Geography
+
+la_lookup<-fread(paste0(stem,"aux data/lsoa_lookup_master.csv"))
+
+pcode<-readRDS(paste0(stem,"aux data/pcode_use.rds"))
+
+
+df<-df[,sc_postcode_clean:=gsub("[[:blank:]]+","",tolower(school_postcode))]
+
+df<-df[,yp_postcode_clean:=gsub("[[:blank:]]+","",tolower(yp_postcode))]
+
+df$yp_postcode_clean<-ifelse(df$yp_postcode_clean %in% c("idontknow","idontwanttosay",""),NA,df$yp_postcode_clean)
+
+df$postcode_use<-with(df,ifelse(is.na(yp_postcode_clean),sc_postcode_clean,
+                                ifelse(!yp_postcode_clean %in% pcode$pcd,sc_postcode_clean,
+                                       yp_postcode_clean)
+))
+
+df$school_name<-gsub("[[:punct:]]","",tolower(df$school_name))
+
+
+df$postcode_use[df$postcode_use==""]<-NA
+
+
+df<-merge(df,pcode,by.x="postcode_use",by.y="pcd",all.x=T)
+
+df<-merge(df,unique(la_lookup[,.(lsoa11=LSOA11CD,UTLA19NM)]),by="lsoa11",all.x=T)
+
+df<-merge(df,unique(la_lookup[,.(yp_la=LAD19NM,ut_work_1=UTLA19NM)]),by="yp_la",all.x=T)
+df<-merge(df,unique(la_lookup[,.(yp_la=UTLA19NM,ut_work_2=UTLA19NM)]),by="yp_la",all.x=T)
+
+df$ut_work<-ifelse(is.na(df$ut_work_1),df$ut_work_2,df$ut_work_1)
+
+df$la_use<-ifelse(is.na(df$ut_work),df$UTLA19NM,df$ut_work)
+
+df<-merge(df,unique(la_lookup[,.(la_use=UTLA19NM,UTLA19CD)]),by="la_use",all.x=T)
+
+df<-as.data.table(df)
+
+### Ethnicity
+eth_lookup<-fread(paste0(stem,"aux data/eth_lookup.csv"))
+
+df<-merge(df,eth_lookup,by="dem_ethnic",all.x=T)
+
+
+### LA vars
+imd<-fread(paste0(stem,"aux data/imd2019lsoa.csv"))[Measurement=="Decile"]
+
+### GIAS
+
+gias<-fread(paste0(stem,"aux data/edubasealldata20210413.csv"))[CloseDate=="" & !`EstablishmentTypeGroup (name)` == "Welsh schools"]
+gias$Postcode<-gsub("[[:blank:]]","",tolower(gias$Postcode))
+
+gias$OpenDate<-lubridate::dmy(gias$OpenDate)
+
+gias_out<-suppressWarnings(gias[,.(urn=URN,school_name=EstablishmentName,scType=`TypeOfEstablishment (name)`,
+        phase=`PhaseOfEducation (name)`,scGroup=`EstablishmentTypeGroup (name)`,
+        school_postcode=Postcode,ofsted=`OfstedRating (name)`,OpenDate)
+        ][,`:=`(m=max(OpenDate,na.rm=T),c=.N),by=.(school_name,school_postcode)
+          ][,keep:=ifelse(c==1,1,ifelse(OpenDate==m,1,0))
+            ][keep==1][,OpenDate:=NULL])
+
+gias_out$school_name<-gsub("[[:punct:]]","",tolower(gias_out$school_name))
+
+gias_out$dfe_phase<-with(gias_out,ifelse(grepl("primary|all[-]through",tolower(phase)),"Primary",
+                                         ifelse(grepl("secondary",tolower(phase)),"Secondary",
+                                                ifelse(grepl("special",tolower(scType)),"Special",
+                                                       ifelse(grepl("referral|alternative",tolower(scType)),"PRU/AP",
+                                                              ifelse(phase=="16 plus","16 plus",
+                                                                     ifelse(phase=="Nursery","Nursery","Other"))))))
+)
+
+df$school_postcode<-gsub("[[:blank:]]","",tolower(df$school_postcode))
+
+df<-merge(df,gias_out[,.(school_name,school_postcode,urn_full=urn)],by=c("school_name","school_postcode"),all.x=T)
+
+df$post3<-substr(df$sc_postcode_clean,1,3)
+
+gias_out$post3<-substr(gias_out$school_postcode,1,3)
+
+df<-merge(df,unique(gias_out[,.(school_name,post3,urn_3=urn)
+][,c:=.N,by=.(school_name,post3)][c==1
+][,c:=NULL]),by=c("school_name","post3"),all.x=T)
+
+df<-df[,urn:=ifelse(!is.na(urn_full),urn_full,urn_3)
+][,`:=`(urn_full=NULL,urn_3=NULL)]
+
+df<-merge(df,gias_out[,.(urn_post_only=urn,school_postcode)][,c:=.N,by=school_postcode][c==1][,c:=NULL],all.x=T,
+          by="school_postcode")
+
+df<-df[,urn:=ifelse(!is.na(urn),urn,urn_post_only)
+]
+
+df<-merge(df,gias_out[,.(urn_name_only=urn,school_name)][,c:=.N,by=school_name][c==1][,c:=NULL],all.x=T,
+          by="school_name")
+
+
+df<-df[,urn:=ifelse(!is.na(urn),urn,urn_name_only)]
+
+df<-merge(df,gias_out[,`:=`(school_name=NULL,school_postcode=NULL,post3=NULL)],by="urn",all.x=T)
+
+
+df$kinship<-ifelse(df$dem_liveNow=="With relatives other than my parent(s) e.g., grandparents, aunt/uncle","Yes","No")
+
+df$care<-ifelse(df$dem_liveNow %in% c("With foster parent(s)","In independent or semi-independent  accommodation supported by the local council","A secure children’s home","A children’s home"),"Yes","No")
+
+df$secure<-ifelse(df$dem_liveNow %in% c("A Young Offender Institution","A secure training centre"),"Yes","No")
+
+df$any_mh<-ifelse(df$dem_liveNow=="A mental health hospital"|df$`dem_support_A counsellor therapist or other health care worker`=="Yes","Yes","No")
+
+df$mh_hospital<-ifelse(df$dem_liveNow=="A mental health hospital","Yes","No")
+
+saveRDS(df,paste0(stem,"survey data/cleaned data/","13-17_clean.rds"))
+
+rm(list=ls())

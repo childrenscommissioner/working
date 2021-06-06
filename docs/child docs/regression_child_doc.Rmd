@@ -9,24 +9,27 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: styles.css
+   css: "../../styles.css"
    fig_width: 10
    theme: null
-   template: "CCO_template_html.html"
+   template: "../../CCO_template_html.html"
 ---
 
 ```{r, include=F}
-knitr::opts_chunk$set(echo = F, warning=F,message = F)
+knitr::opts_chunk$set(echo = F, warning=F,message = F) # set chunk options
 ```
 
 ```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
 
+# Add naviagtion breadcrumbs
 
 ```
 
 <script src="extra_js.js"></script>
 
 ```{r, include=F}
+
+## Dummy table (not shown) to ensure dependencies are attached
 
 df_any_mh<-table_f("any_mh")
 
@@ -36,12 +39,14 @@ two_way_tb_f(df_any_mh,"any_mh","Receiving support from a healthcare worker vs N
 
 ```{r, include=F}
 
-pal<-RColorBrewer::brewer.pal(7,"Reds")
+pal<-RColorBrewer::brewer.pal(7,"Reds") # Get colour palette
 
+# Import lookup to relabel predictor names and add reference label information
 reg_lookup<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/regressions_predictor_lookup.csv")
 
-outcomes<-q_lookup$var[!grepl("Other|dont",q_lookup$var)]
+outcomes<-q_lookup$var[!grepl("Other|dont",q_lookup$var)] # get outcome variable names
 
+# Split predictors into groups of variables
 pred_child<-c("dem_age_clean","dem_gender_clean","dem_eth_grp")
 
 pred_area<-c("idaci_decile","all_crime","covid_quintile","loss10")
@@ -50,14 +55,16 @@ pred_disad<-c("kinship","any_mh","sw","yc")
 
 pred_school<-c("ofsted","dfe_phase")
 
-sel<-c(outcomes,pred_child,pred_area,pred_disad,"wt")
+sel<-c(outcomes,pred_child,pred_area,pred_disad,"wt") # store all variable names in a vector
 
+# store groupings of variables in a list object
 block_list<-list(`Child characteristics`=pred_child,
                  `Area characteristics`=pred_area,
                  `Vulnerabilities`=pred_disad#,
                  #`School characteristics`=pred_school
                  )
 
+# Where needed add in future priorities and happiness variables to block list and sel objects
 hap<-any(grepl("q_lookup_hap",ls())) | any(grepl("happy",q_lookup$var))
 imp<-any(grepl("q_lookup_imp",ls()))
 
@@ -97,30 +104,32 @@ block_list<-list(`Child characteristics`=pred_child,
 }
 
 
-
+# Filter out children not telling us about support they got and recode yc variable
 reg_df<-df[`dem_support_I dont want to say`=="No"
            ][,yc:=ifelse(`dem_support_A young carers project`=="Yes","Young carer","Not")
              ]
 
 #reg_df<-reg_df[!ofsted %in% c(NA,"")][,ofsted:=ifelse(ofsted %in% c("Serious Weaknesses","Special Measures","Inadequate"),"Inadequate",ofsted)][,ofsted:=factor(ofsted,levels=c("Outstanding","Good","Requires improvement","Inadequate"))]
 
-
+# filter to sequired columns
 reg_df<-reg_df[,..sel]
 
 for(i in outcomes){
-  
+  # For each outcome recode to be 1/0
   reg_df<-reg_df[,(i):=ifelse(get(i) %in% dk_vals,NA,
                         ifelse(get(i) %in% target_vals,1,0))]
   
 }
 
 for(i in setdiff(sel,outcomes)){
-  
+  # For all variables that aren't outcomes exclude don't know answers
   reg_df<-reg_df[,(i):=ifelse(get(i) %in% dk_vals,NA,get(i))]
   
 }
 
 if(hap & !any(grepl("happy",q_lookup$var))){
+  
+  # Where used as predictors recode happiness questions as binary unhappy vs Not
   
   dk_vals_hap<-c("I don't know","Not applicable","dont know","I dont want to say")
 
@@ -135,8 +144,9 @@ target_vals_hap<-c("Unhappy","Very unhappy","sad")
   
 }
 
-reg_df<-na.omit(reg_df)[sample(seq_len(.N),1e4)]
+reg_df<-na.omit(reg_df)[sample(seq_len(.N),1e4)] # take sample of 10,000 complete cases at random for speed and to make stat significance meaningful
 
+# Set reference levels for categorical predictors
 reg_df$dem_gender_clean<-relevel(as.factor(reg_df$dem_gender_clean),ref="Male")
 reg_df$dem_eth_grp<-relevel(as.factor(reg_df$dem_eth_grp),ref="White")
 reg_df$dem_age_clean<-relevel(as.factor(reg_df$dem_age_clean),ref="9")
@@ -157,9 +167,12 @@ reg_df$loss10<-as.factor(reg_df$loss10)
 require(survey)
 
 mod_res<-pbapply::pblapply(outcomes,function(x){
-
-  ## Full model
+#For each outcome, this function runs 3 things:
+  # a full model with all predictors included to work out total predictive power and get coefficients
+  # calculate variable importance values for each predictor through permutation
+  # run a regression for each block in the block list object to calcualte predictive power of that type of variable alone
   
+  ### Exclude outcome from list of predictors
   if(any(grepl("happy",q_lookup$var))){
   
   vars<-setdiff(names(reg_df)[!names(reg_df)=="q1_happy_M_clean" & !grepl("Other|dont|not worried",names(reg_df))],x)
@@ -167,22 +180,23 @@ mod_res<-pbapply::pblapply(outcomes,function(x){
     vars<-setdiff(names(reg_df)[!names(reg_df)=="q1_happy_M_clean" & !grepl("Other|dont|not worried",names(reg_df))],outcomes)
   }
   
-  vars<-vars[!vars=="wt"]
+  vars<-vars[!vars=="wt"] # exclude weight variable from predictors
   
-  f<-as.formula(paste0("`",x,"`~`",paste0(vars,collapse="`+`"),"`"))
+  f<-as.formula(paste0("`",x,"`~`",paste0(vars,collapse="`+`"),"`")) # create regression formula
   
-mod<-svyglm(f,design=svydesign(ids=~1,data=reg_df,weights=~wt),family=binomial)
+mod<-svyglm(f,design=svydesign(ids=~1,data=reg_df,weights=~wt),family=binomial) # run weighted regression via survey package
 
 pred_all<-as.numeric(
   predict(mod,newdata=model.frame(f,data=reg_df),type="response",se.fit=F)
-)
+) # get fitted probabilities from model
 
-lb<-reg_df[,get(x)]
+lb<-reg_df[,get(x)] # get labels
 
-allAUC<-ModelMetrics::auc(lb,pred_all)
+allAUC<-ModelMetrics::auc(lb,pred_all) # calculate overall AUC
 
-d2<-modEvA::Dsquared(mod)
+d2<-modEvA::Dsquared(mod) # calculate d2 - not used
 
+# get coef table
 coef<-as.data.table(broom::tidy(mod))[,outcome:=x]
 
 coef$pred<-NA
@@ -191,6 +205,7 @@ for(i in vars){
   coef$pred[grepl(i,coef$term)]<-i
 }
 
+# Clean up variable names and reference levels
 coef<-merge(coef,reg_lookup,by.x="pred",by.y="var",all.x=T)
 
 coef$label<-apply(coef,1,function(x){
@@ -201,12 +216,15 @@ coef$label<-apply(coef,1,function(x){
   
 })
 
+# format coef table
 coef<-coef[,or:=round(exp(estimate),2)
      ][,sig:=ifelse(p.value<0.05,"Yes","")][!grepl("Intercept",term),.(Predictor=label,`Ref category`=ref,`Odds ratio`=or,`Significant at 5% level`=sig,outcome)]
 
 ## Variable importance
 
 permList<-rbindlist(lapply(vars,function(y){
+  
+  # for each predictor randomise the values and recalculate overall AUC of model on new predictions
   
   perm_df<-copy(reg_df)[,(y):=sample(get(y),nrow(reg_df))]
   
@@ -225,6 +243,9 @@ permList<-rbindlist(lapply(vars,function(y){
 ## Blocks
 
 block_auc<-rbindlist(purrr::imap(block_list,function(y,z){
+  
+  # for each block of variables run a regression model including only those predictors and claciulate AUC
+  
   f<-as.formula(paste0("`",x,"`~`",paste0(y[!y==x],collapse="`+`"),"`"))
   
 mod<-svyglm(f,design=svydesign(ids=~1,data=reg_df,weights=~wt),family=binomial)
@@ -240,6 +261,8 @@ data.table(outcome=x,block=z,auc=blockAUC)
 }
             )
 )
+
+# store all results for this outcome in list
 list(coef=coef,d2=d2,allAUC=data.table(outcome=x,auc=allAUC),imp=permList,block_auc=block_auc)
   
 })
@@ -250,10 +273,14 @@ list(coef=coef,d2=d2,allAUC=data.table(outcome=x,auc=allAUC),imp=permList,block_
 
 ```{r}
 
-var_imp<-rbindlist(lapply(mod_res,function(x) x$block_auc))
+# Create plot of block AUC values by outcome
+
+var_imp<-rbindlist(lapply(mod_res,function(x) x$block_auc)) # get block AUC values and coerce to data frame
 
 var_imp$outcome<-plyr::mapvalues(var_imp$outcome,
-                                 q_lookup$var,q_lookup$label)
+                                 q_lookup$var,q_lookup$label) # relabel outcomes
+
+# Make plot
 
 ggplot(var_imp,
        aes(x=block,y=outcome,fill=auc))+
@@ -272,22 +299,23 @@ ggplot(var_imp,
 
 ```{r,fig.width=11,results='asis',fig.height=11}
 
-var_imp<-rbindlist(lapply(mod_res,function(x) x$imp))
+var_imp<-rbindlist(lapply(mod_res,function(x) x$imp)) # extract variable importance scores for each outcome and coerce to data frame
 
 var_imp$outcome<-plyr::mapvalues(var_imp$outcome,
-                                 q_lookup$var,q_lookup$label)
+                                 q_lookup$var,q_lookup$label) # recode outcomes
 
 
-pList<-split(var_imp,var_imp$outcome)
+pList<-split(var_imp,var_imp$outcome) # split scores into list with separate data frame for each outcome
 
-coefList<-rbindlist(lapply(mod_res,function(x) x$coef))
+coefList<-rbindlist(lapply(mod_res,function(x) x$coef)) # get coef tables for each outcome and coerce to data frame
 
 coefList$outcome<-plyr::mapvalues(coefList$outcome,
-                                 q_lookup$var,q_lookup$label)
+                                 q_lookup$var,q_lookup$label) # relabel outcomes
 
 
-coefList<-split(coefList,coefList$outcome)
+coefList<-split(coefList,coefList$outcome) # split data frame into list with one coef table per outcome
 
+# create option list for HTML picker - one for each outcome
 pick_string<-sapply(names(pList),
                     function(x){
                       
@@ -295,8 +323,9 @@ pick_string<-sapply(names(pList),
                       
                     })
 
-pick_string<-paste0(pick_string,collapse = "\n")
+pick_string<-paste0(pick_string,collapse = "\n") # paste options together
 
+#output html picker (this is what switches between outcome plots)
 cat(paste0(
   '<div class="picker-group">
 <label>Select outcome</label>
@@ -311,16 +340,20 @@ cat(paste0(
 
 for(i in seq_len(length(pList))){
   
-  y<-names(pList)[i]
-  x<-pList[[i]]
+  # for each outcome in the list of variable importance plots
   
-  d<-merge(pList[[i]],reg_lookup,by="var",all.x=T)
+  y<-names(pList)[i] # get outcome Name
+  x<-pList[[i]] # get variable importance dataframe
+   
+  d<-merge(pList[[i]],reg_lookup,by="var",all.x=T) # add predictor labels
   
-  d$label<-sapply(d$label,function(y) splitF(y,n_words=5))
+  d$label<-sapply(d$label,function(y) splitF(y,n_words=5)) # split long strings into multiple lines
  
-  cat(paste0('<div id="',gsub(" |[[:punct:]]","_",tolower(y)),'" class="sect reg">\n'))
+  cat(paste0('<div id="',gsub(" |[[:punct:]]","_",tolower(y)),'" class="sect reg">\n')) # create HTML div container for plot (this is what is hidden/shown)
   
-  cat("\n**Overall predictive power**\n")
+  cat("\n**Overall predictive power**\n") # add title above plot
+  
+  # print plot
   
  print( ggplot(d,
        aes(x=reorder(label,change),y=change*100))+geom_segment(aes(xend=label,yend=0))+
@@ -328,14 +361,19 @@ for(i in seq_len(length(pList))){
   theme_bw()+scale_y_continuous(limits=c(min(var_imp$change)*100,max(var_imp$change)*100))+
   xlab("Predictor\n")+ylab("\n% change in correctly identifying a child with outcome\nafter randomising predictor")+ggtitle(y) )
  
- cat("\n**Odds ratios**\n")
+ 
+ ## Coef tables
+ 
+ # add text above table
+ cat("\n\n**Odds ratios**\n")
  
  cat("\n*Table below below presents odds ratios for each predictor in the model after controlling for all other predictors included*\n")
  
- coef_tb<-coefList[[i]]
+ coef_tb<-coefList[[i]] # get coef table
  
  coef_tb<-coef_tb[,outcome:=NULL]
  
+ # print coef table
  print(div(style="margin:auto;text-align:center",html_table_f(coef_tb,
               list(Predictor=colDef(minWidth = 300),
                    `Ref category`=colDef(minWidth=200),
@@ -345,7 +383,7 @@ for(i in seq_len(length(pList))){
  )
  )
   
-  cat("</div>")
+  cat("</div>") # close div
  
 }
 
@@ -355,12 +393,12 @@ for(i in seq_len(length(pList))){
 
 ```{r}
 
-var_imp<-rbindlist(lapply(mod_res,function(x) x$allAUC))
+var_imp<-rbindlist(lapply(mod_res,function(x) x$allAUC)) # get overall predictive power values for each outcome
 
 var_imp$outcome<-plyr::mapvalues(var_imp$outcome,
-                                 q_lookup$var,q_lookup$label)
+                                 q_lookup$var,q_lookup$label) # relabel outcomes
 
-
+# create lolipop plot
 ggplot(var_imp,
        aes(x=reorder(outcome,auc),y=auc))+
   geom_segment(aes(xend=outcome,yend=0.5))+geom_point(size=2)+coord_flip()+scale_y_continuous(limits=c(0.5,1))+theme_bw()+xlab("Outcome")+ylab("Overall prediction quality\n(1 = perfect prediction, 0.5 = no better than random)")+theme_bw()

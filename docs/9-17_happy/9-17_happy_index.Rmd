@@ -6,11 +6,13 @@ output:
    theme: null
    mathjax: null
    highlight: null
-   template: "CCO_template_html.html"
-   css: styles.css
+   template: "../../CCO_template_html.html"
+   css: "../../styles.css"
 ---
 
 ```{r setup, include=FALSE}
+# set chunk options. Code below makes list of links - each link is within <div class="topic_navList"></div> tags
+
 knitr::opts_chunk$set(echo = F)
 ```
 

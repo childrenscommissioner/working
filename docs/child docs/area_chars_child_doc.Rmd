@@ -9,24 +9,28 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: styles.css
+   css: "../../styles.css"
    fig_width: 10
    theme: null
-   template: "CCO_template_html.html"
+   template: "../../CCO_template_html.html"
 ---
 
 ```{r, include=F}
-knitr::opts_chunk$set(echo = F, warning=F,message = F)
+knitr::opts_chunk$set(echo = F, warning=F,message = F) # stop code/messages getting printed
 ```
 
 ```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
 
+# pull in navigation links
 
 ```
 
 <script src="extra_js.js"></script>
 
 ```{r, results='asis'}
+
+# create picker control to switch between tables
+
 if(seg){
 
   suffix<-"_seg"
@@ -57,6 +61,8 @@ cat(
 
 ```{r, results='asis'}
 
+# Create html div to hold table - this is what's shown/hidden by the picker control
+
   cat(
     paste0('<div id="urban',suffix,'" class="sect area',suffix,'">\n'
              )
@@ -68,16 +74,25 @@ cat(
 ```{r}
 
 df_urb<-table_f("ru11ind")[,urb:=ifelse(grepl("[A-C]",ru11ind),"Urban","Rural")
-                           ][!is.na(value)]
+                           ][!is.na(value)] # reshape data to be in correct format
 
-two_way_tb_f(df_urb,"urb","Rural vs Urban",col1)
+two_way_tb_f(df_urb,"urb","Rural vs Urban",col1) # create table
+
+
 
 ```
+
+```{r, results='asis'}
+cat("\nSource: ONS postcode lookup file\n")
+```
+
 
 </div>
 
 
 ```{r, results='asis'}
+
+# Create html div to hold table - this is what's shown/hidden by the picker control
 
   cat(
     paste0('<div id="idaci',suffix,'" class="sect area',suffix,'">\n'
@@ -91,26 +106,34 @@ two_way_tb_f(df_urb,"urb","Rural vs Urban",col1)
 
 if(!"idaci_decile" %in% names(df)){
 
+  # Where not already merged on add in imd information
+  
 df<-merge(df,imd[`Indices of Deprivation`=="i. Income Deprivation Affecting Children Index (IDACI)",.(idaci_decile=Value,FeatureCode)],
              by.x="lsoa11",by.y="FeatureCode",all.x=T)
 }
 
-df_idaci<-table_f("idaci_decile")[!is.na(idaci_decile) & !is.na(value)
+df_idaci<-table_f("idaci_decile")[!is.na(idaci_decile) & !is.na(value) # reshape data
                                   ]
 
 two_way_tb_f(df_idaci,"idaci_decile","Highest vs lowest",col1,
              mult_cols=T,test_vals=c(1,5),
              columnGroups = list(colGroup(name="IDACI quintile (1 = most deprived)",as.character(c(1:5))))
-             )
+             ) # create table - comparison is between 1st and 5th quintile
 
 
 
+```
+
+```{r, results='asis'}
+cat("\nSource: MHCLG Indices of mulitple deprivation 2019\n")
 
 ```
 
 </div>
 
 ```{r, results='asis'}
+
+# Create html div to hold table - this is what's shown/hidden by the picker control
 
   cat(
     paste0('<div id="covid',suffix,'" class="sect area',suffix,'">\n'
@@ -123,7 +146,10 @@ two_way_tb_f(df_idaci,"idaci_decile","Highest vs lowest",col1,
 ```{r}
 
 if(! "covid_quintile" %in% names(df)){
-covid<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/covidCaseRate_1205.csv")
+
+  # where not already add in LA covid quintiles
+  
+  covid<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/covidCaseRate_1205.csv")
 
 covid<-covid[,perc_rank:=frank(caseRate)/.N
              ][,covid_quintile:=ceiling(perc_rank/0.2)]
@@ -132,18 +158,26 @@ df<-merge(df,covid,by.y="areaCode",by.x="UTLA19CD",all.x=T)
 
 }
 
-df_age<-table_f("covid_quintile",df_use=df)[!is.na(covid_quintile)]
+df_age<-table_f("covid_quintile",df_use=df)[!is.na(covid_quintile)] # reshape data
 
 
 two_way_tb_f(df_age,"covid_quintile","Highest quintle vs lowest",col1,mult_cols=T,test_vals=c(1,5),
              columnGroups = list(colGroup(name="Cumulative COVID case rate quintile (5= highest rate)",as.character(c(1:5))))
-             )
+             ) # create table - comparison is between 1st and 5th quintile
+
+
+```
+
+```{r, results='asis'}
+cat("\nSource: https://coronavirus.data.gov.uk/ data up to 11/05/2021\n")
 
 ```
 
 </div>
 
 ```{r, results='asis'}
+
+# Create html div to hold table - this is what's shown/hidden by the picker control
 
   cat(
     paste0('<div id="learn_loss',suffix,'" class="sect area',suffix,'">\n'
@@ -156,7 +190,10 @@ two_way_tb_f(df_age,"covid_quintile","Highest quintle vs lowest",col1,mult_cols=
 ```{r}
 
 if(!"loss10" %in% names(df)){
-la_loss<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/la_learningLoss.csv")
+
+  # Where not already there add in learning loss estimates
+  
+  la_loss<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/la_learningLoss.csv")
 
 la_loss<-la_loss[Phase=="All state-funded schools",.(UTLA19CD=`Local Authority Code`,loss_rate=`Days of classroom learning missed per pupil (9th September to 10th December)`)
                  ][,loss10:=ceiling((frank(loss_rate)/.N)/0.2)]
@@ -164,18 +201,25 @@ la_loss<-la_loss[Phase=="All state-funded schools",.(UTLA19CD=`Local Authority C
 df<-merge(df,la_loss,by="UTLA19CD",all.x=T)
 }
 
-df_age<-table_f("loss10")[!is.na(loss10)]
+df_age<-table_f("loss10")[!is.na(loss10)] # reshape data
 
 two_way_tb_f(df_age,"loss10","Highest quintle vs lowest",col1,mult_cols=T,test_vals=c(1,5),
              columnGroups = list(colGroup(name="Learning lost per pupil quintile (5= highest rate)",as.character(c(1:5))))
-             )
+             ) # create table - comparison is between 1st and 5th quintile
              
+
+```
+
+```{r, results='asis'}
+cat("\nSource: CCO estimates of missed face to face learning to December 2020\n")
 
 ```
 
 </div>
 
 ```{r, results='asis'}
+
+# Create html div to hold table - this is what's shown/hidden by the picker control
 
   cat(
     paste0('<div id="obese',suffix,'" class="sect area',suffix,'">\n'
@@ -188,6 +232,9 @@ two_way_tb_f(df_age,"loss10","Highest quintle vs lowest",col1,mult_cols=T,test_v
 ```{r}
 
 if(!"obese_rate" %in% names(df)){
+  
+  # Where not already present add in LA child obesity rates
+  
 obese<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/obesity.csv")
 
 obese<-obese[,.(UTLA19CD=`Area Code`,obese_rate)
@@ -196,18 +243,25 @@ obese<-obese[,.(UTLA19CD=`Area Code`,obese_rate)
 df<-merge(df,obese,by="UTLA19CD",all.x=T)
 }
 
-df_age<-table_f("obese_rate",df[!is.na(obese_rate)])
+df_age<-table_f("obese_rate",df[!is.na(obese_rate)]) # reshape data
 
 two_way_tb_f(df_age,"obese_rate","Highest quintle vs lowest",col1,mult_cols=T,test_vals=c(1,5),
              columnGroups = list(colGroup(name="LA child obesity rate quintile (Yr 6 children, 5= highest rate)",as.character(c(1:5))))
-             )
-             
+             ) # create table - comparison is between 1st and 5th quintile
+
+
+```
+
+```{r, results='asis'}
+cat("\nSource: NHS National Child Measurement Programme statistics 2020\n")            
 
 ```
 
 </div>
 
 ```{r, results='asis'}
+
+# Create HTML div - this is whats shown/hidden
 
   cat(
     paste0('<div id="crime_all',suffix,'" class="sect area',suffix,'">\n'
@@ -220,6 +274,9 @@ two_way_tb_f(df_age,"obese_rate","Highest quintle vs lowest",col1,mult_cols=T,te
 ```{r}
 
 if(! "all_crime" %in% names(df)){
+  
+  # Where not already present add in LSOA crime rates
+  
 crime<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/lsoa_crime_quantile.csv")
 
 names(crime)[2]<-"all_crime"
@@ -230,12 +287,18 @@ df<-merge(df,crime,
 }
 
 df_idaci<-table_f("all_crime")[!is.na(all_crime) & !is.na(value)
-                                  ]
+                                  ] # reshape data
 
 two_way_tb_f(df_idaci,"all_crime","Highest quintile vs lowest",col1,
              mult_cols=T,test_vals=c(1,5),
              columnGroups = list(colGroup(name="Crime rate quintile (5 = highest rate)",as.character(c(1:5))))
-             )
+             ) # create table - comparison is between 1st and 5th quintile
+
+
+```
+
+```{r, results='asis'}
+cat("\nSource: Police.uk recorded crime open data 2020/21\n")    
 
 ```
 

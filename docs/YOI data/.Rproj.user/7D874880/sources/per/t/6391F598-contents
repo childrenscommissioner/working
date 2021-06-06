@@ -1,0 +1,73 @@
+---
+title: "How happy are children with their current lives?"
+output: 
+ html_document: 
+   self_contained: no
+   theme: null
+   mathjax: null
+   highlight: null
+   template: "CCO_template_html.html"
+   css: styles.css
+---
+
+```{r setup, include=FALSE}
+# set chunk options. Code below makes list of links - each link is within <div class="topic_navList"></div> tags
+
+knitr::opts_chunk$set(echo = F)
+```
+
+<a href="../../index.html">Home</a></li>
+
+<h3>Overall Rates</h3>
+
+<div class="topic_navList">
+<a class="meta_navList_link" href="9-17_happy_overall.html">
+<h3 class="list_header">How happy are children with their current lives?</h3></a>
+</div>
+
+<div class="topic_navList">
+<a class="meta_navList_link" href="9-17_happy_combs.html">
+<h3 class="list_header">What combinations of things are children unhappy with in their current life?</h3></a>
+</div>
+
+<h3>How is this different for sub-groups of children?</h3>
+
+<div class="topic_navList">
+<a class="meta_navList_link" href="9-17_happy_child_chars.html">
+<h3 class="list_header">Demographic groups</h3></a>
+</div>
+
+<div class="topic_navList">
+<a class="meta_navList_link" href="9-17_happy_disad.html">
+<h3 class="list_header">Vulnerable children</h3></a>
+</div>
+
+<h3>How is this different based on where children live?</h3>
+
+<div class="topic_navList">
+<a class="meta_navList_link" href="9-17_happy_map.html">
+<h3 class="list_header">Overall local area rates</h3></a>
+</div>
+
+<div class="topic_navList">
+<a class="meta_navList_link" href="9-17_happy_area_chars.html">
+<h3 class="list_header">Differences by local area characteristics</h3></a>
+</div>
+
+<h3>How is this different based on where children go to school?</h3>
+
+<div class="topic_navList">
+<a class="meta_navList_link" href="9-17_happy_school.html">
+<h3 class="list_header">School characteristics</h3></a>
+</div>
+
+<h3>Multivariate analysis</h3>
+
+<div class="topic_navList">
+<a class="meta_navList_link" href="9-17_happy_regression.html">
+<h3 class="list_header">Regression analysis</h3></a>
+</div>
+
+<div class="topic_navList">
+<a class="meta_navList_link" href="9-17_happy_segmentation.html">
+<h3 class="list_header">Segmentation analysis</h3></a>

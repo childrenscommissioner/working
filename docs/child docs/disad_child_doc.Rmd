@@ -9,24 +9,27 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: styles.css
+   css: "../../styles.css"
    fig_width: 10
    theme: null
-   template: "CCO_template_html.html"
+   template: "../../CCO_template_html.html"
 ---
 
 ```{r, include=FALSE}
-knitr::opts_chunk$set(echo = F, warning=F,message = F)
+knitr::opts_chunk$set(echo = F, warning=F,message = F) # set chunk options
 ```
 
 ```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
 
+# add navigation breadcrumbs
 
 ```
 
 <script src="extra_js.js"></script>
 
 ```{r, include=F}
+
+## add dummy table. Note this isn't shown (include=F) but is required (due to a weird Rmarkdown quirk) to attach javascript libraries to the page
 
 df_any_mh<-table_f("any_mh")
 
@@ -37,6 +40,9 @@ two_way_tb_f(df_any_mh,"any_mh","Receiving support from a healthcare worker vs N
 
 
 ```{r,results='asis'}
+
+## Add HTML picker to page - this chooses what table is viisible
+
 if(seg){
 
   suffix<-"_seg"
@@ -88,6 +94,8 @@ cat(paste0('
 
 ```{r, results='asis'}
 
+# create html div as container for table(s) this is what s hidden/shown
+
   cat(
     paste0('<div id="sen',suffix,'" class="sect disad',suffix,'">\n'
              )
@@ -100,8 +108,12 @@ cat(paste0('
 
 ```{r, results='asis'}
 
+#Note all subsequent chunks follow the same pattern as below so annotations not repeated.
+
 if(!seg){
 
+  # If not part of segmentation page calculate SEN variable
+  
 if(is.null(age_grp)){
 df$dem_sen<-with(df,
              ifelse(dfe_phase %in% "Special",
@@ -123,13 +135,20 @@ df$dem_sen<-with(df,
 
 if(is.null(age_grp)){
   
+  # If 9-17 yr old data run function to make tables for different age groups - stored in markdown_functions.R script
+  
  create_age_picker_f("_sen","dem_sen","Any SEN vs Not")
   
 }else{
+  
+  # If 6-8 make table as per child_chars document
+  
   df_sen<-table_f("dem_sen")
   
   two_way_tb_f(df_sen,"dem_sen","Any SEN vs Not",col1)
 }
+
+# Add definition of SEN variable
 
 cat("\n*Children with SEN defined as those receiving support from a teaching assistant/SENCO or those enrolled in a special school*\n")
 

@@ -9,18 +9,19 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: styles.css
+   css: "../../styles.css"
    fig_width: 10
    theme: null
-   template: "CCO_template_html.html"
+   template: "../../CCO_template_html.html"
 ---
 
 ```{r, include=F}
-knitr::opts_chunk$set(echo = F, warning=F,message = F)
+knitr::opts_chunk$set(echo = F, warning=F,message = F) # set chunk options
 ```
 
 ```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
 
+# import navigation breadcrumbs
 
 ```
 
@@ -28,8 +29,12 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F)
 
 ```{r, results='asis'}
 
+# Create picker control to select which table is shown
+
 if(seg){
 
+  # add suffix if part of segmentation document - stops name clashes
+  
   suffix<-"_seg"
 }else{
   suffix<-""
@@ -60,6 +65,8 @@ cat(
 
 ```{r, results='asis'}
 
+# Create HTML div as container for table - this is what's hidden and shown when GO is pressed
+
 if(seg){
   cat(
     paste0('<div id="age',suffix,'" class="sect child',suffix,'">\n'
@@ -72,16 +79,23 @@ if(seg){
 ```
 
 ```{r}
+# age groups
 
 if(is.null(age_grp)){
 
+  # Create age groups amongst 9-17 yr olds
+  
 df_age<-table_f("dem_age_clean")[!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
                                                 ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17"))
                                  ][,dem_age_clean:=factor(dem_age_clean,c("9-11","12-15","16-17"))]
 
+# make table - testing is for 16-17 vs 9-11
 two_way_tb_f(df_age,"dem_age_clean","16-17 vs 9-11",col1,
              mult_cols=T,test_vals=c("16-17","9-11"))
 }else{
+  
+  # For 6-8 yr olds
+  
   df_age<-table_f("dem_age_clean")[!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=as.factor(dem_age_clean)]
 
   age_split<-unlist(strsplit(age_grp,"[-]"))
@@ -98,6 +112,9 @@ two_way_tb_f(df_age,"dem_age_clean",age_str,col1,
 </div>
 
 ```{r, results='asis'}
+
+# Single year age
+# Create HTML div as container for table - this is what's hidden and shown when GO is pressed
 
 if(seg){
   cat(
@@ -114,11 +131,16 @@ if(seg){
 
 if(is.null(age_grp)){
 
+  #For 9-17 yr olds
+  
 df_age<-table_f("dem_age_clean")[!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=factor(dem_age_clean,as.character(seq(9,17)))]
 
 two_way_tb_f(df_age,"dem_age_clean","16 vs 9",col1,
              mult_cols=T,test_vals=c("16","9"))
 }else{
+  
+  # For 6-8 yr olds
+  
   df_age<-table_f("dem_age_clean")[!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=as.factor(dem_age_clean)]
 
   age_split<-unlist(strsplit(age_grp,"[-]"))
@@ -136,6 +158,9 @@ two_way_tb_f(df_age,"dem_age_clean",age_str,col1,
 
 ```{r, results='asis'}
 
+# Gender
+# Create HTML div as container for table - this is what's hidden and shown when GO is pressed
+
 if(seg){
   cat(
     paste0('<div id="gender',suffix,'" class="sect child',suffix,'">\n'
@@ -150,18 +175,22 @@ if(seg){
 ```{r}
 
 
-df_gender<-table_f("dem_gender_clean")[!dem_gender_clean=="I dont want to say"]
+df_gender<-table_f("dem_gender_clean")[!dem_gender_clean=="I dont want to say"] # reshape data
 
-df_gender$dem_gender_clean<-factor(df_gender$dem_gender_clean,c("Female","Girl","Boy","Male","Other"))
+df_gender$dem_gender_clean<-factor(df_gender$dem_gender_clean,c("Female","Girl","Boy","Male","Other")) # ensure factor levels are correct
 
 two_way_tb_f(df_gender,"dem_gender_clean","Male vs Female",col1,
-             mult_cols = T, test_vals=c("Male","Female"))
+             mult_cols = T, test_vals=c("Male","Female")) # make table
 
 ```
 
 </div>
 
 ```{r, results='asis'}
+
+# Age + gender
+# Create HTML div as container for table - this is what's hidden and shown when GO is pressed
+
 
 if(seg){
   cat(
@@ -176,58 +205,83 @@ if(seg){
 
 ```{r}
 
-hap_col<-names(df)[grepl(paste0("^id$|dem_gender_clean|",search_str,"|dem_age_clean|^wt$"),names(df))]
+# Note: helper functions don't work for these multiway tables (i.e. Age+gender age+ethnicity) so have to do manually
 
-df_gender<-melt(df[,..hap_col],id.vars = c("id","dem_gender_clean","dem_age_clean","wt"))[,variable:=plyr::mapvalues(variable,
-                                                                                    q_lookup$var,
-                                                                                    q_lookup$label)]
+hap_col<-names(df)[grepl(paste0("^id$|dem_gender_clean|",search_str,"|dem_age_clean|^wt$"),names(df))] # select columns from main data set
+
+# reshape data to long format and relabel outcomes
+
+df_gender<-melt(df[,..hap_col],
+                id.vars = c("id","dem_gender_clean","dem_age_clean","wt")
+                )[,variable:=plyr::mapvalues(variable,q_lookup$var,q_lookup$label)] 
 
 if(is.null(age_grp)){
+  # Create age group variable for 9-17 yr olds
   
   df_gender<-df_gender[,age:=ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
-                                                ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17"))][,age:=factor(age,levels=c("9-11","12-15","16-17"))]
+                                                ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17"))
+                       ][,age:=factor(age,levels=c("9-11","12-15","16-17"))]
+  
 }else{
   df_gender<-df_gender[,age:=dem_age_clean]
 }
 
+# Recode outcomes to be 1/0 and create percentage table
+# Note: v2 = is variable that combines outcome and age group
+
 df_gender_out<-df_gender[,value:=ifelse(value %in% dk_vals,NA,
                         ifelse(value %in% target_vals,1,0))
-           ][,.(c=sum(wt)),by=.(dem_gender_clean,variable,value,age)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_gender_clean,age)
-  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)][,v2:=paste0(variable,"_",age)]
+           ][,.(c=sum(wt)),by=.(dem_gender_clean,variable,value,age)
+             ][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_gender_clean,age)
+               ][value==1][,val_col:=paste0(c,"|",base,"|",perc)][,v2:=paste0(variable,"_",age)]
+
+# Run effect size and significance testing for each outcome within each age group
 
 effect_test_genAge<-merge(
   effectsize_f(df_gender_out[dem_gender_clean %in% c("Male","Female")],"v2","dem_gender_clean","perc"),
-  sig_f(copy(df_gender)[,variable:=paste0(variable,"_",age)][,.(variable,dem_gender_clean,value)][dem_gender_clean %in% c("Male","Female")],
+  sig_f(copy(df_gender)[,variable:=paste0(variable,"_",age)
+                        ][,.(variable,dem_gender_clean,value)
+                          ][dem_gender_clean %in% c("Male","Female")],
         "dem_gender_clean","value"),by="g1"
 )
 
-tb<-merge(dcast(df_gender_out[!dem_gender_clean %in% c("I dont want to say")][,.(v2,variable,dem_gender_clean,age,perc)],v2+variable+age~dem_gender_clean,value.var = "perc"),
-          effect_test_genAge[,.(v2=g1,rr,diff,p.value)],by="v2")[,v2:=NULL
-                                                         ][order(variable,age)]
+# Merge together percentage table and effect size/sig testing table
 
-tb<-tb[order(variable,age)]
+tb<-merge(
+  dcast(df_gender_out[!dem_gender_clean %in% c("I dont want to say")
+                      ][,.(v2,variable,dem_gender_clean,age,perc)
+                        ],v2+variable+age~dem_gender_clean,value.var = "perc"),
+          effect_test_genAge[,.(v2=g1,rr,diff,p.value)],by="v2"
+  )[,v2:=NULL][order(variable,age)]
 
- download_tb<-tb
+tb<-tb[order(variable,age)] # order tables by outcome and age group
+
+ download_tb<-tb # create copy of table for download
   
+ # Amend download table column names
   names(download_tb)<-plyr::mapvalues(names(tb),c("variable","rr","diff","p.value"),
                                       c(col1,paste0("Relative risk with age group (Male vs Female)"),
                                         "How big is this difference?","Statistical significance"))
  
 
-pList<-p_col_select(tb,c("variable","rr","diff","age","p.value"))
+pList<-p_col_select(tb,c("variable","rr","diff","age","p.value")) # format percentage columns in table to go on web
 
-div(html_table_f(tb,column_def = c(
-  list(
-    variable=colDef(name=col1,minWidth=200),
-    age=colDef(name="Age group")),
-    pList,
-    list(rr=colDef(name="Relative risk with age group (Male vs Female)",format = colFormat(digits=2),align = "center"),
-   diff=colDef("How big is this difference?",minWidth = 150),
-   p.value=colDef("Statistical significance"))
-  ),
-  groupBy="variable",sort_col=NULL),
-  downloadthis::download_this(as.data.frame(download_tb),
-                              output_name="big_ask_table_download",output_extension=".xlsx")
+# output div containing html table and download button
+div(
+  html_table_f(tb,
+               column_def = c(
+                 list(
+                   variable=colDef(name=col1,minWidth=200),
+                   age=colDef(name="Age group")),
+                 pList,
+                 list(rr=colDef(name="Relative risk with age group (Male vs Female)",format = colFormat(digits=2),align = "center"),
+                      diff=colDef("How big is this difference?",minWidth = 150),
+                      p.value=colDef("Statistical significance"))
+               ),
+               groupBy="variable",sort_col=NULL),
+  downloadthis::download_this(
+    as.data.frame(download_tb),
+    output_name="big_ask_table_download",output_extension=".xlsx")
 )
 
 
@@ -236,6 +290,10 @@ div(html_table_f(tb,column_def = c(
 </div>
 
 ```{r, results='asis'}
+
+# Ethnicity
+# Create HTML div as container for table - this is what's hidden and shown when GO is pressed
+
 
 if(seg){
   cat(
@@ -250,27 +308,45 @@ if(seg){
 
 ```{r}
 
+# Note ethnicity tables include BME variable so have to glue these together manually
+
+# reshape data
 df_eth<-table_f("dem_eth_grp")[!dem_eth_grp %in% c("I dont want to say",NA)
                                ]
 
-df_eth_full<-df_eth[,.(c=sum(wt)),by=.(variable,value,dem_eth_grp)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_eth_grp)
-  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)]
+# Calculate percentage table for ethnicity and outcomes
+df_eth_full<-df_eth[,.(c=sum(wt)),by=.(variable,value,dem_eth_grp)
+                    ][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_eth_grp)
+                      ][value==1
+                        ][,val_col:=paste0(c,"|",base,"|",perc)]
 
-df_bme<-df_eth[!is.na(value)][,bme:=ifelse(dem_eth_grp=="White",1,0)][,.(c=sum(wt)),by=.(variable,bme,value)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,bme)
-                                                                             ][value==1][,value:=NULL][,val_col:=paste0(c,"|",base,"|",perc)]
+# Calculate percentage table for BME and outcomes
+df_bme<-df_eth[!is.na(value)
+               ][,bme:=ifelse(dem_eth_grp=="White",1,0)
+                 ][,.(c=sum(wt)),by=.(variable,bme,value)
+                   ][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,bme)
+                     ][value==1][,value:=NULL][,val_col:=paste0(c,"|",base,"|",perc)]
 
-effect_test_bme<-merge(effectsize_f(df_bme,"variable","bme","perc"),
-                       sig_f(df_eth[!is.na(value) & !is.na(dem_eth_grp)][,bme:=ifelse(dem_eth_grp=="White",1,0)],"bme","value"),
-                       by="g1"
+# Calculate effect size and significance for BME vs White
+
+effect_test_bme<-merge(
+  effectsize_f(df_bme,"variable","bme","perc"),
+  sig_f(df_eth[!is.na(value) & !is.na(dem_eth_grp)
+               ][,bme:=ifelse(dem_eth_grp=="White",1,0)],"bme","value"),by="g1"
 )
 
-tb<-Reduce(function(x,y) merge(x,y,by="variable"),
-           list(dcast(df_eth_full[,.(variable,dem_eth_grp,perc)],variable~dem_eth_grp,value.var = "perc"),
-                df_bme[bme==0][,.(variable,BME=perc)],
-          effect_test_bme[,.(variable=g1,rr,diff,p.value)]
+# Put wide ethnicity table, bme and effect size tables into a list and merge together via reduce
+
+tb<-Reduce(
+  function(x,y) merge(x,y,by="variable"),
+  list(
+    dcast(df_eth_full[,.(variable,dem_eth_grp,perc)],variable~dem_eth_grp,value.var = "perc"),
+    df_bme[bme==0][,.(variable,BME=perc)],
+    effect_test_bme[,.(variable=g1,rr,diff,p.value)]
           )
 )
 
+# Create download and web tables as above
 
 pList<-p_col_select(tb,c("variable","rr","diff","p.value"))
 
@@ -301,6 +377,10 @@ div(html_table_f(tb,column_def = c(
 
 ```{r, results='asis'}
 
+# Ethnicity + age
+# Create HTML div as container for table - this is what's hidden and shown when GO is pressed
+
+
 if(seg){
   cat(
     paste0('<div id="ethnicity_age',suffix,'" class="sect child',suffix,'">\n'
@@ -313,44 +393,70 @@ if(seg){
 ```
 
 ```{r}
-hap_col<-names(df)[grepl(paste0("^id$|dem_eth_grp|",search_str,"|dem_age_clean|^wt$"),names(df))]
 
-df_eth<-melt(df[!is.na(dem_eth_grp) & !dem_eth_grp=="I dont want to say",..hap_col],id.vars = c("id","dem_eth_grp","dem_age_clean","wt"))[,variable:=plyr::mapvalues(variable,
-                                                                                    q_lookup$var,
-                                                                                    q_lookup$label)]
+# As above multi-way tables need to be done manually rather than with helper functions
+
+hap_col<-names(df)[grepl(paste0("^id$|dem_eth_grp|",search_str,"|dem_age_clean|^wt$"),names(df))] # define columns needed
+
+# subset columns and convert to long format and relabel outcomes
+df_eth<-melt(df[!is.na(dem_eth_grp) & !dem_eth_grp=="I dont want to say",..hap_col],
+             id.vars = c("id","dem_eth_grp","dem_age_clean","wt")
+             )[,variable:=plyr::mapvalues(variable,q_lookup$var,q_lookup$label)]
 
 if(is.null(age_grp)){
-  
+# Create age groups for 9-17 year olds
+    
   df_eth<-df_eth[,age:=ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
-                                                ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17"))][,age:=factor(age,levels=c("9-11","12-15","16-17"))]
+                              ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17"))
+                 ][,age:=factor(age,levels=c("9-11","12-15","16-17"))
+                   ]
 }else{
   df_eth<-df_eth[,age:=dem_age_clean]
 }
 
-df_eth<-df_eth[!is.na(value)][,value:=ifelse(value %in% dk_vals,NA,
+# recode outcomes to be 1/0
+df_eth<-df_eth[!is.na(value)
+               ][,value:=ifelse(value %in% dk_vals,NA,
                         ifelse(value %in% target_vals,1,0))
            ]
 
+# Create percentage table for ethnic groups - note v2 = combined outcome and age variable
 df_eth_all<-df_eth[,.(c=sum(wt)),by=.(dem_eth_grp,variable,value,age)
              ][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_eth_grp,age)
-  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)][,v2:=paste0(variable,"_",age)]
+               ][value==1][,val_col:=paste0(c,"|",base,"|",perc)
+                           ][,v2:=paste0(variable,"_",age)]
 
-df_bme<-df_eth[!is.na(value)][,bme:=ifelse(dem_eth_grp=="White",1,0)][,.(c=sum(wt)),by=.(variable,age,bme,value)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,age,bme)
-  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)][,v2:=paste0(variable,"_",age)]
+# Create percentage table for bme vs white - note v2 = combined outcome and age variable
+df_bme<-df_eth[!is.na(value)
+               ][,bme:=ifelse(dem_eth_grp=="White",1,0)
+                 ][,.(c=sum(wt)),by=.(variable,age,bme,value)
+                   ][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,age,bme)
+                     ][value==1][,val_col:=paste0(c,"|",base,"|",perc)][,v2:=paste0(variable,"_",age)]
 
+# Run effect size and significance testing for bme vs white for every outcome + age combination
 effect_test_ethAge<-merge(
   effectsize_f(df_bme,"v2","bme","perc"),
-  sig_f(df_eth[!is.na(value)][,bme:=ifelse(dem_eth_grp=="White",1,0)
-                              ][,variable:=paste0(variable,"_",age)][,.(bme,variable,value)],"bme","value"),
+  sig_f(df_eth[!is.na(value)
+               ][,bme:=ifelse(dem_eth_grp=="White",1,0)
+                 ][,variable:=paste0(variable,"_",age)
+                   ][,.(bme,variable,value)],"bme","value"),
   by="g1"
 )
 
-tb<-merge(dcast(df_eth_all[,.(v2,variable,dem_eth_grp,age,perc)],v2+variable+age~dem_eth_grp,value.var = "perc"),
-          effect_test_ethAge[,.(v2=g1,rr,diff,p.value)],by="v2")[order(variable,age)]
+# Merge ethnic group table and effect/significance testing table
 
+tb<-merge(
+  dcast(df_eth_all[,.(v2,variable,dem_eth_grp,age,perc)],v2+variable+age~dem_eth_grp,value.var = "perc"),
+  effect_test_ethAge[,.(v2=g1,rr,diff,p.value)],by="v2"
+  )[order(variable,age)]
+
+# Merge on BME %s and reorder columns
 tb<-merge(tb,
       df_bme[bme==0][,.(v2,`BME`=perc)],
-      by="v2")[,v2:=NULL][,.(variable,Age=age,Asian,Black,Mixed,Other,BME,White,rr,diff,p.value)]
+      by="v2")[,v2:=NULL
+               ][,.(variable,Age=age,Asian,Black,Mixed,Other,BME,White,rr,diff,p.value)]
+
+# Output download and web tables as above
 
 tb<-tb[order(variable,Age)]
 
@@ -386,6 +492,10 @@ downloadthis::download_this(as.data.frame(download_tb),
 
 ```{r, results='asis'}
 
+# Ethnicity + gender
+# Create HTML div as container for table - this is what's hidden and shown when GO is pressed
+
+
 if(seg){
   cat(
     paste0('<div id="ethnicity_gender',suffix,'" class="sect child',suffix,'">\n'
@@ -398,37 +508,66 @@ if(seg){
 ```
 
 ```{r, fig.width=10}
-hap_col<-names(df)[grepl(paste0("^id$|dem_eth_grp|",search_str,"|dem_gender_clean|^wt$"),names(df))]
+# As above helper functions don't work for multi-way tables
 
-df_eth<-melt(df[!is.na(dem_eth_grp) & !dem_eth_grp=="I dont want to say",..hap_col],id.vars = c("id","dem_eth_grp","dem_gender_clean","wt"))[,variable:=plyr::mapvalues(variable,
-                                                                                    q_lookup$var,
-                                                                                    q_lookup$label)]
+hap_col<-names(df)[grepl(paste0("^id$|dem_eth_grp|",search_str,"|dem_gender_clean|^wt$"),names(df))] # get columns to use
 
-df_eth_2<-df_eth[!is.na(value)][,value:=ifelse(value %in% dk_vals,NA,
+# convert to long format and relabel outcomes
+
+df_eth<-melt(df[!is.na(dem_eth_grp) & !dem_eth_grp=="I dont want to say",..hap_col],
+             id.vars = c("id","dem_eth_grp","dem_gender_clean","wt")
+             )[,variable:=plyr::mapvalues(variable,q_lookup$var,q_lookup$label)]
+
+# recode outcomes to 1/0 and calculate percentage table for ethnic groups
+
+df_eth_2<-df_eth[!is.na(value)
+                 ][,value:=ifelse(value %in% dk_vals,NA,
                         ifelse(value %in% target_vals,1,0))
-           ][,.(c=sum(wt)),by=.(dem_eth_grp,variable,value,dem_gender_clean)][,v2:=paste0(variable,"_",dem_gender_clean)]
+                   ][,.(c=sum(wt)),by=.(dem_eth_grp,variable,value,dem_gender_clean)
+                     ][,v2:=paste0(variable,"_",dem_gender_clean)]
 
-df_bme<-df_eth_2[!is.na(value)][,bme:=ifelse(dem_eth_grp=="White",1,0)][,.(c=sum(c)),by=.(v2,bme,value)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(v2,bme)
-  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)]
+# Calculate percentage table for bme vs white
 
-df_eth_all<-df_eth_2[!is.na(value)][,perc:=c/sum(c),by=.(dem_eth_grp,variable,dem_gender_clean)][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_eth_grp,dem_gender_clean)
-  ][value==1][,val_col:=paste0(c,"|",base,"|",perc)][,v2:=paste0(variable,"_",dem_gender_clean)]
+df_bme<-df_eth_2[!is.na(value)
+                 ][,bme:=ifelse(dem_eth_grp=="White",1,0)
+                   ][,.(c=sum(c)),by=.(v2,bme,value)
+                     ][,`:=`(perc=c/sum(c),base=sum(c)),by=.(v2,bme)
+                       ][value==1][,val_col:=paste0(c,"|",base,"|",perc)]
+
+# calculate ethnic group table
+
+df_eth_all<-df_eth_2[!is.na(value)
+                     ][,perc:=c/sum(c),by=.(dem_eth_grp,variable,dem_gender_clean)
+                       ][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_eth_grp,dem_gender_clean)
+                         ][value==1][,val_col:=paste0(c,"|",base,"|",perc)
+                                     ][,v2:=paste0(variable,"_",dem_gender_clean)]
+
+# Calcualte effect size and sig testing for BME vs Not by outcome and gender (v2)
 
 effect_test_ethdem_gender_clean<-merge(
   effectsize_f(df_bme,"v2","bme","perc"),
-  sig_f(df_eth[!is.na(value)][,value:=ifelse(value %in% dk_vals,NA,
+  sig_f(df_eth[!is.na(value)
+               ][,value:=ifelse(value %in% dk_vals,NA,
                         ifelse(value %in% target_vals,1,0))
-           ][,bme:=ifelse(dem_eth_grp=="White",1,0)][,variable:=paste0(variable,"_",dem_gender_clean)],"bme","value"),
+                 ][,bme:=ifelse(dem_eth_grp=="White",1,0)
+                   ][,variable:=paste0(variable,"_",dem_gender_clean)],"bme","value"),
   by="g1"
 )
 
-tb<-merge(dcast(df_eth_all[,.(v2,variable,dem_eth_grp,dem_gender_clean,perc)],v2+variable+dem_gender_clean~dem_eth_grp,value.var = "perc"),
-          effect_test_ethdem_gender_clean[,.(v2=g1,rr,diff,p.value)],by="v2")[order(variable,dem_gender_clean)]
+# merge ethnic group table and sig testing/effect size
 
+tb<-merge(
+  dcast(df_eth_all[,.(v2,variable,dem_eth_grp,dem_gender_clean,perc)],v2+variable+dem_gender_clean~dem_eth_grp,value.var = "perc"),
+          effect_test_ethdem_gender_clean[,.(v2=g1,rr,diff,p.value)],by="v2"
+  )[order(variable,dem_gender_clean)]
+
+# merge on BME percs and reorder columns
 tb<-merge(tb,
       df_bme[bme==0][,.(v2,`BME`=perc)],
-      by="v2")[,v2:=NULL][,.(variable,dem_gender_clean=dem_gender_clean,Asian,Black,Mixed,Other,BME,White,rr,diff,p.value)]
+      by="v2")[,v2:=NULL
+               ][,.(variable,dem_gender_clean=dem_gender_clean,Asian,Black,Mixed,Other,BME,White,rr,diff,p.value)]
 
+# Create download and output tables as above
 pList<-p_col_select(tb,c("variable","rr","diff","dem_gender_clean","p.value"))
 
 download_tb<-tb

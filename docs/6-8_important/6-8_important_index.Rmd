@@ -6,8 +6,8 @@ output:
    theme: null
    mathjax: null
    highlight: null
-   template: "CCO_template_html.html"
-   css: styles.css
+   template: "../../CCO_template_html.html"
+   css: "../../styles.css"
 ---
 
 ```{r setup, include=FALSE}
