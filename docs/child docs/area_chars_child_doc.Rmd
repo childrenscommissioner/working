@@ -158,7 +158,7 @@ df<-merge(df,covid,by.y="areaCode",by.x="UTLA19CD",all.x=T)
 
 }
 
-df_age<-table_f("covid_quintile",df_use=df)[!is.na(covid_quintile)] # reshape data
+df_age<-table_f("covid_quintile",df_use=df)[!is.na(covid_quintile) & !is.na(value)] # reshape data
 
 
 two_way_tb_f(df_age,"covid_quintile","Highest quintle vs lowest",col1,mult_cols=T,test_vals=c(1,5),
@@ -201,7 +201,7 @@ la_loss<-la_loss[Phase=="All state-funded schools",.(UTLA19CD=`Local Authority C
 df<-merge(df,la_loss,by="UTLA19CD",all.x=T)
 }
 
-df_age<-table_f("loss10")[!is.na(loss10)] # reshape data
+df_age<-table_f("loss10")[!is.na(loss10) & !is.na(value)] # reshape data
 
 two_way_tb_f(df_age,"loss10","Highest quintle vs lowest",col1,mult_cols=T,test_vals=c(1,5),
              columnGroups = list(colGroup(name="Learning lost per pupil quintile (5= highest rate)",as.character(c(1:5))))
@@ -243,7 +243,7 @@ obese<-obese[,.(UTLA19CD=`Area Code`,obese_rate)
 df<-merge(df,obese,by="UTLA19CD",all.x=T)
 }
 
-df_age<-table_f("obese_rate",df[!is.na(obese_rate)]) # reshape data
+df_age<-table_f("obese_rate",df[!is.na(obese_rate)])[!is.na(value)] # reshape data
 
 two_way_tb_f(df_age,"obese_rate","Highest quintle vs lowest",col1,mult_cols=T,test_vals=c(1,5),
              columnGroups = list(colGroup(name="LA child obesity rate quintile (Yr 6 children, 5= highest rate)",as.character(c(1:5))))

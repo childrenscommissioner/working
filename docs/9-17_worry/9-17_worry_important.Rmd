@@ -33,7 +33,7 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F)
 
 hap_col<-names(df)[grepl("id|important_|worry_|wt",names(df))]
 
-df_imp<-df[`q3_worry_I dont want to say` %in% c(NA,"No")][,..hap_col]
+df_imp<-df[`q3_worry_I dont want to say` %in% c(NA,"No") & `q3_worry_I dont know` %in% c(NA,"No") & !`q2_important_I dont know` %in% c("Yes") & !`q2_important_I dont want to say` %in% c("Yes")][,..hap_col]
 
 hap_cols<-hap_col[grepl("important",hap_col) & !grepl("dont|Other",hap_col)]
 
@@ -83,7 +83,7 @@ ggplot(corr_list,
 
 hap_col<-names(df)[grepl("id|important_|worry_|wt",names(df))]
 
-df_imp<-df[`q3_worry_I dont want to say` %in% c(NA,"No")][,..hap_col]
+df_imp<-df[`q3_worry_I dont want to say` %in% c(NA,"No") & `q3_worry_I dont know` %in% c(NA,"No") & !`q2_important_I dont know` %in% c("Yes") & !`q2_important_I dont want to say` %in% c("Yes")][,..hap_col]
 
 hap_cols<-hap_col[grepl("important",hap_col) & !grepl("dont|Other",hap_col)]
 

@@ -85,8 +85,11 @@ if(is.null(age_grp)){
 
   # Create age groups amongst 9-17 yr olds
   
-df_age<-table_f("dem_age_clean")[!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
-                                                ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17"))
+df_age<-table_f("dem_age_clean")[!is.na(value)
+                                 ][!grepl("dont",dem_age_clean)
+                                   ][,dem_age_clean:=ifelse(is.na(as.numeric(dem_age_clean)),NA,
+                                                                         ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
+                                                ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17")))
                                  ][,dem_age_clean:=factor(dem_age_clean,c("9-11","12-15","16-17"))]
 
 # make table - testing is for 16-17 vs 9-11
@@ -96,7 +99,7 @@ two_way_tb_f(df_age,"dem_age_clean","16-17 vs 9-11",col1,
   
   # For 6-8 yr olds
   
-  df_age<-table_f("dem_age_clean")[!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=as.factor(dem_age_clean)]
+  df_age<-table_f("dem_age_clean")[!is.na(value)][!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=as.factor(dem_age_clean)]
 
   age_split<-unlist(strsplit(age_grp,"[-]"))
   
@@ -133,7 +136,7 @@ if(is.null(age_grp)){
 
   #For 9-17 yr olds
   
-df_age<-table_f("dem_age_clean")[!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=factor(dem_age_clean,as.character(seq(9,17)))]
+df_age<-table_f("dem_age_clean")[!is.na(value)][!grepl("dont|Other",dem_age_clean)][,dem_age_clean:=factor(dem_age_clean,as.character(seq(9,17)))]
 
 two_way_tb_f(df_age,"dem_age_clean","16 vs 9",col1,
              mult_cols=T,test_vals=c("16","9"))
@@ -175,7 +178,7 @@ if(seg){
 ```{r}
 
 
-df_gender<-table_f("dem_gender_clean")[!dem_gender_clean=="I dont want to say"] # reshape data
+df_gender<-table_f("dem_gender_clean")[!dem_gender_clean=="I dont want to say"][!is.na(value)] # reshape data
 
 df_gender$dem_gender_clean<-factor(df_gender$dem_gender_clean,c("Female","Girl","Boy","Male","Other")) # ensure factor levels are correct
 
@@ -218,12 +221,12 @@ df_gender<-melt(df[,..hap_col],
 if(is.null(age_grp)){
   # Create age group variable for 9-17 yr olds
   
-  df_gender<-df_gender[,age:=ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
+  df_gender<-df_gender[!grepl("dont|Other",dem_age_clean) & !dem_gender_clean=="I dont want to say"][,age:=ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
                                                 ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17"))
                        ][,age:=factor(age,levels=c("9-11","12-15","16-17"))]
   
 }else{
-  df_gender<-df_gender[,age:=dem_age_clean]
+  df_gender<-df_gender[!grepl("dont|Other",dem_age_clean) & !dem_gender_clean=="I dont want to say"][,age:=dem_age_clean]
 }
 
 # Recode outcomes to be 1/0 and create percentage table
@@ -231,7 +234,7 @@ if(is.null(age_grp)){
 
 df_gender_out<-df_gender[,value:=ifelse(value %in% dk_vals,NA,
                         ifelse(value %in% target_vals,1,0))
-           ][,.(c=sum(wt)),by=.(dem_gender_clean,variable,value,age)
+           ][!is.na(value)][,.(c=sum(wt)),by=.(dem_gender_clean,variable,value,age)
              ][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_gender_clean,age)
                ][value==1][,val_col:=paste0(c,"|",base,"|",perc)][,v2:=paste0(variable,"_",age)]
 
@@ -312,7 +315,7 @@ if(seg){
 
 # reshape data
 df_eth<-table_f("dem_eth_grp")[!dem_eth_grp %in% c("I dont want to say",NA)
-                               ]
+                               ][!is.na(value)]
 
 # Calculate percentage table for ethnicity and outcomes
 df_eth_full<-df_eth[,.(c=sum(wt)),by=.(variable,value,dem_eth_grp)
@@ -401,17 +404,17 @@ hap_col<-names(df)[grepl(paste0("^id$|dem_eth_grp|",search_str,"|dem_age_clean|^
 # subset columns and convert to long format and relabel outcomes
 df_eth<-melt(df[!is.na(dem_eth_grp) & !dem_eth_grp=="I dont want to say",..hap_col],
              id.vars = c("id","dem_eth_grp","dem_age_clean","wt")
-             )[,variable:=plyr::mapvalues(variable,q_lookup$var,q_lookup$label)]
+             )[,variable:=plyr::mapvalues(variable,q_lookup$var,q_lookup$label)][!is.na(value)]
 
 if(is.null(age_grp)){
 # Create age groups for 9-17 year olds
     
-  df_eth<-df_eth[,age:=ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
+  df_eth<-df_eth[!grepl("dont|Other",dem_age_clean)][,age:=ifelse(dem_age_clean %in% as.character(seq(9,11)),"9-11",
                               ifelse(dem_age_clean %in% as.character(seq(12,15)),"12-15","16-17"))
                  ][,age:=factor(age,levels=c("9-11","12-15","16-17"))
                    ]
 }else{
-  df_eth<-df_eth[,age:=dem_age_clean]
+  df_eth<-df_eth[!grepl("dont|Other",dem_age_clean)][,age:=dem_age_clean]
 }
 
 # recode outcomes to be 1/0
@@ -516,7 +519,7 @@ hap_col<-names(df)[grepl(paste0("^id$|dem_eth_grp|",search_str,"|dem_gender_clea
 
 df_eth<-melt(df[!is.na(dem_eth_grp) & !dem_eth_grp=="I dont want to say",..hap_col],
              id.vars = c("id","dem_eth_grp","dem_gender_clean","wt")
-             )[,variable:=plyr::mapvalues(variable,q_lookup$var,q_lookup$label)]
+             )[,variable:=plyr::mapvalues(variable,q_lookup$var,q_lookup$label)][!is.na(value)]
 
 # recode outcomes to 1/0 and calculate percentage table for ethnic groups
 

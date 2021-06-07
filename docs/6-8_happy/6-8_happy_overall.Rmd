@@ -18,7 +18,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::knit_hooks$set(optipng = knitr::hook_optipng)
 
-knitr::opts_chunk$set(echo = F, warning=F,message = F,optipng = '-o7')
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
 
 require(readxl)
 require(data.table)
@@ -32,9 +32,9 @@ stem<-"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/cleaned da
 
 search_str<-"happy.*clean"
 
-dk_vals<-c("I don't know","Not applicable","dont know","I dont want to say")
+dk_vals<-c("I don't know","Not applicable","dont know","I dont want to say","Other")
 
-target_vals<-c("Unhappy","Very unhappy","sad")
+target_vals<-c("Unhappy","Very unhappy","sad","unhappy")
 
 
 table_f<-function(x,df_use=df){
@@ -89,18 +89,48 @@ age_grp<-"6-8"
 
 <script src="extra_js.js"></script>
 
-## `r params$pg`
-
-### Summary
 
 <h3>Key stats</h3>
-<div>
-<div class="stat_box">
-<p style="color: white;">Key stat 1</p>
+<div class="stat-boxes">
+
+<div class="col-xs-12 col-sm-6 col-lg-3">
+<div class="stat">
+<div class="stat-box-outer">
+<div class="stat-box-inner">
+<p class="figure">Key stat</p>
+</div>
+</div>
+</div>
 </div>
 
-<div class="stat_box">
-<p style="color: white;">Key stat 2</p>
+<div class="col-xs-12 col-sm-6 col-lg-3">
+<div class="stat">
+<div class="stat-box-outer">
+<div class="stat-box-inner">
+<p class="figure">Key stat</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="col-xs-12 col-sm-6 col-lg-3">
+<div class="stat">
+<div class="stat-box-outer">
+<div class="stat-box-inner">
+<p class="figure">Key stat</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="col-xs-12 col-sm-6 col-lg-3">
+<div class="stat">
+<div class="stat-box-outer">
+<div class="stat-box-inner">
+<p class="figure">Key stat</p>
+</div>
+</div>
+</div>
 </div>
 
 </div>
@@ -108,8 +138,6 @@ age_grp<-"6-8"
 <h3>About this data</h3>
 
 INTRO TEXT
-
-### Overall rates
 
 <h3>How do children report feeling most of the time?</h3>
 
@@ -175,7 +203,7 @@ hap_col<-names(df)[grepl("^id$|happy.*_clean|wt",names(df))]
 df_happy<-melt(df[,..hap_col],id.vars = c("id","wt"))
 
 dat<-copy(df_happy)[,value:=ifelse(value %in% dk_vals,NA,
-                        ifelse(value %in% c("Unhappy","Very unhappy","sad"),"Sad",
+                        ifelse(value %in% c("Unhappy","Very unhappy","sad","unhappy"),"Sad",
                                ifelse(
                                  value %in% c("neutral","neural"),"Neutral","Happy"
                                )))
@@ -183,10 +211,13 @@ dat<-copy(df_happy)[,value:=ifelse(value %in% dk_vals,NA,
 
 dat<-merge(dat,q_lookup,by.x="variable",by.y="var")
 
+pal_rgb<-c("#57C4AD","#EDA247","#DB4325") # define colours for bar fills
+
+# Create plot
 ggplot(dat,
        aes(x=reorder(label,perc),y=perc,group=value,fill=value))+
   geom_col(colour="grey20",position = position_dodge(0.9))+coord_flip()+geom_text(aes(label=paste0(perc,"%")),hjust=ifelse(dat$perc<10,-0.1,1),position = position_dodge(0.9))+
-  scale_fill_brewer(type="qual",palette=3,name="")+
+  scale_fill_manual(values=pal_rgb,name="")+
   theme_bw()+xlab("")+ylab("% of 6-8 yr olds")
 
 ```
@@ -242,6 +273,7 @@ pal_div<-RColorBrewer::brewer.pal(7,"RdBu")
 
 ggplot(corr_list,
        aes(x=variable,y=hap_var,fill=rr))+geom_tile(colour="grey50")+
+  geom_text(aes(label=round(rr,1)))+
   theme(axis.text.x = element_text(angle=90),
         panel.grid=element_blank(),
         panel.background = element_blank(),
@@ -270,7 +302,7 @@ corr_list<-rbindlist(lapply(hap_cols,function(x){
   
   tb<-melt(df_imp[,..col
          ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) %in% c("dont know","I dont know"),NA,
-                                           ifelse(get(x) %in% c("Unhappy","Very unhappy","sad"),1,0))
+                                           ifelse(get(x) %in% c("Unhappy","Very unhappy","sad","unhappy"),1,0))
                               ][!is.na(get(x)) & !is.na(value)][,.(c=sum(wt)),by=.(hap=get(x),variable,value)
                                   ][,perc:=c/sum(c),by=.(hap,variable)
                                     ]
@@ -293,6 +325,7 @@ pal_div<-RColorBrewer::brewer.pal(7,"RdBu")
 
 ggplot(corr_list,
        aes(x=variable,y=hap_var,fill=rr))+geom_tile(colour="grey50")+
+  geom_text(aes(label=round(rr,1)))+
   theme(axis.text.x = element_text(angle=90),
         panel.grid=element_blank(),
         panel.background = element_blank(),

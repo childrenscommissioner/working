@@ -150,7 +150,7 @@ if(is.null(age_grp)){
 
 # Add definition of SEN variable
 
-cat("\n*Children with SEN defined as those receiving support from a teaching assistant/SENCO or those enrolled in a special school*\n")
+cat("\n*Children with SEN defined as those receiving support from a teaching assistant/SENCO, those enrolled in a special school or those completing the easy read version of the questionnaires*\n")
 
 ```
 
@@ -218,14 +218,18 @@ if(is.null(age_grp)){
 
  create_age_picker_f("_sw","sw","In care/has a social worker vs Not")
   
+  cat("\n*Children with a social worker defined as those reporting receiving support from a social worker. Those in care defined by those reporting living with foster parents, in a children's home (secure and non-secure) or those in independent or semi-independent  accommodation supported by the local council*\n")
+  
 }else{
 
 df_sw<-table_f("sw")
 
 two_way_tb_f(df_sw,"sw","In care/has a social worker vs Not",col1)
+
+cat("\n*Children with a social worker defined as those reporting receiving support from a social worker. Those in care defined by those reporting living with foster parents or in a children's home*\n")
 }
 
-cat("\n*Children with a social worker defined as those reporting receiving support from a social worker. Those in care defined by those reporting living with foster parents, in a children's home (secure and non-secure) or those in independent or semi-independent  accommodation supported by the local council*\n")
+
 
 ```
 
@@ -299,15 +303,19 @@ cat("**Children currently receiving mental health support**\n")
 
 create_age_picker_f("_mh","any_mh","Receiving mental health support vs Not")
 
+cat("\n*Children receiving mental health support are defined as those reporting receiving support from a counsellor therapist or other health care worker and those reporting living in a mental health hospital*\n")
+
 }else if(age_grp=="6-8"){
   
   df_any_mh<-table_f("any_mh")[,any_mh:=ifelse(any_mh=="Yes","Receiving support from a healthcare worker","Not receiving support from a healthcare worker")][,any_mh:=factor(any_mh,levels=c("Not receiving support from a healthcare worker","Receiving support from a healthcare worker"))]
 
 two_way_tb_f(df_any_mh,"any_mh","Receiving support from a healthcare worker vs Not",col1)
 
+cat("\n*Children receiving mental health support are defined as those reporting receiving support from a health care worker*\n")
+
 }
 
-cat("\n*Children receiving mental health support are defined as those reporting receiving support from a counsellor therapist or other health care worker and those reporting living in a mental health hospital*\n")
+
 
 ```
 
@@ -329,9 +337,11 @@ if(is.null(age_grp)){
 
 create_age_picker_f("_mhhosp","mh_hospital","In MH hospital vs Not")
 
+cat("\n*Children in mental health hospitals defined as those reporting living in a mental health hospital*\n")
+
 }
 
-cat("\n*Children in mental health hospitals defined as those reporting living in a mental health hospital*\n")
+
 
 ```
 
@@ -349,8 +359,7 @@ cat(
 ```{r, results='asis'}
 if(!seg){
 
-df<-df[,yc:=ifelse(`dem_support_I dont want to say`=="Yes",NA,
-                   ifelse(`dem_support_A young carers project`=="Yes","Young carer","Not young carer"))]
+df<-df[,yc:=ifelse(`dem_support_A young carers project`=="Yes","Young carer","Not young carer")]
 
 }
 

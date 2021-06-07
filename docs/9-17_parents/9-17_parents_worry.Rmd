@@ -33,7 +33,7 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F) # Code is the same as 9-1
 
 hap_col<-names(df)[grepl("id|worry_|parents_clean$|wt",names(df))]
 
-df_imp<-df[!q4_parents_clean %in% dk_vals][,..hap_col]
+df_imp<-df[!q4_parents_clean %in% dk_vals & !`q3_worry_I dont know` %in% c("Yes") & !`q3_worry_I dont want to say` %in% c("Yes")][,..hap_col]
 
 hap_cols<-hap_col[grepl("worry",hap_col) & !grepl("dont",hap_col)]
 

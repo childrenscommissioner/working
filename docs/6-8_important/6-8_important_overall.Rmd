@@ -71,9 +71,12 @@ df<-df[!dfe_phase %in% "Secondary"
          ][,dem_gender_clean:=plyr::mapvalues(dem_gender_clean,
                                               c("Boy","Girl"),c("Male","Female"))
            ][,any_mh:=ifelse(`dem_support_A healthcare worker`=="Yes","Yes","No")
+             ][,`q3_important_I dont know`:=ifelse(is.na(`q3_important_I dont know`) & grepl("I dont know",q3_important),"Yes",ifelse(is.na(`q3_important_I dont know`),"No",`q3_important_I dont know`))
+               
              ][`q3_important_I dont want to say` %in% c(NA,"No") &
                  `q3_important_I dont know` %in% c(NA,"No") &
-                 `q3_important_I dont know what will be important` %in% c(NA,"No")]
+                 `q3_important_I dont know what will be important` %in% c(NA,"No")
+               ][,`q3_important_Starting my own family`:=ifelse(grepl("Starting a family of my own",q3_important),"Yes",ifelse(is.na(`q3_important_Starting my own family`),"No",`q3_important_Starting my own family`))]
 
 q_lookup<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\6-8_important_q_lookup.csv")
 

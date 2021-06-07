@@ -66,6 +66,8 @@ df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/fina
 
 imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"][,Value:=ceiling(Value/2)]
 
+df<-df[,`q3_worry_Im not worried about anything`:=ifelse(is.na(`q3_worry_Im not worried about anything`) & grepl("not worried",q3_worry),"Yes",ifelse(is.na(`q3_worry_Im not worried about anything`),"No",`q3_worry_Im not worried about anything`))]
+
 df<-df[`q3_worry_I dont want to say` %in% c(NA,"No")]
 
 q_lookup<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_worry_q_lookup.csv")
@@ -146,7 +148,7 @@ INTRO TEXT
 <h3>What are children worried about for their future?</h3>
 
 ```{r}
-dat<-table_f("")[!grepl("dont|Other",variable)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),2)*100,by=.(variable)][value==1][,.(variable,perc)]
+dat<-table_f("")[!grepl("dont",variable)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),2)*100,by=.(variable)][value==1 & !grepl("Other",variable)][,.(variable,perc)]
 
 ggplot(dat,
        aes(x=reorder(variable,perc),y=perc))+

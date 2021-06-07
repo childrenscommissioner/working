@@ -69,7 +69,7 @@ two_way_out<-rbindlist(lapply(seq_len(nrow(two_way)),function(x){
   # create % table of those saying both (note: base is all respondents)
   
   d<-dat[,.(c=sum(wt)),by=.(var1=get(v1),var2=get(v2))
-  ][,`:=`(perc=c/sum(c)*100,base=sum(c))
+  ][!is.na(var1) & !is.na(var2)][,`:=`(perc=c/sum(c)*100,base=sum(c))
   ][var1==1 & var2==1
     ][,comb:=paste0(v1,"-",v2)
         ][,`:=`(v1=lb1,v2=lb2)][,.(comb,c,perc,base,v1,v2)]
@@ -151,7 +151,7 @@ two_way_out<-rbindlist(lapply(seq_len(nrow(two_way)),function(x){
   
   # create % table - note base is those saying yes to variable 1
   dat[,.(c=sum(wt)),by=.(var1=get(v1),var2=get(v2))
-  ][,`:=`(perc=round(c/sum(c),2)*100,base=sum(c)),by=var1
+  ][!is.na(var1) & !is.na(var2)][,`:=`(perc=round(c/sum(c),2)*100,base=sum(c)),by=var1
   ][var1==1 & var2==1
     ][,comb:=paste0(v1,"-",v2)
         ][,`:=`(v1=lb1,v2=lb2)][,.(comb,c,perc,base,v1,v2)
@@ -290,6 +290,18 @@ for(i in c("9-17","9-11","12-15","16-17")){
   cat(paste0('<div id="',i,'" class="sect ageComb">\n')) # create html div to hold plot - this is whats shown/hidden
    
   cat("\n<h4>Which combinations most commonly co-occur?</h4>\n") # Add title 1
+  
+ # if(params$var=="9-17_happy"){
+    
+   # cat("\nTEXT to add\n")
+  #  cat(
+   #   paste0("\n",spreadsheet$text[spreadsheet$uuid==="UUID"],"\n")
+    #)
+    
+  #}else if(params$var=="9-17_important"){
+    
+    
+#  }
   
   print(comb_chart_f1(comb_age)) # output chart 1
   

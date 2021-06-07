@@ -46,7 +46,7 @@ corr_list<-rbindlist(lapply(hap_cols,function(x){
   
   tb<-melt(df_imp[,..col
          ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) %in% c("dont know","I dont know"),NA,
-                                           ifelse(get(x) %in% c("Unhappy","Very unhappy","sad"),1,0))
+                                           ifelse(get(x) %in% c("Unhappy","Very unhappy","sad","unhappy"),1,0))
                               ][,value:=ifelse(value=="Yes",1,0)
                                 ][,.(c=sum(wt)),by=.(hap=get(x),variable,value)
                                   ][,perc:=c/sum(c),by=.(variable)
@@ -91,7 +91,7 @@ corr_list<-rbindlist(lapply(hap_cols,function(x){
   
   tb<-melt(df_imp[,..col
          ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) %in% c("dont know","I dont know"),NA,
-                                           ifelse(get(x) %in% c("Unhappy","Very unhappy","sad"),1,0))
+                                           ifelse(get(x) %in% c("Unhappy","Very unhappy","sad","unhappy"),1,0))
                               ][!is.na(get(x)) & !is.na(value)][,value:=ifelse(value=="Yes",1,0)
                                 ][,.(c=sum(wt)),by=.(hap=get(x),variable,value)
                                   ][,perc:=c/sum(c),by=.(hap,variable)

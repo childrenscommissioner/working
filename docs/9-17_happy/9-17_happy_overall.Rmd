@@ -33,7 +33,7 @@ stem<-"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/cleaned da
 
 search_str<-"happy.*clean" # string identifying outcome variables
 
-dk_vals<-c("I don't know","Not applicable","dont know","I dont want to say") # values to treat as missing
+dk_vals<-c("I don't know","Not applicable","dont know","I dont want to say","I dont know") # values to treat as missing
 
 target_vals<-c("Unhappy","Very unhappy","sad") # variables to recode to being 1
 

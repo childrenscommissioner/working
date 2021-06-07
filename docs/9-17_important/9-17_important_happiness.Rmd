@@ -48,9 +48,9 @@ corr_list<-rbindlist(lapply(hap_cols,function(x){
   col<-c("id",x,imp_cols,"wt")
   
   tb<-melt(df_imp[,..col
-         ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) %in% c("dont know","I dont know"),NA,
+         ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) %in% c("I don't know","Not applicable","dont know","I dont want to say","I dont know"),NA,
                                            ifelse(get(x) %in% c("Unhappy","Very unhappy","sad"),1,0))
-                              ][,value:=ifelse(value=="Yes",1,0)
+                              ][!is.na(get(x))][,value:=ifelse(value=="Yes",1,0)
                                 ][,.(c=sum(wt)),by=.(hap=get(x),variable,value)
                                   ][,perc:=c/sum(c),by=.(variable,hap)
                                     ][hap==1 & value==1]
@@ -105,7 +105,7 @@ corr_list<-rbindlist(lapply(hap_cols,function(x){
   col<-c("id",x,imp_cols,"wt")
   
   tb<-melt(df_imp[,..col
-         ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) %in% c("dont know","I dont know"),NA,
+         ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) %in% c("I don't know","Not applicable","dont know","I dont want to say","I dont know"),NA,
                                            ifelse(get(x) %in% c("Unhappy","Very unhappy","sad"),1,0))
                               ][!is.na(get(x)) & !is.na(value)][,value:=ifelse(value=="Yes",1,0)
                                 ][,.(c=sum(wt)),by=.(hap=get(x),variable,value)

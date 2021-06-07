@@ -94,7 +94,7 @@ opt_var<-names(tb_map)[!grepl("UTLA",names(tb_map))] # get column names to loop 
 
 require(leaflet)
 
-pal2<-colorNumeric("Reds",c(0,max(df_la$perc,na.rm=T)*100)) # create function to map %s to colours
+pal2<-colorNumeric("Reds",c(0,ceiling(max(df_la$perc,na.rm=T)*100))) # create function to map %s to colours
 
 leaf_poly@data<-merge(leaf_poly@data,tb_map,by.x="ctyua19cd",by.y="UTLA19CD",all.x=T) # attach % data to map file
 
@@ -162,7 +162,7 @@ gList<-sapply(gList,function(x) splitF(x,html=T))
 map %>%
   addLayersControl(
     baseGroups = as.character(gList),options = layersControlOptions(collapsed=F))  %>%
-  addLegend("topleft", pal = pal2, values = seq(0,max(df_la$perc,na.rm=T)*100),bins=5,
+  addLegend("topleft", pal = pal2, values = seq(0,ceiling(max(df_la$perc,na.rm=T)*100)),bins=5,
             labFormat = function(type, cuts, p) { 
               n = length(cuts) 
               cuts[n] = round(max(df_la$perc,na.rm=T)*100) 
@@ -235,7 +235,7 @@ df_la<-melt(df[,..hap_col],id.vars = c("id","pcon","wt"))[,variable:=plyr::mapva
 
 df_la_1<-df_la[,value:=ifelse(value %in% dk_vals,NA,
                         ifelse(value %in% target_vals,1,0))
-           ][,.(c=.N),by=.(pcon,variable,value)]
+           ][!is.na(value)][,.(c=.N),by=.(pcon,variable,value)]
 
 grid<-expand.grid(pcon=unique(df_la_1$pcon),
                   variable=unique(df_la_1$variable),
@@ -268,7 +268,7 @@ opt_var<-names(tb_map)[!grepl("pcon",names(tb_map))]
 
 require(leaflet)
 
-pal2<-colorNumeric("Reds",c(0,max(df_la$perc,na.rm=T)*100))
+pal2<-colorNumeric("Reds",c(0,ceiling(max(df_la$perc,na.rm=T)*100)))
 
 leaf_poly@data<-merge(leaf_poly@data,tb_map,by.x="pcon19cd",by.y="pcon",all.x=T)
 
@@ -322,7 +322,7 @@ gList<-sapply(gList,function(x) splitF(x,html=T))
 map %>%
   addLayersControl(
     baseGroups = as.character(gList),options = layersControlOptions(collapsed=F))  %>%
-  addLegend("topleft", pal = pal2, values = seq(0,max(df_la$perc,na.rm=T)*100),bins=5,
+  addLegend("topleft", pal = pal2, values = seq(0,ceiling(max(df_la$perc,na.rm=T)*100)),bins=5,
             labFormat = function(type, cuts, p) { 
               n = length(cuts) 
               cuts[n] = round(max(df_la$perc,na.rm=T)*100) 
