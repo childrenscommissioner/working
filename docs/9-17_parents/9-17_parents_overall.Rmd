@@ -9,7 +9,6 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: "../../styles.css"
    fig_width: 10
    theme: null
    template: "../../CCO_template_html.html"
@@ -63,11 +62,13 @@ pal<-RColorBrewer::brewer.pal(7,"Reds")
 
 ```
 
+<link rel="stylesheet" href="../../styles.css" type="text/css" />
+
 ```{r}
 
 df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/9-17_weighted.rds")
 
-imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"][,Value:=ceiling(Value/2)]
+imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
 
 df<-df[,id:=paste0(id,survey)
        ][!q4_parents_clean %in% dk_vals

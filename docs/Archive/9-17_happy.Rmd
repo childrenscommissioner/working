@@ -1,0 +1,267 @@
+---
+title: "How happy are children with their life currently?"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning=F,message = F)
+
+require(readxl)
+require(data.table)
+require(dplyr)
+require(ggplot2)
+require(reactable)
+require(htmltools)
+require(tippy)
+
+age_grp<-NULL
+
+stem<-"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/cleaned data/"
+
+search_str<-"happy.*clean"
+
+dk_vals<-c("I don't know","Not applicable","dont know","I dont want to say")
+
+target_vals<-c("Unhappy","Very unhappy","sad")
+
+
+table_f<-function(x,df_use=df){
+  
+  x<-unlist(strsplit(x,"[|]"))
+  
+  reg<-paste0("^",x,"$")
+  
+  reg_string<-paste0("^id$|happy.*clean|^wt$|",paste0(reg,collapse="|"))
+  hap_col<-names(df_use)[grepl(reg_string,names(df_use))]
+
+  
+df_la<-melt(df_use[,..hap_col],id.vars = c("id",x,"wt"))[,variable:=plyr::mapvalues(variable,
+                                                                                    q_lookup$var,
+                                                                                    q_lookup$label)]
+
+df_la[,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,1,0))
+           ]
+}
+
+source("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/scripts/markdown_functions.R",local=knitr::knit_global())
+  
+col1<-"% of children unhappy with..."
+
+```
+
+```{r}
+
+df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/9-17_weighted.rds")
+
+imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"][,Value:=ceiling(Value/2)]
+
+df<-df[,id:=paste0(id,survey)
+       ][,bme:=ifelse(dem_eth_grp=="White",1,0)
+         ]
+
+q_lookup<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_happy_q_lookup.csv")
+q_lookup$var<-gsub("Option ","q1_happy_",q_lookup$var)
+
+q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\13-17_happy_cluster_q_lookup.csv")
+
+```
+
+
+<a href="index.html">Return to home page</a>
+
+<script src="extra_js.js"></script>
+
+## Results {.tabset}
+
+### Summary
+
+<h3>Key stats</h3>
+<div class="stat-boxes">
+
+<div class="col-xs-12 col-sm-6 col-lg-3">
+<div class="stat">
+<div class="stat-box-outer">
+<div class="stat-box-inner">
+<p class="figure">Key stat</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="col-xs-12 col-sm-6 col-lg-3">
+<div class="stat">
+<div class="stat-box-outer">
+<div class="stat-box-inner">
+<p class="figure">Key stat</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="col-xs-12 col-sm-6 col-lg-3">
+<div class="stat">
+<div class="stat-box-outer">
+<div class="stat-box-inner">
+<p class="figure">Key stat</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="col-xs-12 col-sm-6 col-lg-3">
+<div class="stat">
+<div class="stat-box-outer">
+<div class="stat-box-inner">
+<p class="figure">Key stat</p>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<h3>About this data</h3>
+
+INTRO TEXT
+
+### Overall rates
+
+<h3>How happy are children overall?</h3>
+
+```{r,fig.width=8,fig.height=8}
+hap_col<-names(df)[grepl("^id$|happy.*_clean|^wt$",names(df))]
+
+df_happy<-melt(df[,..hap_col],id.vars = c("id","wt"))
+
+dat<-copy(df_happy)[,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,"Unhappy",
+                               ifelse(value %in% c("Neither happy nor unhappy (neutral)","neural"),"Neutral","Happy")))
+           ][!is.na(value)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),2)*100,by=.(variable)][,.(variable,perc,value)]
+
+dat<-merge(dat,q_lookup,by.x="variable",by.y="var")
+
+pal_div<-RColorBrewer::brewer.pal(7,"RdBu")
+
+
+ggplot(dat,
+       aes(x=reorder(label,perc),y=perc,group=value,fill=value))+
+  geom_col(colour="grey20",position = position_dodge(0.9))+coord_flip()+geom_text(aes(label=paste0(perc,"%")),hjust=ifelse(dat$perc<10,-0.1,1),position = position_dodge(0.9))+
+  scale_fill_brewer(type="qual",palette=4,direction=-1,name="")+ylab("% of 9-17 yr olds")+xlab("")+
+  theme_bw()
+
+```
+
+
+<h3>How many aspects of their lives are children unhappy with?</h3>
+
+```{r}
+
+df_happy<-melt(df[,..hap_col],id.vars = c("id","wt"))
+
+dat<-copy(df_happy)[,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,1,0))
+           ][!is.na(value)
+             ][,.(tot=sum(value,na.rm=T)),by=.(id,wt)]
+
+tb<-dat[][,.(c=sum(wt)),by=.(tot)
+    ][,perc:=c/sum(c)][order(-tot)
+                       ][,cum_perc:=cumsum(perc)
+                         ][,cum_perc:=round(ifelse(tot==0,perc,cum_perc),3)*100
+                           ][,tot:=ifelse(tot==0,"0",ifelse(tot==max(tot),"All",paste0(tot,"+")))
+                             ][,.(tot,cum_perc)
+                               ]
+
+names(tb)<-c("Number of aspects of their life children are unhappy with","% of respondents")
+
+reactable(tb,
+             columns=list(`Number of aspects of their life children are unhappy with`=colDef(),`% of respondents`=colDef()),
+    pagination = F,
+    fullWidth = T,
+    bordered = T,
+    resizable = T,
+    searchable = F,
+    showSortable = T,
+    language = reactableLang(searchPlaceholder = "Search table...",searchLabel = ""))
+
+```
+
+### Combinations of items
+
+<h3>What combinations of things are children unhappy about?</h3>
+
+```{r, child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\combs_child_doc.rmd'}
+
+
+```
+
+### Local area rates
+
+<h3>How are rates different in different areas?</h3>
+
+```{r,child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\map_child_doc.rmd'}
+
+```
+
+### Local area chars
+
+<h3>How are rates different based on an area's characteristics?</h3>
+
+```{r,child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\area_chars_child_doc.rmd'}
+
+
+```
+
+### Child demographics
+
+<h3>How are rates different by children's characteristics?</h3>
+
+```{r,child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\child_chars_child_doc.rmd'}
+
+```
+
+### Link to Disadvantage
+
+<h3>How is this different for disadvantaged/vulnerable children?</h3>
+
+```{r,child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\disad_child_doc.rmd'}
+
+```
+
+### School chars
+
+<h3>How is this different by where children go to school?</h3>
+
+```{r,child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\school_child_doc.rmd'}
+
+
+```
+
+### Regression
+
+<h3>What factors are most predictive of children being unhappy?</h3>
+
+```{r, child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\regression_child_doc.rmd'}
+
+```
+
+
+### Segmentation
+
+<h3>Can we combine children into groups that are unhappy about similar aspects of their life?</h3>
+
+```{r, include=F}
+mod<-"happy"
+```
+
+
+```{r, child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\segmentation_child_doc.rmd'}
+
+```
+

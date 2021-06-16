@@ -9,7 +9,6 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: "../../styles.css"
    fig_width: 10
    theme: null
    template: "../../CCO_template_html.html"
@@ -18,6 +17,8 @@ output:
 ```{r, include=F}
 knitr::opts_chunk$set(echo = F, warning=F,message = F) # stop code/messages getting printed
 ```
+
+<link rel="stylesheet" href="../../styles.css" type="text/css" />
 
 ```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
 
@@ -116,8 +117,8 @@ df_idaci<-table_f("idaci_decile")[!is.na(idaci_decile) & !is.na(value) # reshape
                                   ]
 
 two_way_tb_f(df_idaci,"idaci_decile","Highest vs lowest",col1,
-             mult_cols=T,test_vals=c(1,5),
-             columnGroups = list(colGroup(name="IDACI quintile (1 = most deprived)",as.character(c(1:5))))
+             mult_cols=T,test_vals=c(1,10),
+             columnGroups = list(colGroup(name="IDACI decile (1 = most deprived)",as.character(c(1:10))))
              ) # create table - comparison is between 1st and 5th quintile
 
 

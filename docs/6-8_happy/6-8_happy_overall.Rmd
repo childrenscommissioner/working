@@ -9,7 +9,6 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: "../../styles.css"
    fig_width: 10
    theme: null
    template: "../../CCO_template_html.html"
@@ -63,12 +62,14 @@ col1<-"% of children unhappy with..."
   
 ```
 
+<link rel="stylesheet" href="../../styles.css" type="text/css" />
+
 ```{r}
 
 df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/6-8_weighted.rds")
 
 
-imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"][,Value:=ceiling(Value/2)]
+imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
 
 df<-df[!dfe_phase %in% "Secondary"
        ][,id:=paste0(id,survey)
@@ -149,7 +150,7 @@ INTRO TEXT
  
  hap_col<-names(df)[grepl(reg_string,names(df))]
 
-  
+
 df_feel<-melt(df[,..hap_col],id.vars = c("id","wt"))[,variable:=gsub("^.*_","",variable)]
 
 df_feel<-df_feel[,value:=ifelse(value %in% dk_vals,NA,
@@ -169,6 +170,50 @@ ggplot(df_feel_perc,
   theme_bw()+ylab("% of 6-8 yr olds")+xlab("")
 
 ```
+<h3>How many aspects of their lives are children unhappy with?</h3>
+
+```{r}
+
+# Copied over 9-17 code, table shows up with zero - Chunk to make table of number of aspects of life children are unhappy with
+
+hap_col<-names(df)[grepl("^id$|happy.*_clean|^wt$",names(df))] # select columns to create overall rates chart
+
+df_happy<-melt(df[,..hap_col],id.vars = c("id","wt")) # convert to long format
+
+# recode outcomes and get number of unhappy items for each person
+dat<-copy(df_happy)[,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,1,0))
+           ][!is.na(value)
+             ][,.(tot=sum(value,na.rm=T)),by=.(id,wt)]
+
+# Work out cumulative percentages by count of unhappiness items
+tb<-dat[,.(c=sum(wt)),by=.(tot)
+    ][,perc:=c/sum(c)][order(-tot)
+                       ][,cum_perc:=cumsum(perc)
+                         ][,cum_perc:=round(ifelse(tot==0,perc,cum_perc),3)*100
+                           ][,tot:=ifelse(tot==0,"0",ifelse(tot==max(tot),"All",paste0(tot,"+")))
+                             ][,.(tot,cum_perc)
+                               ]
+
+# create table
+names(tb)<-c("Number of aspects of their life children are unhappy with","% of respondents")
+
+div(reactable(tb,
+             columns=list(`Number of aspects of their life children are unhappy with`=colDef(),`% of respondents`=colDef()),
+    pagination = F,
+    fullWidth = T,
+    bordered = T,
+    resizable = T,
+    searchable = F,
+    showSortable = T,
+    language = reactableLang(searchPlaceholder = "Search table...",searchLabel = "")),
+    downloadthis::download_this(tb,output_name ="big_ask_download",output_extension = ".xlsx")
+)
+
+
+
+```
+
 
 ```{r}
 
@@ -202,20 +247,30 @@ hap_col<-names(df)[grepl("^id$|happy.*_clean|wt",names(df))]
 
 df_happy<-melt(df[,..hap_col],id.vars = c("id","wt"))
 
+#dat<-copy(df_happy)[,value:=ifelse(value %in% dk_vals,NA,
+         #               ifelse(value %in% c("Unhappy","Very unhappy","sad","unhappy"),"Sad",
+          #                     ifelse(
+         #                        value %in% c("neutral","neural"),"Neutral","Happy"
+         #                      )))
+         #  ][!is.na(value)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),3)*100,by=.(variable)][,.(variable,perc,value)]
+
 dat<-copy(df_happy)[,value:=ifelse(value %in% dk_vals,NA,
-                        ifelse(value %in% c("Unhappy","Very unhappy","sad","unhappy"),"Sad",
-                               ifelse(
-                                 value %in% c("neutral","neural"),"Neutral","Happy"
-                               )))
-           ][!is.na(value)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),3)*100,by=.(variable)][,.(variable,perc,value)]
+                        ifelse(value %in% target_vals,"Unhappy",
+                               ifelse(value %in% c("Neither happy nor unhappy (neutral)","neural"),"Neutral","Happy")))
+           ][!is.na(value)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),2)*100,by=.(variable)][,.(variable,perc,value)]
 
 dat<-merge(dat,q_lookup,by.x="variable",by.y="var")
 
+dat_unhap<-unique(dat[value=="Unhappy",.(variable,unhap_perc=perc)])
+
+dat<-merge(dat,dat_unhap,by="variable")
+
 pal_rgb<-c("#57C4AD","#EDA247","#DB4325") # define colours for bar fills
+
 
 # Create plot
 ggplot(dat,
-       aes(x=reorder(label,perc),y=perc,group=value,fill=value))+
+       aes(x=reorder(label,unhap_perc),y=perc,group=value,fill=value))+
   geom_col(colour="grey20",position = position_dodge(0.9))+coord_flip()+geom_text(aes(label=paste0(perc,"%")),hjust=ifelse(dat$perc<10,-0.1,1),position = position_dodge(0.9))+
   scale_fill_manual(values=pal_rgb,name="")+
   theme_bw()+xlab("")+ylab("% of 6-8 yr olds")

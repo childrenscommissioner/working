@@ -9,7 +9,6 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: "../../styles.css"
    fig_width: 10
    theme: null
    template: "../../CCO_template_html.html"
@@ -60,11 +59,13 @@ df_la[,value:=ifelse(value %in% target_vals,1,0)
 source("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/scripts/markdown_functions.R",local=knitr::knit_global())
 ```
 
+<link rel="stylesheet" href="../../styles.css" type="text/css" />
+
 ```{r}
 
 df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/9-17_weighted.rds")
 
-imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"][,Value:=ceiling(Value/2)]
+imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
 
 df<-df[,`q3_worry_Im not worried about anything`:=ifelse(is.na(`q3_worry_Im not worried about anything`) & grepl("not worried",q3_worry),"Yes",ifelse(is.na(`q3_worry_Im not worried about anything`),"No",`q3_worry_Im not worried about anything`))]
 
@@ -154,5 +155,51 @@ ggplot(dat,
        aes(x=reorder(variable,perc),y=perc))+
   geom_col(fill="light blue",colour="grey20")+coord_flip()+geom_text(aes(label=paste0(perc,"%")),hjust=1)+
   theme_bw()+xlab("")+ylab("% of 9-17 yr olds")
+
+```
+
+<h3>How many things are children worried about regarding their future?</h3>
+
+```{r}
+
+# Copied over 9-17 code, table shows up with zero - Chunk to make table of number of aspects of life children are worried about - 
+
+
+df_worry<-melt(df[,..hap_col],id.vars = c("id","wt")) # convert to long format
+
+# recode outcomes and get number of worry items for each person
+dat<-copy(df_worry)[,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,1,0))
+           ][!is.na(value)
+             ][,.(tot=sum(value,na.rm=T)),by=.(id,wt)]
+
+# Work out cumulative percentages by count of worry items
+tb<-dat[,.(c=sum(wt)),by=.(tot)
+    ][,perc:=c/sum(c)][order(-tot)
+                       ][,cum_perc:=cumsum(perc)
+                         ][,cum_perc:=round(ifelse(tot==0,perc,cum_perc),3)*100
+                           ][,tot:=ifelse(tot==0,"0",ifelse(tot==max(tot),"All",paste0(tot,"+")))
+                             ][,.(tot,cum_perc)
+                               ]
+
+# create table
+names(tb)<-c("Number of things that children are worried about","% of respondents")
+
+div(reactable(tb,
+             columns=list(`Number of things that children are worried about`=colDef(),`% of respondents`=colDef()),
+    pagination = F,
+    fullWidth = T,
+    bordered = T,
+    resizable = T,
+    searchable = F,
+    showSortable = T,
+    language = reactableLang(searchPlaceholder = "Search table...",searchLabel = "")),
+    downloadthis::download_this(tb,output_name ="big_ask_download",output_extension = ".xlsx")
+)
+
+
+
+
+
 
 ```

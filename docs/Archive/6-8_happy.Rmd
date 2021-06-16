@@ -1,0 +1,346 @@
+---
+title: "How happy are children with their life currently"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   css: styles.css
+   fig_width: 10
+   theme: null
+   template: "CCO_template_html.html"
+---
+
+```{r setup, include=FALSE}
+knitr::knit_hooks$set(optipng = knitr::hook_optipng)
+
+knitr::opts_chunk$set(echo = F, warning=F,message = F,optipng = '-o7')
+
+require(readxl)
+require(data.table)
+require(dplyr)
+require(ggplot2)
+require(reactable)
+require(htmltools)
+require(tippy)
+
+stem<-"W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/cleaned data/"
+
+search_str<-"happy.*clean"
+
+dk_vals<-c("I don't know","Not applicable","dont know","I dont want to say")
+
+target_vals<-c("Unhappy","Very unhappy","sad")
+
+
+table_f<-function(x,df_use=df){
+  
+  x<-unlist(strsplit(x,"[|]"))
+  
+  reg<-paste0("^",x,"$")
+  
+  reg_string<-paste0("^id$|happy.*clean|wt|",paste0(reg,collapse="|"))
+  hap_col<-names(df_use)[grepl(reg_string,names(df_use))]
+
+  
+df_la<-melt(df_use[,..hap_col],id.vars = c("id",x,"wt"))[,variable:=plyr::mapvalues(variable,
+                                                                                    q_lookup$var,
+                                                                                    q_lookup$label)]
+
+df_la[,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% target_vals,1,0))
+           ]
+}
+
+source("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/scripts/markdown_functions.R",local=knitr::knit_global())
+  
+col1<-"% of children unhappy with..."
+
+  
+```
+
+```{r}
+
+df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/6-8_weighted.rds")
+
+
+imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"][,Value:=ceiling(Value/2)]
+
+df<-df[!dfe_phase %in% "Secondary"
+       ][,id:=paste0(id,survey)
+         ][,dem_gender_clean:=plyr::mapvalues(dem_gender_clean,
+                                              c("Boy","Girl"),c("Male","Female"))
+           ][,any_mh:=ifelse(`dem_support_A healthcare worker`=="Yes","Yes","No")]
+
+q_lookup<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\aux data\\6-8_happy_q_lookup.csv")
+
+age_grp<-"6-8"
+
+```
+
+
+<a href="index.html">Return to home page</a>
+
+<script src="extra_js.js"></script>
+
+## Results {.tabset}
+
+### Summary
+
+<h3>Key stats</h3>
+<div>
+<div class="stat_box">
+<p style="color: white;">Key stat 1</p>
+</div>
+
+<div class="stat_box">
+<p style="color: white;">Key stat 2</p>
+</div>
+
+</div>
+
+<h3>About this data</h3>
+
+INTRO TEXT
+
+### Overall rates
+
+<h3>How do children report feeling most of the time?</h3>
+
+*Note children can select more than one option*
+
+```{r}
+
+ reg_string<-"^id$|feel.*_|wt"
+ 
+ hap_col<-names(df)[grepl(reg_string,names(df))]
+
+  
+df_feel<-melt(df[,..hap_col],id.vars = c("id","wt"))[,variable:=gsub("^.*_","",variable)]
+
+df_feel<-df_feel[,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% "Yes",1,0))
+           ][,any_neg:=ifelse(variable %in% c("Stressed","Lonely","Worried","Sad"),1,0)
+             ][,any_pos:=ifelse(variable %in% c("Happy","Safe","Calm","Energetic","Excited"),1,0)
+               ][,any_bored:=ifelse(variable=="Bored",1,0)]
+
+df_feel_perc<-df_feel[,.(c=sum(wt)),by=.(variable,value)
+        ][,perc:=c/sum(c),by=variable][value==1]
+
+ggplot(df_feel_perc,
+       aes(x=reorder(variable,perc),y=perc*100))+
+  geom_col(fill="light blue",colour="grey20")+
+  geom_text(aes(label=paste0(round(perc,2)*100,"%")),hjust=-0.1)+
+  coord_flip()+
+  theme_bw()+ylab("% of 6-8 yr olds")+xlab("")
+
+```
+
+```{r}
+
+df_sent<-df_feel[value==1][,lapply(.SD,function(x){
+  ifelse(sum(x)>0,1,0)
+  }),by=.(id,wt),.SDcols=c("any_neg","any_pos","any_bored")]
+
+
+
+df_sent_out<-melt(df_sent,id.vars=c("id","wt")
+              )[,.(c=sum(wt)),by=.(variable,value)
+                ][,perc:=c/sum(c),by=.(variable)][value==1]
+
+ggplot(df_sent_out[,variable:=plyr::mapvalues(variable,c("any_pos","any_neg","any_bored"),
+                                          c("Any positive","Any negative","Any bored"))],
+       aes(x=reorder(variable,perc),y=perc*100))+
+  geom_col(fill="light blue",colour="grey20")+
+  geom_text(aes(label=paste0(round(perc,2)*100,"%")),hjust=-0.1)+
+  coord_flip()+
+  theme_bw()+ylab("% of 6-8 yr olds")+xlab("")
+
+
+```
+
+
+
+<h3>How happy are they about different aspects of their life?</h3>
+
+```{r}
+hap_col<-names(df)[grepl("^id$|happy.*_clean|wt",names(df))]
+
+df_happy<-melt(df[,..hap_col],id.vars = c("id","wt"))
+
+dat<-copy(df_happy)[,value:=ifelse(value %in% dk_vals,NA,
+                        ifelse(value %in% c("Unhappy","Very unhappy","sad"),"Sad",
+                               ifelse(
+                                 value %in% c("neutral","neural"),"Neutral","Happy"
+                               )))
+           ][!is.na(value)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),3)*100,by=.(variable)][,.(variable,perc,value)]
+
+dat<-merge(dat,q_lookup,by.x="variable",by.y="var")
+
+ggplot(dat,
+       aes(x=reorder(label,perc),y=perc,group=value,fill=value))+
+  geom_col(colour="grey20",position = position_dodge(0.9))+coord_flip()+geom_text(aes(label=paste0(perc,"%")),hjust=ifelse(dat$perc<10,-0.1,1),position = position_dodge(0.9))+
+  scale_fill_brewer(type="qual",palette=3,name="")+
+  theme_bw()+xlab("")+ylab("% of 6-8 yr olds")
+
+```
+
+<h3>How is how they are feeling related to what they are happy with?</h3>
+
+```{r, fig.width=10}
+
+df<-merge(df,df_sent)
+
+hap_col<-names(df)[grepl("id|feel_|happy_.*clean|wt",names(df))]
+
+df_imp<-df[,..hap_col]
+
+hap_cols<-hap_col[grepl("happy",hap_col)]
+
+imp_cols<-hap_col[grepl("feel",hap_col) & !grepl("dont want|wt",hap_col)]
+
+
+
+```
+
+*Correlations between how children describe their life and what they are unhappy with*
+
+*Note: red = stronger positive correlation (i.e. children selecting row are more likely to also select column in the chart below), blue = stronger negative correlation*
+
+```{r}
+corr_list<-rbindlist(lapply(hap_cols,function(x){
+  
+  col<-c("id",x,imp_cols,"wt")
+  
+  tb<-melt(df_imp[,..col
+         ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) %in% c("dont know","I dont know"),NA,
+                                           ifelse(get(x) %in% c("Unhappy","Very unhappy","sad"),1,0))
+                              ][!is.na(get(x)) & !is.na(value)][,value:=ifelse(value=="Yes",1,0)
+                                ][,.(c=sum(wt)),by=.(hap=get(x),variable,value)
+                                  ][,perc:=c/sum(c),by=.(hap,variable)
+                                    ]
+  
+  tb<-dcast(tb[value==1][,.(variable,perc,hap)],variable~hap,value.var="perc"
+            )[,rr:=`1`/`0`][,.(variable,rr)]
+  
+  
+  tb$hap_var<-splitF(q_lookup$label[q_lookup$var==x])
+  
+  tb$variable<-gsub("^.*_","",tb$variable)
+  
+  tb
+})
+)
+
+pal_div<-RColorBrewer::brewer.pal(7,"RdBu")
+
+ggplot(corr_list,
+       aes(x=variable,y=hap_var,fill=rr))+geom_tile(colour="grey50")+
+  theme(axis.text.x = element_text(angle=90),
+        panel.grid=element_blank(),
+        panel.background = element_blank(),
+        axis.ticks=element_blank())+
+  scale_fill_gradient2(low=pal_div[length(pal_div)],high=pal_div[1],midpoint=1,name="Relative risk\n(Children unhappy with row\nare x times more\nlikely to feel\ncolumn)")+
+  ylab("Children are unhappy with...")+xlab("Children feel...")
+
+```
+
+*Correlations between how children describe their life and what they are unhappy with*
+
+*Note: red = stronger positive correlation (i.e. children selecting row are more likely to also select column in the chart below), blue = stronger negative correlation*
+
+```{r}
+hap_col<-names(df)[grepl("id|any_(pos|neg|bored)|happy_.*clean|wt",names(df))]
+
+df_imp<-df[,..hap_col]
+
+hap_cols<-hap_col[grepl("happy",hap_col)]
+
+imp_cols<-hap_col[grepl("any_(pos|neg|bored)",hap_col) & !grepl("dont want|wt",hap_col)]
+
+corr_list<-rbindlist(lapply(hap_cols,function(x){
+  
+  col<-c("id",x,imp_cols,"wt")
+  
+  tb<-melt(df_imp[,..col
+         ],id.vars=c("id",x,"wt"))[,(x):=ifelse(get(x) %in% c("dont know","I dont know"),NA,
+                                           ifelse(get(x) %in% c("Unhappy","Very unhappy","sad"),1,0))
+                              ][!is.na(get(x)) & !is.na(value)][,.(c=sum(wt)),by=.(hap=get(x),variable,value)
+                                  ][,perc:=c/sum(c),by=.(hap,variable)
+                                    ]
+  
+  tb<-dcast(tb[value==1][,.(variable,perc,hap)],variable~hap,value.var="perc"
+            )[,rr:=`1`/`0`][,.(variable,rr)]
+  
+  
+  tb$hap_var<-splitF(q_lookup$label[q_lookup$var==x])
+  
+  tb$variable<-plyr::mapvalues(tb$variable,c("any_pos","any_neg","any_bored"),
+                               c("Any positive","Any negative","Any bored"))
+  
+  
+  tb
+})
+)
+
+pal_div<-RColorBrewer::brewer.pal(7,"RdBu")
+
+ggplot(corr_list,
+       aes(x=variable,y=hap_var,fill=rr))+geom_tile(colour="grey50")+
+  theme(axis.text.x = element_text(angle=90),
+        panel.grid=element_blank(),
+        panel.background = element_blank(),
+        axis.ticks=element_blank())+
+  scale_fill_gradient2(low=pal_div[length(pal_div)],high=pal_div[1],midpoint=1,name="Relative risk\n(Children unhappy with row\nare x times more\nlikely to feel\ncolumn)")+
+  ylab("Children are unhappy with...")+xlab("Children feel...")
+```
+
+
+### Combinations of items
+
+<h3>What combinations of items are children unhappy about</h3>
+
+```{r}
+hap_col<-names(df)[grepl("^id$|happy.*_clean|^wt$",names(df))]
+
+pal<-RColorBrewer::brewer.pal(7,"Reds")
+
+```
+
+
+```{r, child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\combs_child_doc.rmd'}
+```
+
+### Local area rates
+
+<h3>How is this different in different areas?</h3>
+
+```{r, child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\map_child_doc.rmd'}
+
+```
+
+### Child demographics
+
+<h3>How is this different by children's characteristics?</h3>
+
+```{r, child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\child_chars_child_doc.rmd'}
+
+```
+
+### Vulnerable children
+
+<h3>How is this different for disadvantaged/vulnerable children?</h3>
+
+```{r,child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\disad_child_doc.rmd'}
+
+```
+
+### School chars
+
+<h3>How is this different by where children go to school?</h3>
+
+```{r,child='W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\markdown\\child docs\\school_child_doc.rmd'}
+
+```
+
+

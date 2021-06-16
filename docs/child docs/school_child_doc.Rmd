@@ -9,7 +9,6 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: "../../styles.css"
    fig_width: 10
    theme: null
    template: "../../CCO_template_html.html"
@@ -18,6 +17,8 @@ output:
 ```{r, include=F}
 knitr::opts_chunk$set(echo = F, warning=F,message = F)
 ```
+
+<link rel="stylesheet" href="../../styles.css" type="text/css" />
 
 ```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
 
@@ -70,7 +71,9 @@ if(is.null(age_grp)){
 
 ```{r, results='asis'}
 if(is.null(age_grp)){
-df_dfe_phase<-table_f("dfe_phase")[!is.na(dfe_phase)]
+
+  
+  df_dfe_phase<-table_f("dfe_phase")[!is.na(dfe_phase)]
 
 print(
   two_way_tb_f(df_dfe_phase,"dfe_phase","Primary vs Secondary",col1,

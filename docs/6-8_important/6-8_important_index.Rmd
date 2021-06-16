@@ -7,12 +7,13 @@ output:
    mathjax: null
    highlight: null
    template: "../../CCO_template_html.html"
-   css: "../../styles.css"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = F)
 ```
+
+<link rel="stylesheet" href="../../styles.css" type="text/css" />
 
 <a href="../../index.html">Home</a></li>
 

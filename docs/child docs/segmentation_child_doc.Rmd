@@ -9,7 +9,6 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: "../../styles.css"
    fig_width: 10
    theme: null
    template: "../../CCO_template_html.html"
@@ -18,6 +17,8 @@ output:
 ```{r, include=F}
 knitr::opts_chunk$set(echo = F, warning=F,message = F) # add chunk options
 ```
+
+<link rel="stylesheet" href="../../styles.css" type="text/css" />
 
 ```{r, results='asis'}
 
@@ -88,7 +89,7 @@ table_f<-function(x,df_use=df){ # redefine table_f function to use segments as o
   
   hap_col<-hap_col[!grepl("dont want to",hap_col)]
   
-df_la<-melt(df_use[,..hap_col],id.vars = c("id",x,"wt"))[,variable:=plyr::mapvalues(variable,
+df_la<-melt(df_use[,..hap_col],id.vars = c("id",x,"wt"))[!is.na(value)][,variable:=plyr::mapvalues(variable,
                                                                                     q_lookup$var,
                                                                                     q_lookup$label)]
 

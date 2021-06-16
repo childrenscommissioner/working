@@ -1,0 +1,80 @@
+*Variation within an LA*
+
+
+```{r, fig.width=10}
+
+leaf_poly<-readRDS("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\interactive_eg\\laBase_19.rds")
+
+tb_map<-dcast(df_la_p[!is.infinite(rat)][,.(UTLA19CD,variable,rat)],UTLA19CD~variable,value.var="rat")
+
+names(tb_map)[!grepl("UTLA",names(tb_map))]<-gsub(" |[']","_",names(tb_map)[!grepl("UTLA",names(tb_map))])
+
+opt_var<-names(tb_map)[!grepl("UTLA",names(tb_map))]
+
+require(leaflet)
+
+pal2<-colorNumeric("Reds",c(0,max(df_la_p$rat[!is.infinite(df_la_p$rat)],na.rm=T)))
+
+leaf_poly@data<-merge(leaf_poly@data,tb_map,by.x="ctyua19cd",by.y="UTLA19CD",all.x=T)
+
+
+labels<-lapply(opt_var,function(x){
+  
+  lb<-gsub("_s_","'s_",x)
+  lb<-gsub("_"," ",lb)
+  
+  substr(lb,1,1)<-tolower(substr(lb,1,1))
+  
+  paste0("LA: ",leaf_poly@data$ctyua19nm,"</br>Measure: Ratio of 20% highest wards</br>in an LA to LA average: ",round(leaf_poly@data[,x],1),":1")
+  
+  
+})
+
+for(i in seq_len(length(labels))){
+  
+  labels[[i]]<-lapply(labels[[i]],htmltools::HTML)
+  
+}
+
+names(labels)<-opt_var
+
+map2<-leaflet(data=leaf_poly, options = leafletOptions(background="#FFF"),
+        elementId = "la_map_2") %>%
+  addProviderTiles(providers$CartoDB)
+
+for(i in opt_var){
+
+  fill_f<-as.formula(paste0("~pal2(",i,")"))
+  
+  g<-gsub("_s_","'s_",i)
+  g<-gsub("_"," ",g)
+  
+map2<-map2 %>%
+  addPolygons(color="#444444", weight=1, smoothFactor = 0.5,
+              opacity=1.0, fillOpacity = 0.7, fillColor = fill_f,
+              popupOptions = highlightOptions(bringToFront = T, weight=4),
+              label =labels[[i]],group=splitF(g,html=T)) 
+
+}
+
+gList<-gsub("_s_","'s_",opt_var)
+gList<-gsub("_"," ",gList)
+
+gList<-sapply(gList,function(x) splitF(x,html=T))
+
+map2 %>%
+  addLayersControl(
+    baseGroups = as.character(gList),options = layersControlOptions(collapsed=F))  %>%
+  addLegend("topleft", pal = pal2, values = seq(0,max(df_la_p$rat[!is.infinite(df_la_p$rat)],na.rm=T)),bins=5,
+            labFormat = function(type, cuts, p) { 
+              n = length(cuts) 
+              cuts[n] = paste0(as.character(round(max(df_la_p$rat[!is.infinite(df_la_p$rat)],na.rm=T),1))) 
+              for (i in 2:(n-1)){cuts[i] = " "} 
+              cuts[1] = "1" 
+              paste0(cuts[-n], cuts[-1])},
+            title = "Top 20% of wards have x times higher</br>rates than the LA average",
+            na.label = "Missing/excluded",
+            opacity = 0.7,className = "la_map_legend_2"
+  )
+
+```

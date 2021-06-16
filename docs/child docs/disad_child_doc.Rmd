@@ -9,7 +9,6 @@ output:
    self_contained: no
    mathjax: null
    highlight: null
-   css: "../../styles.css"
    fig_width: 10
    theme: null
    template: "../../CCO_template_html.html"
@@ -18,6 +17,9 @@ output:
 ```{r, include=FALSE}
 knitr::opts_chunk$set(echo = F, warning=F,message = F) # set chunk options
 ```
+
+<link rel="stylesheet" href="../../styles.css" type="text/css" />
+
 
 ```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/navigation_child_doc.rmd'}
 
@@ -31,6 +33,8 @@ knitr::opts_chunk$set(echo = F, warning=F,message = F) # set chunk options
 
 ## add dummy table. Note this isn't shown (include=F) but is required (due to a weird Rmarkdown quirk) to attach javascript libraries to the page
 
+hap_col<-names(df)[grepl("^id$|happy.*_clean|^wt$",names(df))] # select columns to create overall rates chart
+
 df_any_mh<-table_f("any_mh")
 
 two_way_tb_f(df_any_mh,"any_mh","Receiving support from a healthcare worker vs Not",col1)
@@ -41,7 +45,7 @@ two_way_tb_f(df_any_mh,"any_mh","Receiving support from a healthcare worker vs N
 
 ```{r,results='asis'}
 
-## Add HTML picker to page - this chooses what table is viisible
+## Add HTML picker to page - this chooses what table is visible
 
 if(seg){
 
@@ -119,9 +123,15 @@ df$dem_sen<-with(df,
              ifelse(dfe_phase %in% "Special",
                     "SEN",
                     ifelse(`dem_support_A teaching assistant or SENCO at school` %in% "Yes","SEN",
-                           ifelse(grepl("easy",survey),"SEN","Not SEN")))
+                           ifelse(grepl("easy",survey),"SEN","Not SEN"))))
              
-)
+             df$dem_sen_2<-with(df,
+             ifelse(dfe_phase %in% "Special",
+                    "SEN",
+                    ifelse(`dem_support_A teaching assistant or SENCO at school` %in% "Yes","SEN","Not SEN")))
+             
+             
+
 }else if(age_grp=="6-8"){
   df$dem_sen<-with(df,
              ifelse(dfe_phase %in% "Special",
@@ -136,8 +146,9 @@ df$dem_sen<-with(df,
 if(is.null(age_grp)){
   
   # If 9-17 yr old data run function to make tables for different age groups - stored in markdown_functions.R script
+  # create_age_picker_f - creates tables
   
- create_age_picker_f("_sen","dem_sen","Any SEN vs Not")
+ create_age_picker_f("_sen","dem_sen","Any SEN vs Not") 
   
 }else{
   
@@ -224,7 +235,7 @@ if(is.null(age_grp)){
 
 df_sw<-table_f("sw")
 
-two_way_tb_f(df_sw,"sw","In care/has a social worker vs Not",col1)
+print(two_way_tb_f(df_sw,"sw","In care/has a social worker vs Not",col1))
 
 cat("\n*Children with a social worker defined as those reporting receiving support from a social worker. Those in care defined by those reporting living with foster parents or in a children's home*\n")
 }
@@ -305,11 +316,11 @@ create_age_picker_f("_mh","any_mh","Receiving mental health support vs Not")
 
 cat("\n*Children receiving mental health support are defined as those reporting receiving support from a counsellor therapist or other health care worker and those reporting living in a mental health hospital*\n")
 
-}else if(age_grp=="6-8"){
+}else{
   
   df_any_mh<-table_f("any_mh")[,any_mh:=ifelse(any_mh=="Yes","Receiving support from a healthcare worker","Not receiving support from a healthcare worker")][,any_mh:=factor(any_mh,levels=c("Not receiving support from a healthcare worker","Receiving support from a healthcare worker"))]
 
-two_way_tb_f(df_any_mh,"any_mh","Receiving support from a healthcare worker vs Not",col1)
+print(two_way_tb_f(df_any_mh,"any_mh","Receiving support from a healthcare worker vs Not",col1))
 
 cat("\n*Children receiving mental health support are defined as those reporting receiving support from a health care worker*\n")
 

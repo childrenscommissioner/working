@@ -57,7 +57,7 @@ sil_use<-sil_res$clust[which.max(sil_res$sil)]
 
 ## Note: happy clustering uses 7 rather than max score 10 due to little difference on silhouette scores and easier interpretation
 
-df_seg$clust<-clust[[sil_use]]$clustering 
+df_seg$clust<-clust[[7]]$clustering 
 
 clust_wide<-df_seg[,.(id,clust)][,val:="Yes"]
 
