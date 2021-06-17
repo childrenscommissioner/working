@@ -79,6 +79,9 @@ df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/fina
 
 imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
 
+test <- fread(file = "W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"][`Indices of Deprivation`=="i. Income Deprivation Affecting Children Index (IDACI)"]
+                                                                                                  
+
 
 df<-df[,id:=paste0(id,survey)
        ][,bme:=ifelse(dem_eth_grp=="White",1,0)
@@ -155,7 +158,6 @@ INTRO TEXT
 <h3>How happy are children overall?</h3>
 
 ```{r,fig.width=8,fig.height=8}
-#hap_col<-names(df)[grepl("^id$|happy.*_clean|^wt$",names(df))] # select columns to create overall rates chart
 
 df_happy<-melt(df[,..hap_col],id.vars = c("id","wt")) # select relevant columns and convert to long format
 
@@ -190,6 +192,8 @@ ggplot(dat,
 ```{r}
 
 # Chunk to make table of number of aspects of life children are unhappy with
+
+hap_col<-names(df)[grepl("^id$|happy.*_clean|^wt$",names(df))] # select columns to create overall rates chart
 
 df_happy<-melt(df[,..hap_col],id.vars = c("id","wt")) # convert to long format
 
