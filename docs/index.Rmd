@@ -6,6 +6,7 @@ output:
    theme: null
    mathjax: null
    highlight: null
+   css: styles.css
    template: "CCO_template_html.html"
 ---
 
@@ -13,8 +14,13 @@ output:
 knitr::opts_chunk$set(echo = F)
 ```
 
-<link rel="stylesheet" href="../../styles.css" type="text/css" />
 
+
+```{r}
+
+#<link rel="stylesheet" href="../../styles.css" type="text/css" />
+
+```
 <h2>Introduction</h2>
 
 INTRO TEXT

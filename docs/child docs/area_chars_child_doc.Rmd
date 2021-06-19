@@ -45,7 +45,8 @@ cat(
 <label>Select characteristic</label>
 <select id="area_picker',suffix,'">
 <option value="urban',suffix,'">Urban/rural</option>
-<option value="idaci',suffix,'">Income deprivation affecting children</option>
+<option value="idaci',suffix,'">Income deprivation affecting children (deciles)</option>
+<option value="idaci_v',suffix,'"Income deprivation affecting children (vigintiles)</option>
 <option value="covid',suffix,'">Cumulative LA COVID case rate</option>
 <option value="learn_loss',suffix,'">LA rates of missed face to face teaching up to Dec 2020</option>
 <option value="crime_all',suffix,'">Crime rates in an area</option>
@@ -61,6 +62,8 @@ cat(
 *Please select area characteristic of interest and press Go. Note: all characteristics are based on respondents' LSOA of residence with the exception of estimated days of missed face-to-face teaching estimates and child obesity rates which are LA level*
 
 ```{r, results='asis'}
+
+##### Urban/rural #####
 
 # Create html div to hold table - this is what's shown/hidden by the picker control
 
@@ -93,6 +96,8 @@ cat("\nSource: ONS postcode lookup file\n")
 
 ```{r, results='asis'}
 
+##### IDACI #####
+
 # Create html div to hold table - this is what's shown/hidden by the picker control
 
   cat(
@@ -105,21 +110,23 @@ cat("\nSource: ONS postcode lookup file\n")
 
 ```{r}
 
-if(!"idaci_decile" %in% names(df)){
+if(!"idacidecile" %in% names(df)){
 
   # Where not already merged on add in imd information
   
-df<-merge(df,imd[`Indices of Deprivation`=="i. Income Deprivation Affecting Children Index (IDACI)",.(idaci_decile=Value,FeatureCode)],
-             by.x="lsoa11",by.y="FeatureCode",all.x=T)
+df<- left_join(df, imd, by= c("lsoa11"="FeatureCode"))
 }
 
-df_idaci<-table_f("idaci_decile")[!is.na(idaci_decile) & !is.na(value) # reshape data
+#df<-merge(df,imd[ ,.(idacidecile=Value,FeatureCode)],
+            # by.x="lsoa11",by.y="FeatureCode",all.x=T)
+
+df_idaci<-table_f("idacidecile")[!is.na(idacidecile) & !is.na(value) # reshape data
                                   ]
 
-two_way_tb_f(df_idaci,"idaci_decile","Highest vs lowest",col1,
+two_way_tb_f(df_idaci,"idacidecile","Highest vs lowest",col1,
              mult_cols=T,test_vals=c(1,10),
              columnGroups = list(colGroup(name="IDACI decile (1 = most deprived)",as.character(c(1:10))))
-             ) # create table - comparison is between 1st and 5th quintile
+             ) # create table - comparison is between 1st and 10th decile
 
 
 
@@ -131,6 +138,35 @@ cat("\nSource: MHCLG Indices of mulitple deprivation 2019\n")
 ```
 
 </div>
+
+```{r, results='asis'}
+
+# Create html div to hold table - this is what's shown/hidden by the picker control
+
+  cat(
+    paste0('<div id="idaci_v',suffix,'" class="sect area',suffix,'">\n'
+             )
+  )
+
+
+```
+
+<div id="idaci_v" class="sect area">
+
+```{r, results='asis'}
+
+
+df_idaci<-table_f("idacivigintile")[!is.na(idacivigintile) & !is.na(value) # reshape data
+                                  ]
+
+two_way_tb_f(df_idaci,"idacivigintile","Highest vs lowest",col1,
+             mult_cols=T,test_vals=c(1,10),
+             columnGroups = list(colGroup(name="IDACI vigintile (1 = most deprived)",as.character(c(1:10))))
+             ) # create table - comparison is between 1st and 10th decile
+
+
+```
+
 
 ```{r, results='asis'}
 
