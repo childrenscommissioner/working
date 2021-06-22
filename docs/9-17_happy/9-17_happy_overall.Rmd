@@ -162,6 +162,7 @@ INTRO TEXT
 df_happy<-melt(df[,..hap_col],id.vars = c("id","wt")) # select relevant columns and convert to long format
 
 # recode dk vals to NA and target vals to 1 and calculate percentages for each outcome
+#target_vals<-c("Unhappy","Very unhappy","sad") # variables to recode to being 1
 
 dat<-copy(df_happy)[,value:=ifelse(value %in% dk_vals,NA,
                         ifelse(value %in% target_vals,"Unhappy",

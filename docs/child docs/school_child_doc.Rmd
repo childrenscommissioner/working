@@ -37,6 +37,7 @@ cat(paste0(
 <option value="sctype">Type of school</option>
 <option value="ofsted">School Ofsted rating</option>
 <option value="att8">Average school attainment 8 scores</option>
+<option value="p8">Average school progress 8 scores</option>
 <option value="exclusion">School exclusion rates</option>
 <option value="absence">School absence rates</option>
 </select>
@@ -158,7 +159,55 @@ cat("\n*Source: DfE Key Stage 4 Performance Tables 2019*\n")
 }
 ```
 
+</div>
+
 ```{r, results='asis'}
+
+if(is.null(age_grp)){
+  cat('<div id="p8" class="sect school">')
+}
+
+
+```
+
+```{r, results='asis'}
+
+if(is.null(age_grp)){
+  
+  if(! "p8_quintile" %in% names(df)){
+
+att<-fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/attainment_2605.csv"
+              )[!is.na(URN)
+                ][,p8:=as.numeric(P8MEA)
+                  ][!is.na(p8)
+                    ][,.(urn=URN,p8)
+                      ][,perc_rank:=frank(p8)/.N
+             ][,p8_quintile:=ceiling(perc_rank/0.2)]
+
+
+df_exc<-merge(df,att[,.(urn,p8_quintile)],all.x=T,by="urn")
+}else{
+  df_exc<-df
+}
+  
+  
+df_age<-table_f("p8_quintile",df_use=df_exc)[!is.na(p8_quintile)]
+
+
+print(
+  two_way_tb_f(df_age,"p8_quintile","Highest quintle vs lowest",col1,mult_cols=T,test_vals=c(1,5),
+             columnGroups = list(colGroup(name="School average progress 8 score quintile (5= highest rate)",as.character(c(1:5))))
+             
+  ))
+
+cat("\n*Source: DfE Key Stage 4 Performance Tables 2019*\n")
+}
+
+```
+</div>
+
+```{r,resuts='asis'}
+
 if(is.null(age_grp)){
 cat("</div>")
 }

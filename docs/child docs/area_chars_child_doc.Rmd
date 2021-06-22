@@ -46,7 +46,7 @@ cat(
 <select id="area_picker',suffix,'">
 <option value="urban',suffix,'">Urban/rural</option>
 <option value="idaci',suffix,'">Income deprivation affecting children (deciles)</option>
-<option value="idaci_v',suffix,'"Income deprivation affecting children (vigintiles)</option>
+<option value="idaci_v',suffix,'">Income deprivation affecting children (vigintiles)</option>
 <option value="covid',suffix,'">Cumulative LA COVID case rate</option>
 <option value="learn_loss',suffix,'">LA rates of missed face to face teaching up to Dec 2020</option>
 <option value="crime_all',suffix,'">Crime rates in an area</option>
@@ -164,9 +164,11 @@ two_way_tb_f(df_idaci,"idacivigintile","Highest vs lowest",col1,
              columnGroups = list(colGroup(name="IDACI vigintile (1 = most deprived)",as.character(c(1:10))))
              ) # create table - comparison is between 1st and 10th decile
 
+cat("\nSource: MHCLG Indices of mulitple deprivation 2019\n")
 
 ```
 
+</div>
 
 ```{r, results='asis'}
 
