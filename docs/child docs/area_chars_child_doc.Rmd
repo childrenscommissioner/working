@@ -148,21 +148,29 @@ cat("\nSource: MHCLG Indices of mulitple deprivation 2019\n")
              )
   )
 
-
+#<div id="idaci_v" class="sect area"> - in white box below
 ```
 
-<div id="idaci_v" class="sect area">
+
+
 
 ```{r, results='asis'}
 
-
-df_idaci<-table_f("idacivigintile")[!is.na(idacivigintile) & !is.na(value) # reshape data
+df_idaciv<-table_f("idacivigintile")[!is.na(idacivigintile) & !is.na(value) # reshape data
                                   ]
 
-two_way_tb_f(df_idaci,"idacivigintile","Highest vs lowest",col1,
-             mult_cols=T,test_vals=c(1,10),
-             columnGroups = list(colGroup(name="IDACI vigintile (1 = most deprived)",as.character(c(1:10))))
-             ) # create table - comparison is between 1st and 10th decile
+two_way_tb_f(df_idaciv,"idacivigintile","Highest vs lowest",col1,
+             mult_cols=T,test_vals=c(1,20),
+             columnGroups = list(colGroup(name="IDACI vigintile (1 = most deprived)",as.character(c(1:20))))
+             ) # create table - comparison is between 1st and 20th vigintile
+
+
+ 
+
+```
+
+
+```{r, results='asis'}
 
 cat("\nSource: MHCLG Indices of mulitple deprivation 2019\n")
 
@@ -170,8 +178,8 @@ cat("\nSource: MHCLG Indices of mulitple deprivation 2019\n")
 
 </div>
 
-```{r, results='asis'}
 
+```{r, results='asis'}
 # Create html div to hold table - this is what's shown/hidden by the picker control
 
   cat(
