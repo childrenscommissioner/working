@@ -204,7 +204,7 @@ cat("\n*Source: DfE Key Stage 4 Performance Tables 2019*\n")
 }
 
 ```
-</div>
+
 
 ```{r,resuts='asis'}
 
@@ -242,12 +242,12 @@ two_way_tb_f(df_exc_perm,"perm10","Top 10% permanent exclusion rate vs rest",col
 cat("\n*Source: DfE Exclusion statistics 2019*\n")
 
 ```
-
+</div>
 
 **Fixed term exclusions**
 
 ```{r, results='asis'}
-df_exc_perm<-table_f("fixed10",df_exc)
+df_exc_perm<-table_f("fixed10",df_exc) ##### added </div> above
 
 two_way_tb_f(df_exc_perm,"fixed10","Top 10% fixed term exclusion rate vs rest",col1)
 
@@ -286,6 +286,9 @@ two_way_tb_f(df_ab_perm,"ab10","Top 20% persistent absence rate vs rest",col1)
 cat("\n*Source: DfE Absence statistics 2019*\n")
 
 ```
+
+</div>
+
 
 **Unauthorised absence**
 

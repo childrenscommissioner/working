@@ -387,4 +387,5 @@ ggplot(corr_list,
         axis.ticks=element_blank())+
   scale_fill_gradient2(low=pal_div[length(pal_div)],high=pal_div[1],midpoint=1,name="Relative risk\n(Children unhappy with row\nare x times more\nlikely to feel\ncolumn)")+
   ylab("Children are unhappy with...")+xlab("Children feel...")
+
 ```
