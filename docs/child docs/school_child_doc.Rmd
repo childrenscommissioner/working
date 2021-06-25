@@ -287,8 +287,6 @@ cat("\n*Source: DfE Absence statistics 2019*\n")
 
 ```
 
-</div>
-
 
 **Unauthorised absence**
 
