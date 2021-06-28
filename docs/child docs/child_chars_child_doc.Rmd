@@ -51,6 +51,7 @@ cat(
 <option value="gender',suffix,'">Gender</option>
 <option value="age_gender',suffix,'">Age + gender</option>
 <option value="ethnicity',suffix,'">Ethnicity</option>
+<option value="dethnicity',suffix,'">Ethnicity</option>
 <option value="ethnicity_age',suffix,'">Ethnicity + Age</option>
 <option value="ethnicity_gender',suffix,'">Ethnicity + Gender</option>
 </select>
@@ -381,6 +382,94 @@ div(html_table_f(tb,column_def = c(
 
 ```{r, results='asis'}
 
+# Detailed ethnicity
+
+# Create HTML div as container for table - this is what's hidden and shown when GO is pressed
+
+
+if(seg){
+  cat(
+    paste0('<div id="dethnicity',suffix,'" class="sect child',suffix,'">\n'
+             )
+  )
+}else{
+  cat('<div id="dethnicity" class="sect child">\n')
+}
+
+```
+
+</div>
+
+```{r}
+
+#### EDIT FOR DETAILED ETHNIC GROUP
+# Note ethnicity tables include BME variable so have to glue these together manually
+
+# reshape data
+df_deth<-table_f("dem_ethnic_clean")[!dem_ethnic_clean %in% c("I dont want to say",NA)
+                               ][!is.na(value)]
+
+# Calculate percentage table for ethnicity and outcomes
+df_deth_full<-df_deth[,.(c=sum(wt)),by=.(variable,value,dem_ethnic_clean)
+                    ][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,dem_ethnic_clean)
+                      ][value==1
+                        ][,val_col:=paste0(c,"|",base,"|",perc)]
+
+# Calculate percentage table for BME and outcomes
+df_dbme<-df_deth[!is.na(value)
+               ][,bme:=ifelse(dem_ethnic_clean=="White",1,0)
+                 ][,.(c=sum(wt)),by=.(variable,bme,value)
+                   ][,`:=`(perc=c/sum(c),base=sum(c)),by=.(variable,bme)
+                     ][value==1][,value:=NULL][,val_col:=paste0(c,"|",base,"|",perc)]
+
+# Calculate effect size and significance for BME vs White
+
+effect_test_dbme<-merge(
+  effectsize_f(df_dbme,"variable","bme","perc"),
+  sig_f(df_deth[!is.na(value) & !is.na(dem_ethnic_clean)
+               ][,bme:=ifelse(dem_ethnic_clean=="White",1,0)],"bme","value"),by="g1"
+)
+
+# Put wide ethnicity table, bme and effect size tables into a list and merge together via reduce
+
+tb<-Reduce(
+  function(x,y) merge(x,y,by="variable"),
+  list(
+    dcast(df_deth_full[,.(variable,dem_ethnic_clean,perc)],variable~dem_ethnic_clean,value.var = "perc"),
+    df_dbme[bme==0][,.(variable,BME=perc)],
+    effect_test_dbme[,.(variable=g1,rr,diff,p.value)]
+          )
+)
+
+# Create download and web tables as above
+
+pList<-p_col_select(tb,c("variable","rr","diff","p.value"))
+
+download_tb<-tb
+  
+  names(download_tb)<-plyr::mapvalues(names(tb),c("variable","rr","diff","p.value"),
+                                      c(col1,paste0("Relative risk (White vs BME)"),
+                                        "How big is this difference?","Statistical significance"))
+ 
+
+div(html_table_f(tb,column_def = c(
+  list(
+    variable=colDef(name=col1,minWidth=200)),
+    pList,
+    list(rr=colDef(name="Relative risk (White vs BME)",format = colFormat(digits=2),align = "center"),
+   diff=colDef("How big is this difference?",minWidth = 150),
+   p.value=colDef(name="Statistical significance",minWidth = 150))
+  )
+),downloadthis::download_this(as.data.frame(download_tb),
+                              output_name="big_ask_table_download",output_extension=".xlsx")
+)
+
+```
+
+</div>
+
+```{r, results='asis'}
+
 # Ethnicity + age
 # Create HTML div as container for table - this is what's hidden and shown when GO is pressed
 
@@ -396,9 +485,11 @@ if(seg){
 
 ```
 
+
+
 ```{r}
 
-# As above multi-way tables need to be done manually rather than with helper functions
+#### As above multi-way tables need to be done manually rather than with helper functions
 
 hap_col<-names(df)[grepl(paste0("^id$|dem_eth_grp|",search_str,"|dem_age_clean|^wt$"),names(df))] # define columns needed
 
@@ -599,3 +690,8 @@ div(html_table_f(tb[!dem_gender_clean=="I dont want to say"],column_def = c(
 ```
 
 </div>
+
+```{r}
+
+
+```
