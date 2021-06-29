@@ -51,7 +51,7 @@ cat(
 <option value="gender',suffix,'">Gender</option>
 <option value="age_gender',suffix,'">Age + gender</option>
 <option value="ethnicity',suffix,'">Ethnicity</option>
-<option value="dethnicity',suffix,'">Ethnicity</option>
+<option value="dethnicity',suffix,'">Detailed ethnicity</option>
 <option value="ethnicity_age',suffix,'">Ethnicity + Age</option>
 <option value="ethnicity_gender',suffix,'">Ethnicity + Gender</option>
 </select>
