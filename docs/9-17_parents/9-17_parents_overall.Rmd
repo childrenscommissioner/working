@@ -68,7 +68,9 @@ pal<-RColorBrewer::brewer.pal(7,"Reds")
 
 df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/9-17_weighted.rds")
 
-imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
+#imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
+
+imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/idaci.csv")
 
 df<-df[,id:=paste0(id,survey)
        ][!q4_parents_clean %in% dk_vals

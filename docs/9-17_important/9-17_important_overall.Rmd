@@ -70,7 +70,9 @@ source("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/scripts/markdown_func
 df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/9-17_weighted.rds")
 
 
-imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
+#imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
+
+imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/idaci.csv")
 
 df<-df[`q2_important_I dont want to say` %in% c(NA,"No")] # exclude children saying I dont want to say from all analyses
 
@@ -165,5 +167,9 @@ ggplot(dat,
        aes(x=reorder(variable,perc),y=perc))+
   geom_col(fill="light blue",colour="grey20")+coord_flip()+geom_text(aes(label=paste0(perc,"%")),hjust=1)+
   theme_bw()+xlab("")+ylab("% of 9-17 yr olds")
+
+```
+
+```{r}
 
 ```

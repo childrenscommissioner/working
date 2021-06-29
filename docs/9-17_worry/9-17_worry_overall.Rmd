@@ -65,7 +65,9 @@ source("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/scripts/markdown_func
 
 df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/9-17_weighted.rds")
 
-imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
+#imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
+
+imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/idaci.csv")
 
 df<-df[,`q3_worry_Im not worried about anything`:=ifelse(is.na(`q3_worry_Im not worried about anything`) & grepl("not worried",q3_worry),"Yes",ifelse(is.na(`q3_worry_Im not worried about anything`),"No",`q3_worry_Im not worried about anything`))]
 

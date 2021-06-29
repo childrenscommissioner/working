@@ -398,7 +398,6 @@ if(seg){
 
 ```
 
-</div>
 
 ```{r}
 
@@ -465,7 +464,6 @@ div(html_table_f(tb,column_def = c(
 )
 
 ```
-
 </div>
 
 ```{r, results='asis'}
