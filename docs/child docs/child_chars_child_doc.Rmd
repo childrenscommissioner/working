@@ -464,7 +464,12 @@ div(html_table_f(tb,column_def = c(
 )
 
 ```
-</div>
+
+
+```{r, results='asis'}
+cat("</div>")
+```
+
 
 ```{r, results='asis'}
 
@@ -689,7 +694,3 @@ div(html_table_f(tb[!dem_gender_clean=="I dont want to say"],column_def = c(
 
 </div>
 
-```{r}
-
-
-```
