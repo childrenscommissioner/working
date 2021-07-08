@@ -66,6 +66,7 @@ cat(paste0('
 <option value="sw',suffix,'">Children in care/with a social worker</option>
 <option value="mh',suffix,'">Children receiving mental health support</option>
 <option value="yc',suffix,'">Young carers</option>
+<option value="yot',suffix,'">Children receiving support from a YOT</option>
 </select>
 <button class="picker_button" onclick="picker_f(',"'","disad_picker",suffix,"',","'","disad",suffix,"'",')">Go</button>
 </div>
@@ -83,6 +84,7 @@ cat(paste0('
 <option value="sw',suffix,'">Children in care/with a social worker</option>
 <option value="mh',suffix,'">Children receiving mental health support</option>
 <option value="yc',suffix,'">Young carers</option>
+<option value="yot',suffix,'">Children receiving support from a YOT</option>
 </select>
 <button class="picker_button" onclick="picker_f(',"'","disad_picker",suffix,"',","'","disad",suffix,"'",')">Go</button>
 </div>
@@ -391,4 +393,36 @@ cat("\n*Young carers defined as children reporting receiving support from a youn
 
 </div>
 
+```{r, results='asis'}
 
+cat(
+  paste0('<div id="yot',suffix,'" class="sect disad',suffix,'">\n'
+             )
+  )
+
+```
+
+**Children receiving support from Youth Offending Teams (YOTs)**
+
+```{r, results='asis'}
+
+if(!seg){
+
+df<-df[,yot:=ifelse(`dem_support_A youth offending team`=="Yes","Receiving support from YOT","Not receiving support from YOT")]
+
+}
+
+if(is.null(age_grp)){
+  
+  create_age_picker_f("_yot","yot","Receiving support from YOT vs Not")
+}else{
+
+  cat("\n*Data unavailable for children aged 6-8 as they are too young to be arrested or charged with a crime*\n")
+}
+
+cat("\n*Defined as children who report receiving support from a Youth Offending Team (YOT)*\n")
+
+
+```
+
+</div>
