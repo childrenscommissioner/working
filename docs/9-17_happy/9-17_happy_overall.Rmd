@@ -175,6 +175,7 @@ dat_unhap<-unique(dat[value=="Unhappy",.(variable,unhap_perc=perc)])
 
 dat<-merge(dat,dat_unhap,by="variable")
 
+
 pal_rgb<-c("#57C4AD","#EDA247","#DB4325") # define colours for bar fills
 
 # Create plot

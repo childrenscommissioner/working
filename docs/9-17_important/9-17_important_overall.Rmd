@@ -163,6 +163,7 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 
 dat<-table_f("")[!grepl("dont",variable)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),2)*100,by=.(variable)][value==1 & !grepl("Other",variable)][,.(variable,perc)][,variable:=gsub("dont","don't",variable)]
 
+
 ggplot(dat,
        aes(x=reorder(variable,perc),y=perc))+
   geom_col(fill="light blue",colour="grey20")+coord_flip()+geom_text(aes(label=paste0(perc,"%")),hjust=1)+
