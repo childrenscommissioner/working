@@ -111,7 +111,7 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 <script src="extra_js.js"></script>
 
 
-<h3>About this data
+<h3>About this data</h3>
 
 Children aged 9-17 were asked the following question about future worries: “When you grow up, which things, if any, are you most worried that you won’t have? Choose up to 5 things from the list below.”
 
