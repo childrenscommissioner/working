@@ -115,64 +115,26 @@ df<-merge(df,df_sent)
 
 <script src="extra_js.js"></script>
 
-## `r params$pg`
-
-### Summary
-
-<h3>Key stats</h3>
-<div class="stat-boxes">
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-
-<div class="row"></div>
-
-
-
 <h3>About this data</h3>
 
-INTRO TEXT
+This section provides the headline findings from a rapid initial analysis of the responses gathered from 6-8 year olds, which accounted for 18% of all responses to The Big Ask.
 
-### Overall rates
+Children aged 6-8 were asked: “When you grow up, which things do you think will be most important for you to have a good life? Choose up to 5 things from the list below.”
+
+_* Getting on well with my current family_
+_* Starting my own family_
+_* Good friends_
+_* A good job or career_
+_* Being healthy and active_
+_* A good education_
+_* Living in a nice area with things to do_
+_* A nice home to live in_
+_* Enough money to buy the things I need_
+_* Something else (Select this option to tell us what you think in your own words)_
+_* I don’t know what will be important_
+_* I don’t want to say_
+
+<br/>
 
 <h3>What do children think is important for their future></h3>
 

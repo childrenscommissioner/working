@@ -92,55 +92,13 @@ age_grp<-"6-8"
 
 <script src="extra_js.js"></script>
 
-
-<h3>Key stats</h3>
-<div class="stat-boxes">
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-
 <h3>About this data</h3>
 
-INTRO TEXT
+This section provides the headline findings from a rapid initial analysis of the responses gathered from 6-8 year olds, which accounted for 18% of all responses to The Big Ask. The version of the survey which these children filled out was simpler, with fewer questions and less detail, but it did ask children about their current levels of happiness with various aspects of their life, and their future priorities in order to have a good life when they grow up.
+
+In this survey we asked children two questions about how happy they are. The first question was: “Choose up to three words that describe how you feel most of the time.” The chart below shows the overall results. The good news is that around three-quarters of 6-8 year olds feel happy most of the time. However, around a quarter feel bored most of the time. Further, around 1 in 8 felt stressed most of the time, 1 in 9 felt sad, 1 in 9 felt lonely and 1 in 11 felt worried. Overall 1 in 3 6-8 year olds reported feeling stressed, sad, lonely or worried most of the time.  
+
+<br/>
 
 <h3>How do children report feeling most of the time?</h3>
 

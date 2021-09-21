@@ -106,54 +106,28 @@ hap_col<-names(df)[grepl("^id$|happy.*_clean|^wt$",names(df))] # select columns 
 
 <script src="extra_js.js"></script>
 
-<h3>Key stats</h3>
-<div class="stat-boxes">
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-</div>
 
 <h3>About this data</h3>
 
-INTRO TEXT
+Children aged 9-17 were asked “How happy are you with these things in your life now?”, and were given the following list of aspects of their life to consider and asked to rate the aspect from ‘Very Unhappy’, ‘Unhappy’, ‘Neither happy nor unhappy’, ‘Happy’ or ‘Very Happy’:
+
+_* My friendships_
+_* My experiences online_
+_* My personal safety_
+_* My access to somewhere outside to go to have fun_
+_* The choice of things to do in my local area_
+_* Life at school_
+_* My progress in education_
+_* My mental health_
+_* My physical health_
+_* My family’s health_
+_* My family life_
+_* My family’s ability to buy things we need_
+_* My life overall_
+
+In the chart below, the red bars indicate the proportion of children who reported being unhappy or very unhappy (hereafter, the rate of unhappiness) while the green bars indicate the proportion of children who reported being happy or very happy.
+
+<br/>
 
 <h3>How happy are children overall?</h3>
 

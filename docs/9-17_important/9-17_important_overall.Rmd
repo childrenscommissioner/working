@@ -69,6 +69,19 @@ source("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/scripts/markdown_func
 
 df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/9-17_weighted.rds")
 
+# LA filtered files for analysis - ##### REMEMBER TO DELETE #####
+
+# liverpool <- df %>% filter(la_use %in% c("Liverpool"))
+# manchester <- df %>% filter(la_use %in% c("Manchester", "Bolton", "Bury", "Oldham", "Rochdale", "Salford","Stockport","Tameside",
+#                                           "Trafford", "Wigan"))
+# newcastle <- df %>% filter(la_use %in% c("Newcastle upon Tyne"))
+# bristol <- df %>% filter(la_use %in% c("Bristol, City of"))
+# yorkshire <- df %>% filter(la_use %in% c("Barnsley", "Bradford", "Calderdale", "East Riding of Yorkshire", "Kingston upon Hull, City of",
+#                                          "Kirklees", "Leeds", "North East Lincolnshire",
+#                                          "North Lincolnshire", "North Yorkshire", "Rotherham","Sheffield","Wakefield", "York"))
+# 
+# df <-manchester
+
 
 #imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
 
@@ -100,63 +113,34 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 
 <script src="extra_js.js"></script>
 
-<h3>Key stats</h3>
-<div class="stat-boxes">
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-
-<div class="row"></div>
-
-
 
 <h3>About this data</h3>
 
-*Children were asked to select up to 5 items from the items below that they felt were most important for them to have a good life when they grow up. The percentages in the chart below represent the proportion selecting each item.*
+Children aged 9-17 were asked the following question about future priorities: “When you grow up, which things, if any, do you think will be most important for you to have a good life? Choose up to 5 things from the list below.”
+
+_* Having a good education_
+_* Good friends_
+_* A good job or career_
+_* Enough money to buy the things I need_
+_* Getting on well with my current family_
+_* Starting my own family_
+_* A nice home to live in_
+_* Good mental health_
+_* Good physical health_
+_* Being part of a good local community_
+_* Living in a nice area with things to do_
+_* Everyone being treated fairly_
+_* A healthy environment and planet_
+
+
+The chart below shows which topics and themes children selected as their most important priorities in order for them to have a good life when they grow up. The single most common choice was ‘a good job or career’ (69%), followed by ‘enough money to buy the things I need’ (59%), ‘good friends’ (57%), and ‘having a good education’ and ‘good mental health’ (both chosen by 52% of children).
+
+<br/>
 
 
 <h3>What do children think is important for their future?</h3>
 
-
+*Note children can select more than one option*
 
 ```{r}
 # Same plot function as 9-17_happiness overall

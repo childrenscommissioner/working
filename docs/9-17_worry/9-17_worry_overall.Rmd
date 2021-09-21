@@ -65,6 +65,19 @@ source("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/scripts/markdown_func
 
 df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/9-17_weighted.rds")
 
+# LA filtered files for analysis - ##### REMEMBER TO DELETE #####
+
+# liverpool <- df %>% filter(la_use %in% c("Liverpool"))
+# manchester <- df %>% filter(la_use %in% c("Manchester", "Bolton", "Bury", "Oldham", "Rochdale", "Salford","Stockport","Tameside",
+#                                           "Trafford", "Wigan"))
+# newcastle <- df %>% filter(la_use %in% c("Newcastle upon Tyne")) 
+# bristol <- df %>% filter(la_use %in% c("Bristol, City of")) 
+# yorkshire <- df %>% filter(la_use %in% c("Barnsley", "Bradford", "Calderdale", "East Riding of Yorkshire", "Kingston upon Hull, City of",
+#                                          "Kirklees", "Leeds", "North East Lincolnshire",
+#                                          "North Lincolnshire", "North Yorkshire", "Rotherham","Sheffield","Wakefield", "York"))
+# 
+# df <- manchester
+
 #imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
 
 imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/idaci.csv")
@@ -97,58 +110,34 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 
 <script src="extra_js.js"></script>
 
-<h3>Key stats
-<div class="stat-boxes">
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-<div class="col-xs-12 col-sm-6 col-lg-3">
-<div class="stat">
-<div class="stat-box-outer">
-<div class="stat-box-inner">
-<p class="figure">Key stat</p>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-
-<div class="row"></div>
 
 <h3>About this data
 
-INTRO TEXT
+Children aged 9-17 were asked the following question about future worries: “When you grow up, which things, if any, are you most worried that you won’t have? Choose up to 5 things from the list below.”
+
+
+_* Having a good education_
+_* Good friends_
+_* A good job or career_
+_* Enough money to buy the things I need_
+_* Getting on well with my current family_
+_* Starting my own family_
+_* A nice home to live in_
+_* Good mental health_
+_* Good physical health_
+_* Being part of a good local community_
+_* Living in a nice area with things to do_
+_* Everyone being treated fairly_
+_* A healthy environment and planet_
+
+
+The chart below shows which things children worried most about not having when they grow up.
+
+<br/>
 
 <h3>What are children worried about for their future?</h3>
+
+*Note children can select more than one option*
 
 ```{r}
 dat<-table_f("")[!grepl("dont",variable)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),2)*100,by=.(variable)][value==1 & !grepl("Other",variable)][,.(variable,perc)]
