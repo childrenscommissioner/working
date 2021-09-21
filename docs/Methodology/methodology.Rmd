@@ -1,0 +1,136 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "Methodology"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   fig_width: 10
+   theme: null
+   template: "../../CCO_template_html.html"
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = F,warning=F,message=F)
+
+setwd("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/Methodology")
+
+```
+
+<link rel="stylesheet" href="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/styles.css" type="text/css" />
+
+<a href="../../index.html">Home</a></li>
+
+```{r}
+
+# import most packages needed
+require(readxl)
+require(data.table)
+require(dplyr)
+require(ggplot2)
+require(reactable)
+require(htmltools)
+require(tippy)
+
+
+```
+
+## Methodology  
+
+<br/>
+
+**1. Sampling challenges**
+
+An important consideration to note is that a key priority for The Big Ask was to reach as many children as possible as a landmark consultation exercise. Implementing any survey involves trade--offs between scale, speed, sampling strategy and resources. In the case of The Big Ask, the priority was to deliver a very large scale at pace, with limited resources. In order to do this, an online survey was used as the main survey mechanism. The survey also took place during Covid-19, which strengthened the case for remote methods of surveying. 
+
+The challenges and limitations of publicly available online surveys are well-known.1 (LINK REFERENCE)The ability to select into the survey means that surveys may not perfectly target the desired population --- in this case, children living in England. This was compounded by the fact that the survey was anonymous, both for data protection reasons and to minimise barriers to participation. The survey did not have access to identifying information or location data which could be used to verify that the respondents were in fact children aged under 18 in England.2 (LINK REFERENCE) However, an important mitigation is the fact that the majority of the participation in the survey was via schools, who generally supported their pupils to do the survey during ‘form time’ in the morning. Throughout the survey period, server logs continually showed that the peak in traffic on The Big Ask website (on weekdays) always coincided with the beginning of the school day (roughly 8.30am-9am).  
+
+A separate survey for adults was created and signposted for users of The Big Ask website. As well as providing a space for teachers, parents, care leavers and others to share their views on the same general questions that were the focus of The Big Ask, this also helped to minimise the risk of adults filling in the child surveys. 
+
+Another challenge is that it is difficult to assess the generalisability of the sample and results. The fact that the survey was anonymous and that responses were not overseen by an interviewer or fieldwork manager --- crucial for ensuring that as many children as possible could be reached and could speak freely and openly –-- also meant that a targeted sampling frame or sampling strategy could not be used. It is useful to bear in mind here that the primary purpose of the survey was a *public statutory function* –-- to consult with children at scale and gather their views –-- rather than an academic or statistical research function of estimating the characteristics and attributes of the population. A useful benchmark here is the ‘Coronavirus and Me’ survey carried out in 2020 by the Children’s Commissioner for Wales,3 (LINK REFERENCE) which had a similar purpose to this survey and was also distributed as a publicly available online survey. 
+
+Nevertheless, given the scale of the sample achieved, and the fact that certain characteristics of the respondents are known, it becomes possible to make broad population-level inferences, at least in qualitative terms. This report describes the results as if they apply to the population both because of this, and for simplicity of language. 
+
+The third challenge is the potential exclusion of disadvantaged and vulnerable groups, particularly those without access to an internet--enabled device. This risk was mitigated by the fact that schools facilitated participation in the survey in classrooms and computer rooms, and by the fact that the survey was designed to work well in any mobile browser. However, the most vulnerable groups in society could still be excluded. A range of supplementary methods were therefore used –-- these are detailed in the next section. 
+
+<br/>
+
+```{r engagement, echo=FALSE}
+
+
+```
+
+**2. Maximising reach and engagement**
+
+<br/>
+
+The main element of The Big Ask was an online survey launched on the CCO website and publicised through media activity and the CCO’s social media channels. The survey ran for approximately 6 weeks, from 19 April to 28 May. The survey link was sent to every single school and local authority in England several times during the survey period. Schools were contacted directly by CCO and also via the Department for Education’s daily sector email.  
+
+In order to ensure that as many schools as possible took part, a video assembly about The Big Ask was produced in collaboration with Oak National Academy.6 CCO also worked with Votes for Schools to produce teaching resources, including lesson plans and activity packs, so that teachers could build The Big Ask into their class time. 
+
+Throughout the survey period, the response rates by age, gender, school type and local authority were regularly monitored in order to help refine and target additional communications and drive increased take-up of the survey. Local authorities with lower response rates were contacted directly to and asked to help ensure that their children’s voices would not be missed out. 
+
+The link for the survey was also shared with a wide range of organisations that work with children, including charities, sector organisations and community groups, using CCO’s existing networks of contacts as well as social media channels. The survey was also sent to children’s homes, Children in Care Councils, and inpatient mental health units for children and young people.  
+
+For the 6-8, 9-12 and 13-17 age groups, an ‘easy read’ version of the survey was also produced, in order to provide a more accessible version suitable for children and young people with a range of reading needs – including, for example, dyslexia. The easy-read versions met official accessibility criteria including larger font sizes, simpler text and clearer images. 
+
+Overall, therefore, The Big Ask survey consisted of the following versions: 
+
+* Version for 13--17 year olds 
+
+* Easy-read version 13--17 year olds  
+
+* Version for 9--12 year olds 
+
+* Easy-read version 9--12 year olds  
+
+* Version for 6--8 year olds 
+
+* Easy-read version 6--8 year olds  
+
+* Version for 4--5 year olds (parent--led with some questions at the end for children to complete) 
+
+* Version for adults  
+
+
+Children in youth custody did not have access to internet--enabled devices and were therefore unable to complete the online survey. In order to reach these young people, hard copies of the 13--17 survey were printed out and posted to every Young Offender Institution (YOI) and Secure Training Centre (STC), so that the young people in these settings could fill them in and the settings could post the completed surveys back. These hard copies have all had to be tracked, processed, scanned, validated and analysed manually. The analysis of these returns is ongoing and will be reported separately in due course.  
+
+Alongside the survey, a programme of visits and focus groups was also set up to engage more broadly with key vulnerable groups but asking similar types of questions to the main Big Ask survey. These focus groups included:  
+
+
+* Children in care 
+
+* Children in care living in a residential children’s home 
+
+* Children in care living in unregulated accommodation 
+
+* Unaccompanied asylum seeking children 
+
+* Children in secure mental health settings 
+
+* Children who are home educated 
+
+* Children and young people identifying as LGBTQ 
+
+* Children with special educational needs and disabilities (SEND) 
+
+* Parents of very young children (aged 0-3) 
+
+* Early years professionals 
+
+* Children receiving help from a social worker  
+
+ 
+A separate report, available here (ADD LINK), contains the findings from these conversations.  
+
+<br/><br/>
+
+**3. Survey questions
+
+
+
