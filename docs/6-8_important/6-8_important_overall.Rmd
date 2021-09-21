@@ -121,18 +121,18 @@ This section provides the headline findings from a rapid initial analysis of the
 
 Children aged 6-8 were asked: “When you grow up, which things do you think will be most important for you to have a good life? Choose up to 5 things from the list below.”
 
-_* Getting on well with my current family_
-_* Starting my own family_
-_* Good friends_
-_* A good job or career_
-_* Being healthy and active_
-_* A good education_
-_* Living in a nice area with things to do_
-_* A nice home to live in_
-_* Enough money to buy the things I need_
-_* Something else (Select this option to tell us what you think in your own words)_
-_* I don’t know what will be important_
-_* I don’t want to say_
+* Getting on well with my current family
+* Starting my own family
+* Good friends
+* A good job or career
+* Being healthy and active
+* A good education
+* Living in a nice area with things to do
+* A nice home to live in
+* Enough money to buy the things I need
+* Something else (Select this option to tell us what you think in your own words)
+* I don’t know what will be important
+* I don’t want to say
 
 <br/>
 

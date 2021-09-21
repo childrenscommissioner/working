@@ -101,11 +101,11 @@ q_lookup_worry<-q_lookup_worry[!grepl("dont want",var)]
 
 Children aged 9-17 were asked: “When you grow up, how likely do you think it is that you will have a better life than your parents?”
 
-_* Very likely_
-_* Fairly likely_
-_* Neither likely nor unlikely_
-_* Fairly unlikely_
-_* Very unlikely_
+* Very likely
+* Fairly likely
+* Neither likely nor unlikely
+* Fairly unlikely
+* Very unlikely
 
 
 On average, children are more likely than not to think that they will have a better life than their parents when they grow up. Around half of children (52%) thought it was likely or very likely, whereas only 1 in 11 (9%) thought it was unlikely or very unlikely. A substantial proportion of children – nearly 2 in 5 – were essentially unsure, and said it was neither likely nor unlikely

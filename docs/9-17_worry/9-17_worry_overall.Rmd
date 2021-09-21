@@ -116,19 +116,19 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 Children aged 9-17 were asked the following question about future worries: “When you grow up, which things, if any, are you most worried that you won’t have? Choose up to 5 things from the list below.”
 
 
-_* Having a good education_
-_* Good friends_
-_* A good job or career_
-_* Enough money to buy the things I need_
-_* Getting on well with my current family_
-_* Starting my own family_
-_* A nice home to live in_
-_* Good mental health_
-_* Good physical health_
-_* Being part of a good local community_
-_* Living in a nice area with things to do_
-_* Everyone being treated fairly_
-_* A healthy environment and planet_
+* Having a good education
+* Good friends
+* A good job or career
+* Enough money to buy the things I need
+* Getting on well with my current family
+* Starting my own family
+* A nice home to live in
+* Good mental health
+* Good physical health
+* Being part of a good local community
+* Living in a nice area with things to do
+* Everyone being treated fairly
+* A healthy environment and planet
 
 
 The chart below shows which things children worried most about not having when they grow up.
