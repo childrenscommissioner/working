@@ -72,15 +72,16 @@ df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/fina
 # LA filtered files for analysis - ##### REMEMBER TO DELETE #####
 
 # liverpool <- df %>% filter(la_use %in% c("Liverpool"))
-# manchester <- df %>% filter(la_use %in% c("Manchester", "Bolton", "Bury", "Oldham", "Rochdale", "Salford","Stockport","Tameside",
-#                                           "Trafford", "Wigan"))
+# manchester <- df %>% filter(la_use %in% c("Manchester", "Bolton", "Bury", "Oldham", "Rochdale", "Salford","Stockport","Tameside","Trafford", #"Wigan"))
+#                                           
 # newcastle <- df %>% filter(la_use %in% c("Newcastle upon Tyne"))
 # bristol <- df %>% filter(la_use %in% c("Bristol, City of"))
 # yorkshire <- df %>% filter(la_use %in% c("Barnsley", "Bradford", "Calderdale", "East Riding of Yorkshire", "Kingston upon Hull, City of",
 #                                          "Kirklees", "Leeds", "North East Lincolnshire",
 #                                          "North Lincolnshire", "North Yorkshire", "Rotherham","Sheffield","Wakefield", "York"))
-# 
-# df <-manchester
+# bolton <- df %>% filter(la_use %in% c("Bolton"))
+# #mancity <- df %>% filter(la_use %in% c("Manchester"))
+# df <-bolton
 
 
 #imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
@@ -116,7 +117,9 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 
 <h3>About this data</h3>
 
-Children aged 9-17 were asked the following question about future priorities: “When you grow up, which things, if any, do you think will be most important for you to have a good life? Choose up to 5 things from the list below.”
+Children aged 9-17 were asked: “When you grow up, which things, if any, do you think will be most important for you to have a good life? Choose up to 5 things from the list below.” 
+
+The options to choose from were:
 
 * Having a good education
 * Good friends
@@ -133,7 +136,7 @@ Children aged 9-17 were asked the following question about future priorities: �
 * A healthy environment and planet
 
 
-The chart below shows which topics and themes children selected as their most important priorities in order for them to have a good life when they grow up. The single most common choice was ‘a good job or career’ (69%), followed by ‘enough money to buy the things I need’ (59%), ‘good friends’ (57%), and ‘having a good education’ and ‘good mental health’ (both chosen by 52% of children).
+The chart below shows what proportion of children chose each option. 
 
 <br/>
 
@@ -146,6 +149,10 @@ The chart below shows which topics and themes children selected as their most im
 # Same plot function as 9-17_happiness overall
 
 dat<-table_f("")[!grepl("dont",variable)][,.(c=sum(wt)),by=.(variable,value)][,perc:=round(c/sum(c),2)*100,by=.(variable)][value==1 & !grepl("Other",variable)][,.(variable,perc)][,variable:=gsub("dont","don't",variable)]
+
+# dat2 <- table_f("")[!grepl("dont",variable)][,.(c=sum(wt)),by=.(variable,value)][,perc:=c/sum(c),by=.(variable)][value==1 & #!grepl("Other",variable)][,.(variable,perc)][,variable:=gsub("dont","don't",variable)]
+# # 
+# # dat3 <- df %>% group_by(la_use,`q2_important_Good mental health`) %>% tally() %>% mutate(perc=n/sum(n)) %>% filter() 
 
 
 ggplot(dat,
