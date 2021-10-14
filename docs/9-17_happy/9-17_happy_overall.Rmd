@@ -25,6 +25,7 @@ require(ggplot2)
 require(reactable)
 require(htmltools)
 require(tippy)
+require(downloadthis)
 
 age_grp<-NULL # set age_grp variable - marker for 9-17s/6-8
 
@@ -74,6 +75,33 @@ col1<-"% of children unhappy with..." # define column label for outcomes in tabl
 # read in survey responses
 df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/9-17_weighted.rds")
 
+# new care marker inc. children's homes
+
+df <- df %>% mutate(care_full = ifelse(dem_liveNow_clean %in% c("A childrens home","A secure childrens home","With foster parent(s)"), "Yes", "No"),
+                      care_home = ifelse(dem_liveNow_clean %in% c("A childrens home","A secure childrens home"), "Yes", "No"))
+
+
+#### Filters for LA and other groups
+
+# # liverpool <- df %>% filter(la_use %in% c("Liverpool"))
+# 
+# manchester <- df %>% filter(la_use %in% c("Manchester", "Bolton", "Bury", "Oldham", "Rochdale", "Salford","Stockport","Tameside","Trafford","Wigan"))
+#                                           
+# # #                                           
+# # # newcastle <- df %>% filter(la_use %in% c("Newcastle upon Tyne")) 
+# # # bristol <- df %>% filter(la_use %in% c("Bristol, City of")) 
+# # # yorkshire <- df %>% filter(la_use %in% c("Barnsley", "Bradford", "Calderdale", "East Riding of Yorkshire", "Kingston upon Hull, City of",
+# # #                                          "Kirklees", "Leeds", "North East Lincolnshire",
+# # #                                          "North Lincolnshire", "North Yorkshire", "Rotherham","Sheffield","Wakefield", "York"))
+# # #
+# # # mancity <- df %>% filter(la_use %in% c("Manchester"))
+# # # 
+# # #
+# 
+#  df <- manchester
+
+# df <- df %>% filter(care_home %in% c("Yes"))
+
 # read in IMD data... this is in a weird place
 #imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
 
@@ -109,7 +137,7 @@ hap_col<-names(df)[grepl("^id$|happy.*_clean|^wt$",names(df))] # select columns 
 
 <h3>About this data</h3>
 
-Children aged 9-17 were asked “How happy are you with these things in your life now?”, and were given the following list of aspects of their life to consider and asked to rate the aspect from ‘Very Unhappy’, ‘Unhappy’, ‘Neither happy nor unhappy’, ‘Happy’ or ‘Very Happy’:
+Children aged 9-17 were asked “How happy are you with these things in your life now?”, and were given a list of items to assess with the response options ‘Very Unhappy’, ‘Unhappy’, ‘Neither happy nor unhappy’, ‘Happy’ or ‘Very Happy’. The list of items was:
 
 * My friendships
 * My experiences online
@@ -125,7 +153,7 @@ Children aged 9-17 were asked “How happy are you with these things in your lif
 * My family’s ability to buy things we need
 * My life overall
 
-In the chart below, the red bars indicate the proportion of children who reported being unhappy or very unhappy (hereafter, the rate of unhappiness) while the green bars indicate the proportion of children who reported being happy or very happy.
+In the chart below, the red bars show the proportion of children who said they were unhappy or very unhappy, while the green bars show the proportion of children who said they were happy or very happy. The amber bars show the proportion of children who were neutral – neither happy nor unhappy.
 
 <br/>
 

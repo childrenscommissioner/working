@@ -117,9 +117,9 @@ df<-merge(df,df_sent)
 
 <h3>About this data</h3>
 
-This section provides the headline findings from a rapid initial analysis of the responses gathered from 6-8 year olds, which accounted for 18% of all responses to The Big Ask.
+Children aged 6-8 were asked: “When you grow up, which things do you think will be most important for you to have a good life? Choose up to 5 things from the list below.” 
 
-Children aged 6-8 were asked: “When you grow up, which things do you think will be most important for you to have a good life? Choose up to 5 things from the list below.”
+The options to choose from were:
 
 * Getting on well with my current family
 * Starting my own family

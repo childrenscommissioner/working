@@ -13,6 +13,8 @@ output:
 # set chunk options. Code below makes list of links - each link is within <div class="topic_navList"></div> tags
 
 knitr::opts_chunk$set(echo = F)
+
+# what are children happiest with = % happy
 ```
 
 <link rel="stylesheet" href="../../styles.css" type="text/css" />
@@ -30,6 +32,11 @@ knitr::opts_chunk$set(echo = F)
 <div class="topic_navList">
 <a class="meta_navList_link" href="9-17_happy_combs.html">
 <h3 class="list_header">What combinations of things are children unhappy with in their current life?</h3></a>
+</div>
+
+<div class="topic_navList">
+<a class="meta_navList_link" href="phappy-simple.html">
+<h3 class="list_header">What are children happiest with in their current life?</h3></a>
 </div>
 
 <h3>How is this different for sub-groups of children?</h3>

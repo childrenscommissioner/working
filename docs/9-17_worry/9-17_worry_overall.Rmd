@@ -68,15 +68,19 @@ df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/fina
 # LA filtered files for analysis - ##### REMEMBER TO DELETE #####
 
 # liverpool <- df %>% filter(la_use %in% c("Liverpool"))
-# manchester <- df %>% filter(la_use %in% c("Manchester", "Bolton", "Bury", "Oldham", "Rochdale", "Salford","Stockport","Tameside",
-#                                           "Trafford", "Wigan"))
+
+ # manchester <- df %>% filter(la_use %in% c("Manchester", "Bolton", "Bury", "Oldham", "Rochdale", "Salford","Stockport","Tameside",
+ #                                           "Trafford", "Wigan"))
+
 # newcastle <- df %>% filter(la_use %in% c("Newcastle upon Tyne")) 
 # bristol <- df %>% filter(la_use %in% c("Bristol, City of")) 
 # yorkshire <- df %>% filter(la_use %in% c("Barnsley", "Bradford", "Calderdale", "East Riding of Yorkshire", "Kingston upon Hull, City of",
 #                                          "Kirklees", "Leeds", "North East Lincolnshire",
 #                                          "North Lincolnshire", "North Yorkshire", "Rotherham","Sheffield","Wakefield", "York"))
 # 
-# df <- manchester
+#df <- manchester
+
+#df <- df %>% filter(care %in% c("Yes"))
 
 #imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
 
@@ -113,8 +117,9 @@ q_lookup_clust<-fread("W:\\CCO-WORKING-FS\\Projects\\big ask survey\\analysis\\a
 
 <h3>About this data</h3>
 
-Children aged 9-17 were asked the following question about future worries: “When you grow up, which things, if any, are you most worried that you won’t have? Choose up to 5 things from the list below.”
-
+Children aged 9-17 were asked: “When you grow up, which things, if any, are you most worried that you won’t have? Choose up to 5 things from the list below.” 
+ 
+The options to choose from were:
 
 * Having a good education
 * Good friends
@@ -131,7 +136,7 @@ Children aged 9-17 were asked the following question about future worries: “Wh
 * A healthy environment and planet
 
 
-The chart below shows which things children worried most about not having when they grow up.
+The chart below shows what proportion of children chose each option. 
 
 <br/>
 

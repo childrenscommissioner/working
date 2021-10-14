@@ -68,6 +68,25 @@ pal<-RColorBrewer::brewer.pal(7,"Reds")
 
 df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/final data/9-17_weighted.rds")
 
+# liverpool <- df %>% filter(la_use %in% c("Liverpool"))
+
+# manchester <- df %>% filter(la_use %in% c("Manchester", "Bolton", "Bury", "Oldham", "Rochdale", "Salford","Stockport","Tameside","Trafford","Wigan"))
+                                          
+# #                                           
+# # newcastle <- df %>% filter(la_use %in% c("Newcastle upon Tyne")) 
+# # bristol <- df %>% filter(la_use %in% c("Bristol, City of")) 
+# # yorkshire <- df %>% filter(la_use %in% c("Barnsley", "Bradford", "Calderdale", "East Riding of Yorkshire", "Kingston upon Hull, City of",
+# #                                          "Kirklees", "Leeds", "North East Lincolnshire",
+# #                                          "North Lincolnshire", "North Yorkshire", "Rotherham","Sheffield","Wakefield", "York"))
+# #
+# # mancity <- df %>% filter(la_use %in% c("Manchester"))
+# # 
+# #
+
+# df <- manchester
+
+#df <- df %>% filter(care %in% c("Yes"))
+
 #imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
 
 imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/idaci.csv")
@@ -99,7 +118,9 @@ q_lookup_worry<-q_lookup_worry[!grepl("dont want",var)]
 
 <h3> About this data</h3>
 
-Children aged 9-17 were asked: “When you grow up, how likely do you think it is that you will have a better life than your parents?”
+Children aged 9-17 were asked: “When you grow up, how likely do you think it is that you will have a better life than your parents?” 
+
+The options to choose from were:
 
 * Very likely
 * Fairly likely
@@ -108,7 +129,7 @@ Children aged 9-17 were asked: “When you grow up, how likely do you think it i
 * Very unlikely
 
 
-On average, children are more likely than not to think that they will have a better life than their parents when they grow up. Around half of children (52%) thought it was likely or very likely, whereas only 1 in 11 (9%) thought it was unlikely or very unlikely. A substantial proportion of children – nearly 2 in 5 – were essentially unsure, and said it was neither likely nor unlikely
+The chart below shows what proportion of children chose each option, but with ‘Very likely’ and ‘Fairly likely’ combined into ‘Likely’, and ‘Very unlikely’ and ‘Fairly unlikely’ combined into ‘Unlikely’.
 
 <br/>
 
@@ -125,5 +146,8 @@ ggplot(dat,
        aes(x=reorder(q4_parents_clean,perc),y=perc))+
   geom_col(fill="light blue",colour="grey20")+coord_flip()+geom_text(aes(label=paste0(perc,"%")),hjust=1)+
   theme_bw()+xlab("How likely ist it you will have\na better life than your parents?\n")+ylab("% of 9-17 yr olds")
+
+```
+```{r}
 
 ```

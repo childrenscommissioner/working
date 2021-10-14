@@ -72,7 +72,9 @@ df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/fina
 # LA filtered files for analysis - ##### REMEMBER TO DELETE #####
 
 # liverpool <- df %>% filter(la_use %in% c("Liverpool"))
-# manchester <- df %>% filter(la_use %in% c("Manchester", "Bolton", "Bury", "Oldham", "Rochdale", "Salford","Stockport","Tameside","Trafford", #"Wigan"))
+
+# manchester <- df %>% filter(la_use %in% c("Manchester", "Bolton", "Bury", "Oldham", "Rochdale", "Salford","Stockport","Tameside","Trafford", "Wigan"))
+                                          
 #                                           
 # newcastle <- df %>% filter(la_use %in% c("Newcastle upon Tyne"))
 # bristol <- df %>% filter(la_use %in% c("Bristol, City of"))
@@ -81,8 +83,11 @@ df<-readRDS("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/survey data/fina
 #                                          "North Lincolnshire", "North Yorkshire", "Rotherham","Sheffield","Wakefield", "York"))
 # bolton <- df %>% filter(la_use %in% c("Bolton"))
 # #mancity <- df %>% filter(la_use %in% c("Manchester"))
-# df <-bolton
 
+# df <-manchester
+
+
+#df <- df %>% filter(care %in% c("Yes"))
 
 #imd<-fread(file="W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/imd2019lsoa.csv")[Measurement=="Decile"]
 
