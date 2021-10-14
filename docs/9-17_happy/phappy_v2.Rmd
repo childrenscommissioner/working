@@ -72,8 +72,8 @@ kable(overall_table) %>%
 overall_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -100,8 +100,8 @@ kable(age_table) %>%
 age_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -124,8 +124,8 @@ kable(gender_table) %>%
 gender_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -147,8 +147,8 @@ kable(ethnicity_table) %>%
 ethnicity_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -170,8 +170,8 @@ kable(dethnicity_table) %>%
 dethnicity_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -194,8 +194,8 @@ kable(idaci_table) %>%
 idaci_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -217,8 +217,8 @@ kable(caresw_table) %>%
 caresw_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -240,8 +240,8 @@ kable(care_table) %>%
 care_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -263,8 +263,8 @@ kable(sw_table) %>%
 sw_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -286,8 +286,8 @@ kable(sen_table) %>%
 sen_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -309,8 +309,8 @@ kable(mh_table) %>%
 mh_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -332,8 +332,8 @@ kable(yc_table) %>%
 yc_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -355,8 +355,8 @@ kable(yot_table) %>%
 yot_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
@@ -378,8 +378,8 @@ kable(kinship_table) %>%
 kinship_table %>%
   download_this(
     output_name = "big ask data download",
-    output_extension = ".csv",
-    button_label = "Download data as csv",
+    output_extension = ".xlsx",
+    button_label = "Download data as xlsx",
     button_type = "default",
     has_icon = TRUE,
     icon = "fa fa-save"
