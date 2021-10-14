@@ -1,0 +1,389 @@
+---
+params:
+  section: "abc"
+  pg: "abc"
+  var: "abc"
+title: "What proportion of children are happy with their life at the moment?"
+output: 
+ html_document: 
+   self_contained: no
+   mathjax: null
+   highlight: null
+   fig_width: 10
+   theme: null
+   template: "../../CCO_template_html.html"
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = F, warning=F,message = F) # set chunk options
+```
+
+<link rel="stylesheet" href="../../styles.css" type="text/css" />
+
+```{r, child='W:/CCO-WORKING-FS/Projects/big ask survey/analysis/markdown/child docs/Copies for analysis/navigation_child_doc_phappy.rmd'}
+
+# read in breadcrumbs. HTML below creates key stat boxes
+
+```
+
+<script src="extra_js.js"></script>
+
+### About this data
+
+Children aged 9-17 were asked “How happy are you with these things in your life now?”, and were given a list of items to assess with the response options ‘Very Unhappy’, ‘Unhappy’, ‘Neither happy nor unhappy’, ‘Happy’ or ‘Very Happy’. The list of items was:
+
+* My friendships
+* My experiences online
+* My personal safety
+* My access to somewhere outside to go to have fun
+* The choice of things to do in my local area
+* Life at school
+* My progress in education
+* My mental health
+* My physical health
+* My family’s health
+* My family life
+* My family’s ability to buy things we need
+* My life overall
+
+The tables below show the percentage of children *happy* or *very happy* with various aspects of their lives broken down by characteristics including age, gender, ethnicity and disadvantage (e.g. children in care and special educational needs).
+
+
+</br>
+
+### Overall results
+
+```{r overall, echo=FALSE}
+
+require(data.table)
+require(dplyr)
+require(tidyr)
+require(knitr)
+require(kableExtra)
+require(downloadthis)
+
+### Overall ###
+
+overall_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_overall.csv")
+
+kable(overall_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) 
+
+# overall_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+<br/>
+
+
+### Age
+
+
+```{r age, echo=FALSE}
+
+
+### Age groups ###
+
+age_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_age.csv")
+
+kable(age_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# age_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+
+<br/>
+
+### Gender
+
+```{r gender, echo=FALSE}
+
+gender_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_gender.csv")
+
+kable(gender_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# gender_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+<br/>
+
+### Ethnicity
+
+```{r ethnicity, echo=FALSE}
+
+ethnicity_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_ethnicity.csv")
+
+kable(ethnicity_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# ethnicity_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+<br/>
+
+### Detailed ethnicity
+
+```{r dethnicity, echo=FALSE}
+
+dethnicity_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_dethnicity.csv")
+
+kable(dethnicity_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# dethnicity_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+
+```
+
+<br/>
+
+### Income deprivation affecting children index (IDACI) decile
+
+```{r idaci, echo=FALSE}
+
+idaci_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_idaci.csv")
+
+kable(idaci_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# idaci_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+<br/>
+
+### Children in foster care or with a social worker
+
+```{r care or sw, echo=FALSE}
+
+caresw_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_caresw.csv")
+
+kable(caresw_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# caresw_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+<br/>
+
+### Children in foster care only
+
+```{r care only, echo=FALSE}
+
+care_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_care.csv")
+
+kable(care_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# care_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+<br/>
+
+### Children with a social worker only
+
+```{r sw only, echo=FALSE}
+
+sw_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_sw.csv")
+
+kable(sw_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# sw_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+<br/>
+
+### Children with special educational needs (SEN)
+
+```{r sen, echo=FALSE}
+
+sen_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_sen.csv")
+
+kable(sen_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# sen_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+<br/>
+
+### Children receiving mental health support
+
+```{r mh, echo=FALSE}
+
+mh_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_mh.csv")
+
+kable(mh_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# mh_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+<br/>
+
+### Young carers
+
+```{r carers, echo=FALSE}
+
+yc_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_youngcarers.csv")
+
+kable(yc_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# yc_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+<br/>
+
+### Children receiving support from Youth Offending Teams (YOTs)
+
+```{r yot, echo=FALSE}
+
+yot_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_yot.csv")
+
+kable(yot_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# yot_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
+<br/>
+
+### Children in kinship care
+
+```{r kinship, echo=FALSE}
+
+kinship_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/perc happy/phappy_kinship.csv")
+
+kable(kinship_table) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+# kinship_table %>% 
+#   download_this(
+#     output_name = "big ask data download",
+#     output_extension = ".csv",
+#     button_label = "Download data as csv",
+#     button_type = "default",
+#     has_icon = TRUE,
+#     icon = "fa fa-save"
+#   )
+
+```
+
