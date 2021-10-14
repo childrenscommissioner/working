@@ -69,15 +69,15 @@ overall_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux d
 kable(overall_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) 
 
-# overall_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+overall_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -97,15 +97,15 @@ age_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/
 kable(age_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# age_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+age_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -121,15 +121,15 @@ gender_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux da
 kable(gender_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# gender_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+gender_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -144,15 +144,15 @@ ethnicity_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux
 kable(ethnicity_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# ethnicity_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+ethnicity_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -167,15 +167,15 @@ dethnicity_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/au
 kable(dethnicity_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# dethnicity_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+dethnicity_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 
 ```
@@ -191,15 +191,15 @@ idaci_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux dat
 kable(idaci_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# idaci_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+idaci_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -214,15 +214,15 @@ caresw_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux da
 kable(caresw_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# caresw_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+caresw_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -237,15 +237,15 @@ care_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data
 kable(care_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# care_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+care_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -260,15 +260,15 @@ sw_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/p
 kable(sw_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# sw_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+sw_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -283,15 +283,15 @@ sen_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/
 kable(sen_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# sen_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+sen_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -306,15 +306,15 @@ mh_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/p
 kable(mh_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# mh_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+mh_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -329,15 +329,15 @@ yc_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/p
 kable(yc_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# yc_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+yc_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -352,15 +352,15 @@ yot_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux data/
 kable(yot_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# yot_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+yot_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
@@ -375,15 +375,15 @@ kinship_table <- fread("W:/CCO-WORKING-FS/Projects/big ask survey/analysis/aux d
 kable(kinship_table) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 
-# kinship_table %>% 
-#   download_this(
-#     output_name = "big ask data download",
-#     output_extension = ".csv",
-#     button_label = "Download data as csv",
-#     button_type = "default",
-#     has_icon = TRUE,
-#     icon = "fa fa-save"
-#   )
+kinship_table %>%
+  download_this(
+    output_name = "big ask data download",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
 
 ```
 
